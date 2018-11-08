@@ -58,6 +58,12 @@ class HashMatchesTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new HashMatches('1234567890'))->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsFalseWhenHashIsInvalid(): void
     {
         $this->assertFalse((new HashMatches('1234567890'))->validate('123456789'));

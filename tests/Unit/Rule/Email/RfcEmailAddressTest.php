@@ -58,6 +58,12 @@ class RfcEmailAddressTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new RfcEmailAddress())->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsFalseWhenEmailAddressIsInvalid(): void
     {
         $this->assertFalse((new RfcEmailAddress())->validate('invalid-email-address'));

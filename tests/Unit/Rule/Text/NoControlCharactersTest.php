@@ -58,6 +58,12 @@ class NoControlCharactersTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new NoControlCharacters())->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsFalseWhenPassingAStringContainingControlCharacters(): void
     {
         $this->assertFalse((new NoControlCharacters())->validate('€€€€€€€€€' . chr(0)));

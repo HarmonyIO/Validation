@@ -60,6 +60,12 @@ class PasswordMatchesTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsFalseWhenPasswordIsInvalid(): void
     {
         $this->markTestSkipped('Waiting for fix of: https://github.com/amphp/parallel-functions/issues/12');

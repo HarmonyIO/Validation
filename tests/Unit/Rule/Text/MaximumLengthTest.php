@@ -58,6 +58,12 @@ class MaximumLengthTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new MaximumLength(10))->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsTrueWhenPassingAStringSmallerThanTheMaximumLength(): void
     {
         $this->assertTrue((new MaximumLength(10))->validate('€€€€€€€€€'));

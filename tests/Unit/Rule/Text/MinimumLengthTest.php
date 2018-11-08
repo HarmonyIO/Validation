@@ -58,6 +58,12 @@ class MinimumLengthTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new MinimumLength(10))->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsFalseWhenPassingAStringSmallerThanTheMinimumLength(): void
     {
         $this->assertFalse((new MinimumLength(10))->validate('€€€€€€€€€'));

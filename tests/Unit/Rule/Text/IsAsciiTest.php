@@ -58,6 +58,12 @@ class IsAsciiTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new IsAscii())->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsTrueWhenPassingAnAsciiString(): void
     {
         $this->assertTrue((new IsAscii())->validate(

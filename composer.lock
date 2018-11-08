@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d480da477530d3ce6f9e678ff27b8b7",
+    "content-hash": "1f78cc619848cab972aa26cfde639ffc",
     "packages": [
         {
             "name": "amphp/amp",
@@ -304,16 +304,16 @@
         },
         {
             "name": "amphp/process",
-            "version": "v1.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/process.git",
-                "reference": "9d0d7ab3601272ec66d2b13f6d606257926b2c40"
+                "reference": "51874750e3a39fe72926c52547d67f2c4d532781"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/process/zipball/9d0d7ab3601272ec66d2b13f6d606257926b2c40",
-                "reference": "9d0d7ab3601272ec66d2b13f6d606257926b2c40",
+                "url": "https://api.github.com/repos/amphp/process/zipball/51874750e3a39fe72926c52547d67f2c4d532781",
+                "reference": "51874750e3a39fe72926c52547d67f2c4d532781",
                 "shasum": ""
             },
             "require": {
@@ -355,7 +355,7 @@
             ],
             "description": "Asynchronous process manager.",
             "homepage": "https://github.com/amphp/process",
-            "time": "2018-10-20T16:34:05+00:00"
+            "time": "2018-11-08T04:47:07+00:00"
         },
         {
             "name": "amphp/sync",
@@ -691,12 +691,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/HarmonyIO/PHP-CodeSniffer-Ruleset.git",
-                "reference": "d420eac5ef5c42f0efc0b0302fd9981ecb435660"
+                "reference": "b4dffa09b891c07a89322e61c7b999e7998822f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/HarmonyIO/PHP-CodeSniffer-Ruleset/zipball/d420eac5ef5c42f0efc0b0302fd9981ecb435660",
-                "reference": "d420eac5ef5c42f0efc0b0302fd9981ecb435660",
+                "url": "https://api.github.com/repos/HarmonyIO/PHP-CodeSniffer-Ruleset/zipball/b4dffa09b891c07a89322e61c7b999e7998822f8",
+                "reference": "b4dffa09b891c07a89322e61c7b999e7998822f8",
                 "shasum": ""
             },
             "require": {
@@ -715,7 +715,7 @@
                 }
             ],
             "description": "HarmonyIO coding standard",
-            "time": "2018-11-08T02:38:27+00:00"
+            "time": "2018-11-08T19:21:17+00:00"
         },
         {
             "name": "harmonyio/phpunit-extension",
@@ -3172,9 +3172,17 @@
             "time": "2018-01-29T19:49:41+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "1.0",
+            "alias_normalized": "1.0.0.0",
+            "version": "9999999-dev",
+            "package": "amphp/process"
+        }
+    ],
     "minimum-stability": "dev",
     "stability-flags": {
+        "amphp/process": 20,
         "harmonyio/php-codesniffer-ruleset": 20
     },
     "prefer-stable": true,

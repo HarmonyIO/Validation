@@ -58,6 +58,12 @@ class NativeEmailAddressTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new NativeEmailAddress())->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsFalseWhenEmailAddressIsInvalid(): void
     {
         $this->assertFalse((new NativeEmailAddress())->validate('invalid-email-address'));

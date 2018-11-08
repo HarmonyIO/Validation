@@ -58,6 +58,12 @@ class IsFloatTest extends TestCase
         fclose($resource);
     }
 
+    public function testValidateReturnsFalseWhenPassingACallable(): void
+    {
+        $this->assertFalse((new IsFloat())->validate(static function (): void {
+        }));
+    }
+
     public function testValidateReturnsTrueWhenPassingAnIntegerAsAString(): void
     {
         $this->assertTrue((new IsFloat())->validate('1'));
