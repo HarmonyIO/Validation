@@ -82,7 +82,7 @@ before_script:
 script:
   - if [ -z "$phpstan" ] && [ -z "$cs" ]; then phpdbg -qrr vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml; fi;
   - if [ "$phpstan" = 1 ]; then vendor/bin/phpstan analyse -l max src tests; fi;
-  - if [ "cs" = 1 ]; then vendor/bin/phpcs -s; fi;
+  - if [ "$cs" = 1 ]; then vendor/bin/phpcs -s; fi;
 
 after_success:
   - if [ -z "$phpstan" ] && [ -z "$cs" ]; then travis_retry php php-coveralls.phar; fi;
