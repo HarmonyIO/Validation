@@ -1,0 +1,88 @@
+sudo: false
+
+language: php
+
+matrix:
+  include:
+    - name: '[PHPSTAN] PHP 7.2'
+      php: '7.2'
+      env: phpstan=1
+    - name: '[PHPSTAN] PHP 7.3'
+      php: '7.2'
+      env: phpstan=1
+    - name: '[PHPSTAN] PHP nightly'
+      php: '7.2'
+      env: phpstan=1
+
+    - name: '[CS] PHP 7.2'
+      php: '7.2'
+      env: cs=1
+    - name: '[CS] PHP 7.3'
+      php: '7.3'
+      env: cs=1
+    - name: '[CS] PHP Nightly'
+      php: nightly
+      env: cs=1
+
+    - name: '[UNIT] PHP 7.2 With Locked Dependencies'
+      php: '7.2'
+    - name: '[UNIT] PHP 7.2 With Lowest Dependencies'
+      php: '7.2'
+      env: dependencies=lowest
+    - name: '[UNIT] PHP 7.2 With Highest Dependencies'
+      php: '7.2'
+      env: dependencies=highest
+    - name: '[UNIT] PHP 7.3 With Locked Dependencies'
+      php: '7.3'
+    - name: '[UNIT] PHP 7.3 With Lowest Dependencies'
+      php: '7.3'
+      env: dependencies=lowest
+    - name: '[UNIT] PHP 7.3 With Highest Dependencies'
+      php: '7.3'
+      env: dependencies=highest
+    - name: '[UNIT] PHP Nightly With Locked Dependencies'
+      php: nightly
+    - name: '[UNIT] PHP Nightly With Highest Dependencies'
+      php: nightly
+      env: dependencies=lowest
+    - name: '[UNIT] PHP Nightly With Lowest Dependencies'
+      php: nightly
+      env: dependencies=highest
+  allow_failures:
+    - name: '[PHPSTAN] PHP nightly'
+      php: '7.2'
+      env: phpstan=1
+
+    - name: '[CS] PHP Nightly'
+      php: nightly
+      env: cs=1
+
+    - name: '[UNIT] PHP Nightly With Locked Dependencies'
+      php: nightly
+    - name: '[UNIT] PHP Nightly With Highest Dependencies'
+      php: nightly
+      env: dependencies=lowest
+    - name: '[UNIT] PHP Nightly With Lowest Dependencies'
+      php: nightly
+      env: dependencies=highest
+
+before_install:
+- phpenv config-rm xdebug.ini || echo "No xdebug config."
+- composer self-update
+
+install:
+- wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.0.0/php-coveralls.phar
+- chmod +x php-coveralls.phar
+
+before_script:
+  - if [ -z "$dependencies" ]; then travis_retry composer install --no-scripts; fi;
+  - if [ "$dependencies" = "lowest" ]; then travis_retry composer update --no-scripts --prefer-lowest -n; fi;
+  - if [ "$dependencies" = "highest" ]; then travis_retry composer update --no-scripts -n; fi;
+
+script:
+  - if [ -z "$phpstan" ] && [ -z "$cs" ]; then phpdbg -qrr vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml; fi;
+  - if [ "$phpstan" = 1 ]; then vendor/bin/phpstan analyse -l max src tests; fi;
+  - if [ "cs" = 1 ]; then vendor/bin/phpcs -s; fi;
+
+after_success:
+  - if [ -z "$phpstan" ] && [ -z "$cs" ]; then travis_retry php php-coveralls.phar; fi;

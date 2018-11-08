@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ruleset>
+    <arg name="basepath" value="."/>
+
+    <file>./src</file>
+    <file>./tests</file>
+
+    <rule ref="./vendor/harmonyio/php-codesniffer-ruleset/ruleset.xml"/>
+
+    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+        <properties>
+            <property name="rootNamespaces" type="array">
+                <element key="src" value="HarmonyIO\Validation"/>
+                <element key="tests" value="HarmonyIO\ValidationTest"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>
