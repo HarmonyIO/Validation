@@ -68,15 +68,11 @@ class PasswordMatchesTest extends TestCase
 
     public function testValidateReturnsFalseWhenPasswordIsInvalid(): void
     {
-        $this->markTestSkipped('Waiting for fix of: https://github.com/amphp/parallel-functions/issues/12');
-
         $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate('123456789'));
     }
 
     public function testValidateReturnsFalseWhenPasswordIsValid(): void
     {
-        $this->markTestSkipped('Waiting for fix of: https://github.com/amphp/parallel-functions/issues/12');
-
         $this->assertTrue((new PasswordMatches(self::TEST_HASH))->validate('1234567890'));
     }
 }

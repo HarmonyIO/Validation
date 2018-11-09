@@ -308,12 +308,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/process.git",
-                "reference": "51874750e3a39fe72926c52547d67f2c4d532781"
+                "reference": "90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/process/zipball/51874750e3a39fe72926c52547d67f2c4d532781",
-                "reference": "51874750e3a39fe72926c52547d67f2c4d532781",
+                "url": "https://api.github.com/repos/amphp/process/zipball/90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c",
+                "reference": "90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c",
                 "shasum": ""
             },
             "require": {
@@ -355,7 +355,7 @@
             ],
             "description": "Asynchronous process manager.",
             "homepage": "https://github.com/amphp/process",
-            "time": "2018-11-08T04:47:07+00:00"
+            "time": "2018-11-09T00:02:00+00:00"
         },
         {
             "name": "amphp/sync",
