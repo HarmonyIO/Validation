@@ -8,16 +8,6 @@ matrix:
       php: '7.2'
       env: require=1
 
-    - name: '[PHPSTAN] PHP 7.2'
-      php: '7.2'
-      env: phpstan=1
-    - name: '[PHPSTAN] PHP 7.3'
-      php: '7.2'
-      env: phpstan=1
-    - name: '[PHPSTAN] PHP nightly'
-      php: '7.2'
-      env: phpstan=1
-
     - name: '[CS] PHP 7.2'
       php: '7.2'
       env: cs=1
@@ -53,10 +43,6 @@ matrix:
       php: nightly
       env: dependencies=highest
   allow_failures:
-    - name: '[PHPSTAN] PHP nightly'
-      php: '7.2'
-      env: phpstan=1
-
     - name: '[CS] PHP Nightly'
       php: nightly
       env: cs=1
@@ -84,10 +70,9 @@ before_script:
   - if [ "$dependencies" = "highest" ]; then travis_retry composer update --no-scripts -n; fi;
 
 script:
-  - if [ -z "$phpstan" ] && [ -z "$cs" ] && [ -z "$require" ]; then phpdbg -qrr vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml; fi;
-  - if [ "$phpstan" = 1 ]; then vendor/bin/phpstan analyse -l max src tests; fi;
+  - if [ -z "$cs" ] && [ -z "$require" ]; then phpdbg -qrr vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml; fi;
   - if [ "$cs" = 1 ]; then vendor/bin/phpcs -s; fi;
   - if [ "$require" = 1 ]; then vendor/bin/composer-require-checker check; fi;
 
 after_success:
-  - if [ -z "$phpstan" ] && [ -z "$cs" ]; then travis_retry php php-coveralls.phar; fi;
+  - if [ -z "$cs" ] && [ -z "$require" ]; then travis_retry php php-coveralls.phar; fi;
