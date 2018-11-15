@@ -27,7 +27,9 @@ class PasswordMatches implements Rule
         }
 
         return parallel(function () use ($value) {
+            // @codeCoverageIgnoreStart
             return password_verify($value, $this->hash);
+            // @codeCoverageIgnoreEnd
         })();
     }
 }

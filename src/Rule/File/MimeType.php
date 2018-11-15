@@ -35,6 +35,7 @@ class MimeType implements Rule
             }
 
             return parallel(function () use ($value) {
+                // @codeCoverageIgnoreStart
                 $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
 
                 if ($fileInfo === false) {
@@ -46,6 +47,7 @@ class MimeType implements Rule
                 finfo_close($fileInfo);
 
                 return $mimeType === $this->mimeType;
+                // @codeCoverageIgnoreEnd
             })();
         });
     }
