@@ -4,43 +4,43 @@ namespace HarmonyIO\ValidationTest\Unit\Rule\Text;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Rule\Rule;
-use HarmonyIO\Validation\Rule\Text\IsAscii;
+use HarmonyIO\Validation\Rule\Text\Ascii;
 
-class IsAsciiTest extends TestCase
+class AsciiTest extends TestCase
 {
     public function testRuleImplementsInterface(): void
     {
-        $this->assertInstanceOf(Rule::class, new IsAscii());
+        $this->assertInstanceOf(Rule::class, new Ascii());
     }
 
     public function testValidateReturnsFalseWhenPassingAnInteger(): void
     {
-        $this->assertFalse((new IsAscii())->validate(1));
+        $this->assertFalse((new Ascii())->validate(1));
     }
 
     public function testValidateReturnsFalseWhenPassingAFloat(): void
     {
-        $this->assertFalse((new IsAscii())->validate(1.1));
+        $this->assertFalse((new Ascii())->validate(1.1));
     }
 
     public function testValidateReturnsFalseWhenPassingABoolean(): void
     {
-        $this->assertFalse((new IsAscii())->validate(true));
+        $this->assertFalse((new Ascii())->validate(true));
     }
 
     public function testValidateReturnsFalseWhenPassingAnArray(): void
     {
-        $this->assertFalse((new IsAscii())->validate([]));
+        $this->assertFalse((new Ascii())->validate([]));
     }
 
     public function testValidateReturnsFalseWhenPassingAnObject(): void
     {
-        $this->assertFalse((new IsAscii())->validate(new \DateTimeImmutable()));
+        $this->assertFalse((new Ascii())->validate(new \DateTimeImmutable()));
     }
 
     public function testValidateReturnsFalseWhenPassingNull(): void
     {
-        $this->assertFalse((new IsAscii())->validate(null));
+        $this->assertFalse((new Ascii())->validate(null));
     }
 
     public function testValidateReturnsFalseWhenPassingAResource(): void
@@ -53,26 +53,26 @@ class IsAsciiTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new IsAscii())->validate($resource));
+        $this->assertFalse((new Ascii())->validate($resource));
 
         fclose($resource);
     }
 
     public function testValidateReturnsFalseWhenPassingACallable(): void
     {
-        $this->assertFalse((new IsAscii())->validate(static function (): void {
+        $this->assertFalse((new Ascii())->validate(static function (): void {
         }));
     }
 
     public function testValidateReturnsTrueWhenPassingAnAsciiString(): void
     {
-        $this->assertTrue((new IsAscii())->validate(
+        $this->assertTrue((new Ascii())->validate(
             ' !"#$%&\\\'() * +,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\] ^ _`abcdefghijklmnopqrstuvwxyz{|}~'
         ));
     }
 
     public function testValidateReturnsFalseWhenPassingAnUtf8String(): void
     {
-        $this->assertFalse((new IsAscii())->validate('€'));
+        $this->assertFalse((new Ascii())->validate('€'));
     }
 }

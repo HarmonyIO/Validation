@@ -3,44 +3,44 @@
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Numeric\IsInteger;
+use HarmonyIO\Validation\Rule\Numeric\NumericType;
 use HarmonyIO\Validation\Rule\Rule;
 
-class IsIntegerTest extends TestCase
+class NumericTypeTest extends TestCase
 {
     public function testRuleImplementsInterface(): void
     {
-        $this->assertInstanceOf(Rule::class, new IsInteger());
+        $this->assertInstanceOf(Rule::class, new NumericType());
     }
 
     public function testValidateReturnsTrueWhenPassingAnInteger(): void
     {
-        $this->assertTrue((new IsInteger())->validate(1));
+        $this->assertTrue((new NumericType())->validate(1));
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateReturnsTrueWhenPassingAFloat(): void
     {
-        $this->assertFalse((new IsInteger())->validate(1.1));
+        $this->assertTrue((new NumericType())->validate(1.1));
     }
 
     public function testValidateReturnsFalseWhenPassingABoolean(): void
     {
-        $this->assertFalse((new IsInteger())->validate(true));
+        $this->assertFalse((new NumericType())->validate(true));
     }
 
     public function testValidateReturnsFalseWhenPassingAnArray(): void
     {
-        $this->assertFalse((new IsInteger())->validate([]));
+        $this->assertFalse((new NumericType())->validate([]));
     }
 
     public function testValidateReturnsFalseWhenPassingAnObject(): void
     {
-        $this->assertFalse((new IsInteger())->validate(new \DateTimeImmutable()));
+        $this->assertFalse((new NumericType())->validate(new \DateTimeImmutable()));
     }
 
     public function testValidateReturnsFalseWhenPassingNull(): void
     {
-        $this->assertFalse((new IsInteger())->validate(null));
+        $this->assertFalse((new NumericType())->validate(null));
     }
 
     public function testValidateReturnsFalseWhenPassingAResource(): void
@@ -53,24 +53,24 @@ class IsIntegerTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new IsInteger())->validate($resource));
+        $this->assertFalse((new NumericType())->validate($resource));
 
         fclose($resource);
     }
 
     public function testValidateReturnsFalseWhenPassingACallable(): void
     {
-        $this->assertFalse((new IsInteger())->validate(static function (): void {
+        $this->assertFalse((new NumericType())->validate(static function (): void {
         }));
     }
 
     public function testValidateReturnsTrueWhenPassingAnIntegerAsAString(): void
     {
-        $this->assertTrue((new IsInteger())->validate('1'));
+        $this->assertTrue((new NumericType())->validate('1'));
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloatAsAString(): void
+    public function testValidateReturnsTrueWhenPassingAFloatAsAString(): void
     {
-        $this->assertFalse((new IsInteger())->validate('1.1'));
+        $this->assertTrue((new NumericType())->validate('1.1'));
     }
 }

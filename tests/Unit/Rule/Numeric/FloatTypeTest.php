@@ -3,44 +3,44 @@
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Numeric\IsNumeric;
+use HarmonyIO\Validation\Rule\Numeric\FloatType;
 use HarmonyIO\Validation\Rule\Rule;
 
-class IsNumericTest extends TestCase
+class FloatTypeTest extends TestCase
 {
     public function testRuleImplementsInterface(): void
     {
-        $this->assertInstanceOf(Rule::class, new IsNumeric());
+        $this->assertInstanceOf(Rule::class, new FloatType());
     }
 
     public function testValidateReturnsTrueWhenPassingAnInteger(): void
     {
-        $this->assertTrue((new IsNumeric())->validate(1));
+        $this->assertTrue((new FloatType())->validate(1));
     }
 
     public function testValidateReturnsTrueWhenPassingAFloat(): void
     {
-        $this->assertTrue((new IsNumeric())->validate(1.1));
+        $this->assertTrue((new FloatType())->validate(1.1));
     }
 
     public function testValidateReturnsFalseWhenPassingABoolean(): void
     {
-        $this->assertFalse((new IsNumeric())->validate(true));
+        $this->assertFalse((new FloatType())->validate(true));
     }
 
     public function testValidateReturnsFalseWhenPassingAnArray(): void
     {
-        $this->assertFalse((new IsNumeric())->validate([]));
+        $this->assertFalse((new FloatType())->validate([]));
     }
 
     public function testValidateReturnsFalseWhenPassingAnObject(): void
     {
-        $this->assertFalse((new IsNumeric())->validate(new \DateTimeImmutable()));
+        $this->assertFalse((new FloatType())->validate(new \DateTimeImmutable()));
     }
 
     public function testValidateReturnsFalseWhenPassingNull(): void
     {
-        $this->assertFalse((new IsNumeric())->validate(null));
+        $this->assertFalse((new FloatType())->validate(null));
     }
 
     public function testValidateReturnsFalseWhenPassingAResource(): void
@@ -53,24 +53,24 @@ class IsNumericTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new IsNumeric())->validate($resource));
+        $this->assertFalse((new FloatType())->validate($resource));
 
         fclose($resource);
     }
 
     public function testValidateReturnsFalseWhenPassingACallable(): void
     {
-        $this->assertFalse((new IsNumeric())->validate(static function (): void {
+        $this->assertFalse((new FloatType())->validate(static function (): void {
         }));
     }
 
     public function testValidateReturnsTrueWhenPassingAnIntegerAsAString(): void
     {
-        $this->assertTrue((new IsNumeric())->validate('1'));
+        $this->assertTrue((new FloatType())->validate('1'));
     }
 
     public function testValidateReturnsTrueWhenPassingAFloatAsAString(): void
     {
-        $this->assertTrue((new IsNumeric())->validate('1.1'));
+        $this->assertTrue((new FloatType())->validate('1.1'));
     }
 }

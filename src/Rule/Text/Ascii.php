@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class IsAscii implements Rule
+class Ascii implements Rule
 {
     /**
      * {@inheritdoc}

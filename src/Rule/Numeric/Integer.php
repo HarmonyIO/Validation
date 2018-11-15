@@ -6,13 +6,17 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class IsNumeric implements Rule
+class Integer implements Rule
 {
     /**
      * {@inheritdoc}
      */
     public function validate($value): Promise
     {
-        return new Success(is_numeric($value));
+        if (is_bool($value)) {
+            return new Success(false);
+        }
+
+        return new Success(filter_var($value, FILTER_VALIDATE_INT) !== false);
     }
 }

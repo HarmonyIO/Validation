@@ -3,44 +3,44 @@
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Numeric\IsFloat;
+use HarmonyIO\Validation\Rule\Numeric\Integer;
 use HarmonyIO\Validation\Rule\Rule;
 
-class IsFloatTest extends TestCase
+class IntegerTest extends TestCase
 {
     public function testRuleImplementsInterface(): void
     {
-        $this->assertInstanceOf(Rule::class, new IsFloat());
+        $this->assertInstanceOf(Rule::class, new Integer());
     }
 
     public function testValidateReturnsTrueWhenPassingAnInteger(): void
     {
-        $this->assertTrue((new IsFloat())->validate(1));
+        $this->assertTrue((new Integer())->validate(1));
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloat(): void
+    public function testValidateReturnsFalseWhenPassingAFloat(): void
     {
-        $this->assertTrue((new IsFloat())->validate(1.1));
+        $this->assertFalse((new Integer())->validate(1.1));
     }
 
     public function testValidateReturnsFalseWhenPassingABoolean(): void
     {
-        $this->assertFalse((new IsFloat())->validate(true));
+        $this->assertFalse((new Integer())->validate(true));
     }
 
     public function testValidateReturnsFalseWhenPassingAnArray(): void
     {
-        $this->assertFalse((new IsFloat())->validate([]));
+        $this->assertFalse((new Integer())->validate([]));
     }
 
     public function testValidateReturnsFalseWhenPassingAnObject(): void
     {
-        $this->assertFalse((new IsFloat())->validate(new \DateTimeImmutable()));
+        $this->assertFalse((new Integer())->validate(new \DateTimeImmutable()));
     }
 
     public function testValidateReturnsFalseWhenPassingNull(): void
     {
-        $this->assertFalse((new IsFloat())->validate(null));
+        $this->assertFalse((new Integer())->validate(null));
     }
 
     public function testValidateReturnsFalseWhenPassingAResource(): void
@@ -53,24 +53,24 @@ class IsFloatTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new IsFloat())->validate($resource));
+        $this->assertFalse((new Integer())->validate($resource));
 
         fclose($resource);
     }
 
     public function testValidateReturnsFalseWhenPassingACallable(): void
     {
-        $this->assertFalse((new IsFloat())->validate(static function (): void {
+        $this->assertFalse((new Integer())->validate(static function (): void {
         }));
     }
 
     public function testValidateReturnsTrueWhenPassingAnIntegerAsAString(): void
     {
-        $this->assertTrue((new IsFloat())->validate('1'));
+        $this->assertTrue((new Integer())->validate('1'));
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatAsAString(): void
+    public function testValidateReturnsFalseWhenPassingAFloatAsAString(): void
     {
-        $this->assertTrue((new IsFloat())->validate('1.1'));
+        $this->assertFalse((new Integer())->validate('1.1'));
     }
 }
