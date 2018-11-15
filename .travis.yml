@@ -87,7 +87,7 @@ script:
   - if [ -z "$phpstan" ] && [ -z "$cs" ] && [ -z "$require" ]; then phpdbg -qrr vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml; fi;
   - if [ "$phpstan" = 1 ]; then vendor/bin/phpstan analyse -l max src tests; fi;
   - if [ "$cs" = 1 ]; then vendor/bin/phpcs -s; fi;
-  - if [ "$require" = 1 ]; then composer-require-checker check; fi;
+  - if [ "$require" = 1 ]; then vendor/bin/composer-require-checker check; fi;
 
 after_success:
   - if [ -z "$phpstan" ] && [ -z "$cs" ]; then travis_retry php php-coveralls.phar; fi;
