@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace HarmonyIO\ValidationTest\Unit\Rule\Text;
+namespace HarmonyIO\ValidationTest\Unit\Rule\NationalId;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Rule\NationalId\Bsn;
@@ -91,6 +91,9 @@ class BsnTest extends TestCase
         $this->assertFalse((new Bsn())->validate($bsn));
     }
 
+    /**
+     * @return string[]
+     */
     public function provideValidBsnStrings(): array
     {
         return [
@@ -147,6 +150,9 @@ class BsnTest extends TestCase
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function provideInvalidBsnStrings(): array
     {
         return [
@@ -203,6 +209,9 @@ class BsnTest extends TestCase
         ];
     }
 
+    /**
+     * @return int[]
+     */
     public function provideValidBsnIntegers(): array
     {
         return [
@@ -259,6 +268,9 @@ class BsnTest extends TestCase
         ];
     }
 
+    /**
+     * @return int[]
+     */
     public function provideInvalidBsnIntegers(): array
     {
         return [

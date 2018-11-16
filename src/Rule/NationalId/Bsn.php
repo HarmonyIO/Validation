@@ -39,14 +39,10 @@ class Bsn implements Rule
      */
     private function validateValueType($value): bool
     {
-        if (!is_string($value) && !is_int($value)) {
-            return false;
+        if (is_int($value)) {
+            return true;
         }
 
-        if (is_string($value) && !ctype_digit($value)) {
-            return false;
-        }
-
-        return true;
+        return is_string($value) && ctype_digit($value);
     }
 }
