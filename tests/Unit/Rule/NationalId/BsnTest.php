@@ -29,6 +29,16 @@ class BsnTest extends TestCase
         $this->assertFalse((new Bsn())->validate($bsn));
     }
 
+    public function testValidateReturnsFalseWhenPassingAnIntegerWhichIsTooShort(): void
+    {
+        $this->assertFalse((new Bsn())->validate(12345678));
+    }
+
+    public function testValidateReturnsFalseWhenPassingAnIntegerWhichIsTooLong(): void
+    {
+        $this->assertFalse((new Bsn())->validate(1234567890));
+    }
+
     public function testValidateReturnsFalseWhenPassingAFloat(): void
     {
         $this->assertFalse((new Bsn())->validate(1.1));
@@ -89,6 +99,21 @@ class BsnTest extends TestCase
     public function testValidateReturnsFalseWhenPassingAnInvalidBsnString(string $bsn): void
     {
         $this->assertFalse((new Bsn())->validate($bsn));
+    }
+
+    public function testValidateReturnsFalseWhenPassingAStringWhichIsTooShort(): void
+    {
+        $this->assertFalse((new Bsn())->validate('12345678'));
+    }
+
+    public function testValidateReturnsFalseWhenPassingAStringWhichIsTooLong(): void
+    {
+        $this->assertFalse((new Bsn())->validate('1234567890'));
+    }
+
+    public function testValidateReturnsFalseWhenPassingAStringContainingNonNumbers(): void
+    {
+        $this->assertFalse((new Bsn())->validate('12345678a'));
     }
 
     /**
