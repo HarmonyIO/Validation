@@ -5,6 +5,7 @@ namespace HarmonyIO\ValidationTest\Unit;
 use Amp\Promise;
 use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Rule\Text\MinimumLength;
+use HarmonyIO\Validation\Validator;
 
 class ValidatorTest extends TestCase
 {
