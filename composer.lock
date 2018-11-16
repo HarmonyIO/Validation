@@ -1138,12 +1138,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/HarmonyIO/PHP-CodeSniffer-Ruleset.git",
-                "reference": "530506f333e92be83a4277f44395f0098e45982f"
+                "reference": "85bfb91fb829f084ff00c8e19f529c3a6f8e5308"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/HarmonyIO/PHP-CodeSniffer-Ruleset/zipball/530506f333e92be83a4277f44395f0098e45982f",
-                "reference": "530506f333e92be83a4277f44395f0098e45982f",
+                "url": "https://api.github.com/repos/HarmonyIO/PHP-CodeSniffer-Ruleset/zipball/85bfb91fb829f084ff00c8e19f529c3a6f8e5308",
+                "reference": "85bfb91fb829f084ff00c8e19f529c3a6f8e5308",
                 "shasum": ""
             },
             "require": {
@@ -1162,7 +1162,7 @@
                 }
             ],
             "description": "HarmonyIO coding standard",
-            "time": "2018-11-15T00:37:33+00:00"
+            "time": "2018-11-16T09:17:01+00:00"
         },
         {
             "name": "harmonyio/phpunit-extension",
