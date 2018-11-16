@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "62f90d9e4e717289cef6dafa0cb22da5",
+    "content-hash": "18d18c8dc2c148c39211aaf3a453f3f0",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1138,12 +1138,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/HarmonyIO/PHP-CodeSniffer-Ruleset.git",
-                "reference": "85bfb91fb829f084ff00c8e19f529c3a6f8e5308"
+                "reference": "9e9329473f6cf000cb21bbca76b5498537a0753e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/HarmonyIO/PHP-CodeSniffer-Ruleset/zipball/85bfb91fb829f084ff00c8e19f529c3a6f8e5308",
-                "reference": "85bfb91fb829f084ff00c8e19f529c3a6f8e5308",
+                "url": "https://api.github.com/repos/HarmonyIO/PHP-CodeSniffer-Ruleset/zipball/9e9329473f6cf000cb21bbca76b5498537a0753e",
+                "reference": "9e9329473f6cf000cb21bbca76b5498537a0753e",
                 "shasum": ""
             },
             "require": {
@@ -1162,7 +1162,7 @@
                 }
             ],
             "description": "HarmonyIO coding standard",
-            "time": "2018-11-16T09:17:01+00:00"
+            "time": "2018-11-16T15:22:42+00:00"
         },
         {
             "name": "harmonyio/phpunit-extension",
@@ -3014,6 +3014,7 @@
         "ext-fileinfo": "*",
         "ext-filter": "*",
         "ext-hash": "*",
+        "ext-json": "*",
         "ext-mbstring": "*"
     },
     "platform-dev": []
