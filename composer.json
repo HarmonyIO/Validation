@@ -17,6 +17,7 @@
         "ext-fileinfo": "*",
         "ext-filter": "*",
         "ext-hash": "*",
+        "ext-json": "*",
         "ext-mbstring": "*",
         "amphp/amp": "^2.0",
         "amphp/artax": "^3.0",
