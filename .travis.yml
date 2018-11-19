@@ -4,19 +4,43 @@ language: php
 
 matrix:
   include:
-    - name: '[REQUIRE_CHECK] PHP'
-      php: '7.2'
+    - name: '[REQUIRE_CHECK] With Locked Dependencies'
+      php: '7.3'
       env: require=1
+    - name: '[REQUIRE_CHECK] With Lowest Dependencies'
+      php: '7.3'
+      env: require=1 dependencies=lowest
+    - name: '[REQUIRE_CHECK] With Highest Dependencies'
+      php: '7.3'
+      env: require=1 dependencies=highest
 
-    - name: '[CS] PHP 7.2'
+    - name: '[CS] PHP 7.2 With Locked Dependencies'
       php: '7.2'
       env: cs=1
-    - name: '[CS] PHP 7.3'
+    - name: '[CS] PHP 7.2 With Lowest Dependencies'
+      php: '7.2'
+      env: cs=1 dependencies=lowest
+    - name: '[CS] PHP 7.2 With Highest Dependencies'
+      php: '7.2'
+      env: cs=1 dependencies=highest
+    - name: '[CS] PHP 7.3 With Locked Dependencies'
       php: '7.3'
       env: cs=1
-    - name: '[CS] PHP Nightly'
+    - name: '[CS] PHP 7.3 With Lowest Dependencies'
+      php: '7.3'
+      env: cs=1 dependencies=lowest
+    - name: '[CS] PHP 7.3 With Highest Dependencies'
+      php: '7.3'
+      env: cs=1 dependencies=highest
+    - name: '[CS] PHP Nightly With Locked Dependencies'
       php: nightly
       env: cs=1
+    - name: '[CS] PHP Nightly With Lowest Dependencies'
+      php: nightly
+      env: cs=1 dependencies=lowest
+    - name: '[CS] PHP Nightly With HIghest Dependencies'
+      php: nightly
+      env: cs=1 dependencies=highest
 
     - name: '[UNIT] PHP 7.2 With Locked Dependencies'
       php: '7.2'
@@ -43,9 +67,15 @@ matrix:
       php: nightly
       env: dependencies=highest
   allow_failures:
-    - name: '[CS] PHP Nightly'
+    - name: '[CS] PHP Nightly With Locked Dependencies'
       php: nightly
       env: cs=1
+    - name: '[CS] PHP Nightly With Lowest Dependencies'
+      php: nightly
+      env: cs=1 dependencies=lowest
+    - name: '[CS] PHP Nightly With HIghest Dependencies'
+      php: nightly
+      env: cs=1 dependencies=highest
 
     - name: '[UNIT] PHP Nightly With Locked Dependencies'
       php: nightly
