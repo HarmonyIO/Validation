@@ -4,10 +4,10 @@ namespace HarmonyIO\Validation\Rule\BankAccount\Iban\Country;
 
 use Amp\Promise;
 use Amp\Success;
-use HarmonyIO\Validation\Rule\BankAccount\Iban\Iban;
+use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Georgia extends Iban implements Rule
+class Georgia implements Rule
 {
     private const PATTERN = '~^GE\d{2}[A-Z]{2}\d{16}$~';
 
@@ -24,6 +24,6 @@ class Georgia extends Iban implements Rule
             return new Success(false);
         }
 
-        return new Success($this->validateChecksum($value));
+        return (new IbanChecksum())->validate($value);
     }
 }

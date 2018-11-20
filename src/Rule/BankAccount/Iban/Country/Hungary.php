@@ -4,10 +4,10 @@ namespace HarmonyIO\Validation\Rule\BankAccount\Iban\Country;
 
 use Amp\Promise;
 use Amp\Success;
-use HarmonyIO\Validation\Rule\BankAccount\Iban\Iban;
+use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Hungary extends Iban implements Rule
+class Hungary implements Rule
 {
     private const PATTERN = '~^HU\d{2}\d{3}\d{5}\d{16}$~';
 
@@ -24,6 +24,6 @@ class Hungary extends Iban implements Rule
             return new Success(false);
         }
 
-        return new Success($this->validateChecksum($value));
+        return (new IbanChecksum())->validate($value);
     }
 }

@@ -4,10 +4,10 @@ namespace HarmonyIO\Validation\Rule\BankAccount\Iban\Country;
 
 use Amp\Promise;
 use Amp\Success;
-use HarmonyIO\Validation\Rule\BankAccount\Iban\Iban;
+use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class CostaRica extends Iban implements Rule
+class CostaRica implements Rule
 {
     private const PATTERN = '~^CR\d{2}0\d{3}\d{14}$~';
 
@@ -24,6 +24,6 @@ class CostaRica extends Iban implements Rule
             return new Success(false);
         }
 
-        return new Success($this->validateChecksum($value));
+        return (new IbanChecksum())->validate($value);
     }
 }

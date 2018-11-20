@@ -2,8 +2,24 @@
 
 namespace HarmonyIO\Validation\Rule\BankAccount\Iban;
 
-abstract class Iban
+use Amp\Promise;
+use Amp\Success;
+use HarmonyIO\Validation\Rule\Rule;
+
+class IbanChecksum implements Rule
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function validate($value): Promise
+    {
+        if (!is_string($value)) {
+            return new Success(false);
+        }
+
+        return new Success($this->validateChecksum($value));
+    }
+
     protected function validateChecksum(string $value): bool
     {
         // move first 4 characters to the end of the string
