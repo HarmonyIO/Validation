@@ -7,9 +7,9 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Iban;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Albania extends Iban implements Rule
+class France extends Iban implements Rule
 {
-    private const PATTERN = '~^AL\d{2}\d{8}[a–zA-Z0-9]{16}$~';
+    private const PATTERN = '~^FR\d{2}\d{5}\d{5}[a-zA-Z0-9]{11}\d{2}$~';
 
     /**
      * {@inheritdoc}
