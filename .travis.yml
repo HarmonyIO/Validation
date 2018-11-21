@@ -44,28 +44,59 @@ matrix:
 
     - name: '[UNIT] PHP 7.2 With Locked Dependencies'
       php: '7.2'
+      env: unit=1
     - name: '[UNIT] PHP 7.2 With Lowest Dependencies'
       php: '7.2'
-      env: dependencies=lowest
+      env: dependencies=lowest unit=1
     - name: '[UNIT] PHP 7.2 With Highest Dependencies'
       php: '7.2'
-      env: dependencies=highest
+      env: dependencies=highest unit=1
     - name: '[UNIT] PHP 7.3 With Locked Dependencies'
       php: '7.3'
+      env: unit=1
     - name: '[UNIT] PHP 7.3 With Lowest Dependencies'
       php: '7.3'
-      env: dependencies=lowest
+      env: dependencies=lowest unit=1
     - name: '[UNIT] PHP 7.3 With Highest Dependencies'
       php: '7.3'
-      env: dependencies=highest
+      env: dependencies=highest unit=1
     - name: '[UNIT] PHP Nightly With Locked Dependencies'
       php: nightly
+      env: unit=1
     - name: '[UNIT] PHP Nightly With Highest Dependencies'
       php: nightly
-      env: dependencies=lowest
+      env: dependencies=lowest unit=1
     - name: '[UNIT] PHP Nightly With Lowest Dependencies'
       php: nightly
-      env: dependencies=highest
+      env: dependencies=highest unit=1
+
+    - name: '[INTEGRATION] PHP 7.2 With Locked Dependencies'
+      php: '7.2'
+      env: integration=1
+    - name: '[INTEGRATION] PHP 7.2 With Lowest Dependencies'
+      php: '7.2'
+      env: dependencies=lowest integration=1
+    - name: '[INTEGRATION] PHP 7.2 With Highest Dependencies'
+      php: '7.2'
+      env: dependencies=highest integration=1
+    - name: '[INTEGRATION] PHP 7.3 With Locked Dependencies'
+      php: '7.3'
+      env: integration=1
+    - name: '[INTEGRATION] PHP 7.3 With Lowest Dependencies'
+      php: '7.3'
+      env: dependencies=lowest integration=1
+    - name: '[INTEGRATION] PHP 7.3 With Highest Dependencies'
+      php: '7.3'
+      env: dependencies=highest integration=1
+    - name: '[INTEGRATION] PHP Nightly With Locked Dependencies'
+      php: nightly
+      env: integration=1
+    - name: '[INTEGRATION] PHP Nightly With Highest Dependencies'
+      php: nightly
+      env: dependencies=lowest integration=1
+    - name: '[INTEGRATION] PHP Nightly With Lowest Dependencies'
+      php: nightly
+      env: dependencies=highest integration=1
   allow_failures:
     - name: '[CS] PHP Nightly With Locked Dependencies'
       php: nightly
@@ -79,12 +110,23 @@ matrix:
 
     - name: '[UNIT] PHP Nightly With Locked Dependencies'
       php: nightly
+      env: unit=1
     - name: '[UNIT] PHP Nightly With Highest Dependencies'
       php: nightly
-      env: dependencies=lowest
+      env: dependencies=lowest unit=1
     - name: '[UNIT] PHP Nightly With Lowest Dependencies'
       php: nightly
-      env: dependencies=highest
+      env: dependencies=highest unit=1
+
+    - name: '[INTEGRATION] PHP Nightly With Locked Dependencies'
+      php: nightly
+      env: integration=1
+    - name: '[INTEGRATION] PHP Nightly With Highest Dependencies'
+      php: nightly
+      env: dependencies=lowest integration=1
+    - name: '[INTEGRATION] PHP Nightly With Lowest Dependencies'
+      php: nightly
+      env: dependencies=highest integration=1
 
 before_install:
 - phpenv config-rm xdebug.ini || echo "No xdebug config."
@@ -100,9 +142,10 @@ before_script:
   - if [ "$dependencies" = "highest" ]; then travis_retry composer update --no-scripts -n; fi;
 
 script:
-  - if [ -z "$cs" ] && [ -z "$require" ]; then phpdbg -qrr vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml; fi;
+  - if [ "$unit" = 1 ]; then phpdbg -qrr vendor/bin/phpunit --testsuite HarmonIOValidationUnitTestSuite --coverage-text --coverage-clover build/logs/clover.xml; fi;
+  - if [ "$integration" = 1 ]; then phpdbg -qrr vendor/bin/phpunit --testsuite HarmonIOValidationIntegrationTestSuite --coverage-text --coverage-clover build/logs/clover.xml; fi;
   - if [ "$cs" = 1 ]; then vendor/bin/phpcs -s; fi;
   - if [ "$require" = 1 ]; then vendor/bin/composer-require-checker check; fi;
 
 after_success:
-  - if [ -z "$cs" ] && [ -z "$require" ]; then travis_retry php php-coveralls.phar; fi;
+  - if [ "$unit" = 1 ]; then travis_retry php php-coveralls.phar; fi;
