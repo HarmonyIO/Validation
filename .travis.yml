@@ -38,7 +38,7 @@ matrix:
     - name: '[CS] PHP Nightly With Lowest Dependencies'
       php: nightly
       env: cs=1 dependencies=lowest
-    - name: '[CS] PHP Nightly With HIghest Dependencies'
+    - name: '[CS] PHP Nightly With Highest Dependencies'
       php: nightly
       env: cs=1 dependencies=highest
 
@@ -65,10 +65,10 @@ matrix:
       env: unit=1
     - name: '[UNIT] PHP Nightly With Highest Dependencies'
       php: nightly
-      env: dependencies=lowest unit=1
+      env: dependencies=highest unit=1
     - name: '[UNIT] PHP Nightly With Lowest Dependencies'
       php: nightly
-      env: dependencies=highest unit=1
+      env: dependencies=lowest unit=1
 
     - name: '[INTEGRATION] PHP 7.2 With Locked Dependencies'
       php: '7.2'
@@ -93,10 +93,10 @@ matrix:
       env: integration=1
     - name: '[INTEGRATION] PHP Nightly With Highest Dependencies'
       php: nightly
-      env: dependencies=lowest integration=1
+      env: dependencies=highest integration=1
     - name: '[INTEGRATION] PHP Nightly With Lowest Dependencies'
       php: nightly
-      env: dependencies=highest integration=1
+      env: dependencies=lowest integration=1
   allow_failures:
     - name: '[CS] PHP Nightly With Locked Dependencies'
       php: nightly
@@ -104,7 +104,7 @@ matrix:
     - name: '[CS] PHP Nightly With Lowest Dependencies'
       php: nightly
       env: cs=1 dependencies=lowest
-    - name: '[CS] PHP Nightly With HIghest Dependencies'
+    - name: '[CS] PHP Nightly With Highest Dependencies'
       php: nightly
       env: cs=1 dependencies=highest
 
@@ -113,20 +113,20 @@ matrix:
       env: unit=1
     - name: '[UNIT] PHP Nightly With Highest Dependencies'
       php: nightly
-      env: dependencies=lowest unit=1
+      env: dependencies=highest unit=1
     - name: '[UNIT] PHP Nightly With Lowest Dependencies'
       php: nightly
-      env: dependencies=highest unit=1
+      env: dependencies=lowest unit=1
 
     - name: '[INTEGRATION] PHP Nightly With Locked Dependencies'
       php: nightly
       env: integration=1
     - name: '[INTEGRATION] PHP Nightly With Highest Dependencies'
       php: nightly
-      env: dependencies=lowest integration=1
+      env: dependencies=highest integration=1
     - name: '[INTEGRATION] PHP Nightly With Lowest Dependencies'
       php: nightly
-      env: dependencies=highest integration=1
+      env: dependencies=lowest integration=1
 
 services:
   - redis-server
