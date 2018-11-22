@@ -13,13 +13,14 @@ class NegateTest extends TestCase
     /** @var MockObject|Rule */
     private $rule;
 
+    //phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
     public function setUp()
     {
         $this->rule = $this->createMock(Rule::class);
 
         $this->rule
             ->method('validate')
-            ->willReturnCallback(function(bool $value) {
+            ->willReturnCallback(static function (bool $value) {
                 return new Success($value);
             })
         ;

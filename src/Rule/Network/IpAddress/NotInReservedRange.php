@@ -18,7 +18,7 @@ class NotInReservedRange implements Rule
             return new Success(false);
         }
 
-        return call(function() use ($value) {
+        return call(static function () use ($value) {
             $inCidrRangeRule = new InCidrRange(
                 '100.64.0.0/10',
                 '172.16.0.0/12',
@@ -31,6 +31,7 @@ class NotInReservedRange implements Rule
                 'ff00::/8'
             );
 
+            // phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses
             if ((yield $inCidrRangeRule->validate($value)) === true) {
                 return new Success(false);
             }

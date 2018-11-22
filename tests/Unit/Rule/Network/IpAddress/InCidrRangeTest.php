@@ -65,21 +65,21 @@ class InCidrRangeTest extends TestCase
         }));
     }
 
-    public function testConstructorThrowsOnGarbageCidrRange():  void
+    public function testConstructorThrowsOnGarbageCidrRange(): void
     {
         $this->expectException(InvalidCidrRange::class);
 
         new InCidrRange('0.0.0.0/33');
     }
 
-    public function testConstructorThrowsOnInvalidIpv4CidrRange():  void
+    public function testConstructorThrowsOnInvalidIpv4CidrRange(): void
     {
         $this->expectException(InvalidCidrRange::class);
 
         new InCidrRange('0.0.0.0/33');
     }
 
-    public function testConstructorThrowsOnInvalidIpv6CidrRange():  void
+    public function testConstructorThrowsOnInvalidIpv6CidrRange(): void
     {
         $this->expectException(InvalidCidrRange::class);
 
