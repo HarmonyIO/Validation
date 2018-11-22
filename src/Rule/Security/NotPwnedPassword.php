@@ -2,11 +2,12 @@
 
 namespace HarmonyIO\Validation\Rule\Security;
 
-use Amp\Artax\Request;
-use Amp\Artax\Response;
 use Amp\Promise;
 use Amp\Success;
-use HarmonyIO\Validation\Http\Client;
+use HarmonyIO\HttpClient\Client\Client;
+use HarmonyIO\HttpClient\Message\CachingRequest;
+use HarmonyIO\HttpClient\Message\Request;
+use HarmonyIO\HttpClient\Message\Response;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
@@ -54,14 +55,14 @@ class NotPwnedPassword implements Rule
             /** @var Response $response */
             $response = yield $this->httpClient->request($this->buildRequest($password));
 
-            return yield $response->getBody();
+            return $response->getBody();
         });
     }
 
     private function buildRequest(string $password): Request
     {
-        return (new Request($this->buildUrl($password)))
-            ->withHeader('Accept', self::REQUEST_ACCEPT_HEADER)
+        return (new CachingRequest(self::class, 60*60*24, $this->buildUrl($password)))
+            ->addHeader('Accept', self::REQUEST_ACCEPT_HEADER)
         ;
     }
 
