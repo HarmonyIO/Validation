@@ -16,6 +16,10 @@ class InCidrRange implements Rule
     public function __construct(string ...$cidrRanges)
     {
         $currentErrorHandler = set_error_handler(function(int $errorNumber, string $errorMessage) {
+            if (strpos($errorMessage,'IPSet') !== 0) {
+                return false;
+            }
+
             throw new InvalidCidrRange($errorMessage, $errorNumber);
         }, E_WARNING | E_USER_WARNING);
 
