@@ -28,7 +28,8 @@
         "amphp/uri": "^0.1.3",
         "egulias/email-validator": "^2.1",
         "harmonyio/http-client": "dev-master",
-        "myclabs/php-enum": "^1.6"
+        "myclabs/php-enum": "^1.6",
+        "wikimedia/ip-set": "^1.2"
     },
     "require-dev": {
         "harmonyio/php-codesniffer-ruleset": "dev-master",

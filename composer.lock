@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4b3b97035f9f63a8e8ccf37bdb592abb",
+    "content-hash": "17cb6dd5b5680ee995fedf9c5b2c7606",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1265,6 +1265,48 @@
                 "serialize"
             ],
             "time": "2018-10-02T13:36:53+00:00"
+        },
+        {
+            "name": "wikimedia/ip-set",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wikimedia/IPSet.git",
+                "reference": "cabb679f440c87fd4053e4ea5e0120e769c9447f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wikimedia/IPSet/zipball/cabb679f440c87fd4053e4ea5e0120e769c9447f",
+                "reference": "cabb679f440c87fd4053e4ea5e0120e769c9447f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "jakub-onderka/php-parallel-lint": "0.9.2",
+                "mediawiki/mediawiki-codesniffer": "15.0.0",
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Brandon Black",
+                    "email": "blblack@gmail.com"
+                }
+            ],
+            "description": "Efficiently match IP addresses against a set of CIDR specifications.",
+            "homepage": "https://github.com/wikimedia/IPSet",
+            "time": "2017-12-30T10:52:03+00:00"
         }
     ],
     "packages-dev": [
