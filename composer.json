@@ -21,11 +21,13 @@
         "ext-mbstring": "*",
         "amphp/amp": "^2.0",
         "amphp/artax": "^3.0",
+        "amphp/dns": "^0.9.13",
         "amphp/file": "^0.3.3",
         "amphp/parallel-functions": "^0.1.3",
         "amphp/process": "dev-master as 1.0",
         "egulias/email-validator": "^2.1",
-        "harmonyio/http-client": "dev-master"
+        "harmonyio/http-client": "dev-master",
+        "myclabs/php-enum": "^1.6"
     },
     "require-dev": {
         "harmonyio/php-codesniffer-ruleset": "dev-master",
