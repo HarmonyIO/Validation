@@ -19,6 +19,10 @@ class AmericanExpress implements Rule
             return new Success(false);
         }
 
-        return new Success(preg_match(self::PATTERN, $value) === 1);
+        if (preg_match(self::PATTERN, $value) !== 1) {
+            return new Success(false);
+        }
+
+        return (new LuhnChecksum())->validate($value);
     }
 }

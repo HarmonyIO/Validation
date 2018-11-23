@@ -6,9 +6,9 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class DinersClub implements Rule
+class MasterCard implements Rule
 {
-    private const PATTERN = '~^3(?:0[0-5]|[68][0-9])[0-9]{11}$~';
+    private const PATTERN = '~^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$~';
 
     /**
      * {@inheritdoc}
