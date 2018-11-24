@@ -16,6 +16,7 @@
         "ext-ctype": "*",
         "ext-fileinfo": "*",
         "ext-filter": "*",
+        "ext-gd": "*",
         "ext-hash": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
