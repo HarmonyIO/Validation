@@ -1,46 +1,46 @@
 <?php declare(strict_types=1);
 
-namespace HarmonyIO\ValidationTest\Unit\Rule\File\Image;
+namespace HarmonyIO\ValidationTest\Unit\Rule\File\Image\Type;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\File\Image\Gif;
+use HarmonyIO\Validation\Rule\File\Image\Type\Bmp;
 use HarmonyIO\Validation\Rule\Rule;
 
-class GifTest extends TestCase
+class BmpTest extends TestCase
 {
     public function testRuleImplementsInterface(): void
     {
-        $this->assertInstanceOf(Rule::class, new Gif());
+        $this->assertInstanceOf(Rule::class, new Bmp());
     }
 
     public function testValidateReturnsFalseWhenPassingAnInteger(): void
     {
-        $this->assertFalse((new Gif())->validate(1));
+        $this->assertFalse((new Bmp())->validate(1));
     }
 
     public function testValidateReturnsFalseWhenPassingAFloat(): void
     {
-        $this->assertFalse((new Gif())->validate(1.1));
+        $this->assertFalse((new Bmp())->validate(1.1));
     }
 
     public function testValidateReturnsFalseWhenPassingABoolean(): void
     {
-        $this->assertFalse((new Gif())->validate(true));
+        $this->assertFalse((new Bmp())->validate(true));
     }
 
     public function testValidateReturnsFalseWhenPassingAnArray(): void
     {
-        $this->assertFalse((new Gif())->validate([]));
+        $this->assertFalse((new Bmp())->validate([]));
     }
 
     public function testValidateReturnsFalseWhenPassingAnObject(): void
     {
-        $this->assertFalse((new Gif())->validate(new \DateTimeImmutable()));
+        $this->assertFalse((new Bmp())->validate(new \DateTimeImmutable()));
     }
 
     public function testValidateReturnsFalseWhenPassingNull(): void
     {
-        $this->assertFalse((new Gif())->validate(null));
+        $this->assertFalse((new Bmp())->validate(null));
     }
 
     public function testValidateReturnsFalseWhenPassingAResource(): void
@@ -53,34 +53,34 @@ class GifTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new Gif())->validate($resource));
+        $this->assertFalse((new Bmp())->validate($resource));
 
         fclose($resource);
     }
 
     public function testValidateReturnsFalseWhenPassingACallable(): void
     {
-        $this->assertFalse((new Gif())->validate(static function (): void {
+        $this->assertFalse((new Bmp())->validate(static function (): void {
         }));
     }
 
     public function testValidateReturnsFalseWhenFileDoesNotExists(): void
     {
-        $this->assertFalse((new Gif())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
+        $this->assertFalse((new Bmp())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
     }
 
     public function testValidateReturnsFalseWhenNotMatchingMimeType(): void
     {
-        $this->assertFalse((new Gif())->validate(TEST_DATA_DIR . '/image/mspaint.jpeg'));
+        $this->assertFalse((new Bmp())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
     }
 
     public function testValidateReturnsFalseWhenImageIsCorrupted(): void
     {
-        $this->assertFalse((new Gif())->validate(TEST_DATA_DIR . '/image/broken-mspaint.gif'));
+        $this->assertFalse((new Bmp())->validate(TEST_DATA_DIR . '/image/broken-mspaint.bmp'));
     }
 
     public function testValidateReturnsTrueWhenImageIsValid(): void
     {
-        $this->assertTrue((new Gif())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
+        $this->assertTrue((new Bmp())->validate(TEST_DATA_DIR . '/image/mspaint.bmp'));
     }
 }

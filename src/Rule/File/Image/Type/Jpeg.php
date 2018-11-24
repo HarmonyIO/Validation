@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace HarmonyIO\Validation\Rule\File\Image;
+namespace HarmonyIO\Validation\Rule\File\Image\Type;
 
 use Amp\Promise;
 use Amp\Success;

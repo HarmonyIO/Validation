@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace HarmonyIO\Validation\Rule\File\Image;
+namespace HarmonyIO\Validation\Rule\File\Image\Type;
 
 use Amp\Promise;
 use Amp\Success;
@@ -10,7 +10,7 @@ use function Amp\call;
 use function Amp\File\exists;
 use function Amp\ParallelFunctions\parallel;
 
-class Gif implements Rule
+class Png implements Rule
 {
     /**
      * {@inheritdoc}
@@ -26,13 +26,13 @@ class Gif implements Rule
                 return false;
             }
 
-            if ((yield (new MimeType('image/gif'))->validate($value)) === false) {
+            if ((yield (new MimeType('image/png'))->validate($value)) === false) {
                 return false;
             }
 
             return parallel(static function () use ($value) {
                 // @codeCoverageIgnoreStart
-                $image = @imagecreatefromgif($value);
+                $image = @imagecreatefrompng($value);
 
                 return $image !== false;
                 // @codeCoverageIgnoreEnd
