@@ -147,6 +147,7 @@ class Iban implements Rule
         UnitedArabEmirates::class,
         UnitedKingdom::class,
     ];
+
     /**
      * {@inheritdoc}
      */
@@ -158,6 +159,7 @@ class Iban implements Rule
 
         return call(static function () use ($value) {
             foreach (self::COUNTRY_RULES as $ruleFullyQualifiedClassName) {
+                /** @var Rule $rule */
                 $rule = new $ruleFullyQualifiedClassName();
 
                 // phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses
