@@ -6,7 +6,7 @@ use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Exception\Exception;
 use HarmonyIO\Validation\Exception\InvalidFullyQualifiedClassOrInterfaceName;
 
-class InvalidFullyQualifiedClassOrInterfaceExceptionTest extends TestCase
+class InvalidFullyQualifiedClassOrInterfaceTest extends TestCase
 {
     public function testMessageIsFormattedCorrectly(): void
     {
