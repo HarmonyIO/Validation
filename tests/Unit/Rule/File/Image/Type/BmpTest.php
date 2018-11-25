@@ -69,6 +69,11 @@ class BmpTest extends TestCase
         $this->assertFalse((new Bmp())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
     }
 
+    public function testValidateReturnsFalseWhenPassingInADirectory(): void
+    {
+        $this->assertFalse((new Bmp())->validate(TEST_DATA_DIR . '/file-system/existing'));
+    }
+
     public function testValidateReturnsFalseWhenNotMatchingMimeType(): void
     {
         $this->assertFalse((new Bmp())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));

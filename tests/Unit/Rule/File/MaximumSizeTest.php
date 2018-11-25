@@ -69,6 +69,11 @@ class MaximumSizeTest extends TestCase
         $this->assertFalse((new MaximumSize(3))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
     }
 
+    public function testValidateReturnsFalseWhenPassingInADirectory(): void
+    {
+        $this->assertFalse((new MaximumSize(3))->validate(TEST_DATA_DIR . '/file-system/existing'));
+    }
+
     public function testValidateReturnsTrueWhenFileIsSmallerThanMaximumSize(): void
     {
         $this->assertTrue((new MaximumSize(7))->validate(TEST_DATA_DIR . '/file-size-test-6b.txt'));

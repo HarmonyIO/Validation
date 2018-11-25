@@ -5,9 +5,9 @@ namespace HarmonyIO\Validation\Rule\File;
 use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Exception\FileInfo;
+use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
-use function Amp\File\exists;
 use function Amp\ParallelFunctions\parallel;
 
 class MimeType implements Rule
@@ -30,7 +30,7 @@ class MimeType implements Rule
         }
 
         return call(function () use ($value) {
-            if (!yield exists($value)) {
+            if (!yield (new File())->validate($value)) {
                 return false;
             }
 

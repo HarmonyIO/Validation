@@ -69,6 +69,11 @@ class MimeTypeTest extends TestCase
         $this->assertFalse((new MimeType('plain/text'))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
     }
 
+    public function testValidateReturnsFalseWhenPassingInADirectory(): void
+    {
+        $this->assertFalse((new MimeType('plain/text'))->validate(TEST_DATA_DIR . '/file-system/existing'));
+    }
+
     public function testValidateReturnsTrueWhenFileMatchesMimeType(): void
     {
         $this->assertTrue((new MimeType('text/plain'))->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));

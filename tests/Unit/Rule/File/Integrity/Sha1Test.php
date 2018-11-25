@@ -69,6 +69,11 @@ class Sha1Test extends TestCase
         $this->assertFalse((new Sha1('f0f82bc3889d01ff54acbb3bfbd4d6e3cbb21964'))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
     }
 
+    public function testValidateReturnsFalseWhenPassingInADirectory(): void
+    {
+        $this->assertFalse((new Sha1('f0f82bc3889d01ff54acbb3bfbd4d6e3cbb21964'))->validate(TEST_DATA_DIR . '/file-system/existing'));
+    }
+
     public function testValidateReturnsFalseWhenFileDoesNotMatch(): void
     {
         $this->assertFalse((new Sha1('f0f82bc3889d01ff54acbb3bfbd4d6e3cbb21964'))->validate(TEST_DATA_DIR . '/file-integrity-no-match-test.txt'));

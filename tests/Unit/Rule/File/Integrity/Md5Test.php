@@ -69,6 +69,11 @@ class Md5Test extends TestCase
         $this->assertFalse((new Md5('97b265118a38fb02e7087d30f63515c7'))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
     }
 
+    public function testValidateReturnsFalseWhenPassingInADirectory(): void
+    {
+        $this->assertFalse((new Md5('97b265118a38fb02e7087d30f63515c7'))->validate(TEST_DATA_DIR . '/file-system/existing'));
+    }
+
     public function testValidateReturnsFalseWhenFileDoesNotMatch(): void
     {
         $this->assertFalse((new Md5('97b265118a38fb02e7087d30f63515c7'))->validate(TEST_DATA_DIR . '/file-integrity-no-match-test.txt'));

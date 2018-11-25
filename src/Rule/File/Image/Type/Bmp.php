@@ -6,9 +6,9 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\File\MimeType;
+use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
-use function Amp\File\exists;
 use function Amp\ParallelFunctions\parallel;
 
 class Bmp implements Rule
@@ -23,7 +23,7 @@ class Bmp implements Rule
         }
 
         return call(static function () use ($value) {
-            if (!yield exists($value)) {
+            if (!yield (new File())->validate($value)) {
                 return false;
             }
 

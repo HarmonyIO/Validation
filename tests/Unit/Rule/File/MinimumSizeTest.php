@@ -69,6 +69,11 @@ class MinimumSizeTest extends TestCase
         $this->assertFalse((new MinimumSize(3))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
     }
 
+    public function testValidateReturnsFalseWhenPassingInADirectory(): void
+    {
+        $this->assertFalse((new MinimumSize(3))->validate(TEST_DATA_DIR . '/file-system/existing'));
+    }
+
     public function testValidateReturnsFalseWhenFileIsSmallerThanMinimumSize(): void
     {
         $this->assertFalse((new MinimumSize(7))->validate(TEST_DATA_DIR . '/file-size-test-6b.txt'));

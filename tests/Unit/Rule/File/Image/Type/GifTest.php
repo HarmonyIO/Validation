@@ -69,6 +69,11 @@ class GifTest extends TestCase
         $this->assertFalse((new Gif())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
     }
 
+    public function testValidateReturnsFalseWhenPassingInADirectory(): void
+    {
+        $this->assertFalse((new Gif())->validate(TEST_DATA_DIR . '/file-system/existing'));
+    }
+
     public function testValidateReturnsFalseWhenNotMatchingMimeType(): void
     {
         $this->assertFalse((new Gif())->validate(TEST_DATA_DIR . '/image/mspaint.jpeg'));
