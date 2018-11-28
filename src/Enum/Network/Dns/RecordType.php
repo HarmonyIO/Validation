@@ -5,6 +5,48 @@ namespace HarmonyIO\Validation\Enum\Network\Dns;
 use Amp\Dns\Record;
 use MyCLabs\Enum\Enum;
 
+/**
+ * @method static RecordType A()
+ * @method static RecordType AAAA()
+ * @method static RecordType AFSDB()
+ * @method static RecordType CAA()
+ * @method static RecordType CERT()
+ * @method static RecordType CNAME()
+ * @method static RecordType DHCID()
+ * @method static RecordType DLV()
+ * @method static RecordType DNAME()
+ * @method static RecordType DNSKEY()
+ * @method static RecordType DS()
+ * @method static RecordType HINFO()
+ * @method static RecordType KEY()
+ * @method static RecordType KX()
+ * @method static RecordType ISDN()
+ * @method static RecordType LOC()
+ * @method static RecordType MB()
+ * @method static RecordType MD()
+ * @method static RecordType MF()
+ * @method static RecordType MG()
+ * @method static RecordType MINFO()
+ * @method static RecordType MR()
+ * @method static RecordType MX()
+ * @method static RecordType NAPTR()
+ * @method static RecordType NS()
+ * @method static RecordType NULL()
+ * @method static RecordType PTR()
+ * @method static RecordType RP()
+ * @method static RecordType RT()
+ * @method static RecordType SIG()
+ * @method static RecordType SOA()
+ * @method static RecordType SPF()
+ * @method static RecordType SRV()
+ * @method static RecordType TXT()
+ * @method static RecordType WKS()
+ * @method static RecordType X25()
+ * @method static RecordType AXFR()
+ * @method static RecordType MAILB()
+ * @method static RecordType MAILA()
+ * @method static RecordType ALL()
+ */
 class RecordType extends Enum
 {
     // phpcs:disable SlevomatCodingStandard.Classes.UnusedPrivateElements.UnusedConstant
