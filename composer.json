@@ -14,11 +14,13 @@
     "require": {
         "php": "^7.2",
         "ext-ctype": "*",
+        "ext-dom": "*",
         "ext-fileinfo": "*",
         "ext-filter": "*",
         "ext-gd": "*",
         "ext-hash": "*",
         "ext-json": "*",
+        "ext-libxml": "*",
         "ext-mbstring": "*",
         "amphp/amp": "^2.0",
         "amphp/artax": "^3.0",
