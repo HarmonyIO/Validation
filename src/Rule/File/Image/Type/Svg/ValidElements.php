@@ -5,9 +5,11 @@ namespace HarmonyIO\Validation\Rule\File\Image\Type\Svg;
 use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Enum\File\Image\Svg\Element;
+use HarmonyIO\Validation\Exception\InvalidXml;
 use HarmonyIO\Validation\Rule\File\MimeType;
 use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Xml\SafeParser;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
@@ -41,19 +43,18 @@ class ValidElements implements Rule
 
             return parallel(function () use ($value) {
                 // @codeCoverageIgnoreStart
-                $useInternalErrors = libxml_use_internal_errors(true);
-
-                $domDocument = new \DOMDocument();
-                $domDocument->load($value);
+                try {
+                    $xmlParser = new SafeParser(file_get_contents($value));
+                } catch (InvalidXml $e) {
+                    return false;
+                }
 
                 /** @var \DOMElement $node */
-                foreach ($domDocument->getElementsByTagName('*') as $node) {
+                foreach ($xmlParser->getElementsByTagName('*') as $node) {
                     if (!$this->element->exists($node->nodeName)) {
                         return false;
                     }
                 }
-
-                libxml_use_internal_errors($useInternalErrors);
 
                 return true;
                 // @codeCoverageIgnoreEnd

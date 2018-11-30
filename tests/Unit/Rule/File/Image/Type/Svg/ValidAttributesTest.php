@@ -79,6 +79,11 @@ class ValidAttributesTest extends TestCase
         $this->assertFalse((new ValidAttributes())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
     }
 
+    public function testValidateReturnsFalseWhenImageContainsBrokenXml(): void
+    {
+        $this->assertFalse((new ValidAttributes())->validate(TEST_DATA_DIR . '/image/broken.svg'));
+    }
+
     public function testValidateReturnsFalseWhenImageContainsInvalidElements(): void
     {
         $this->assertFalse((new ValidAttributes())->validate(TEST_DATA_DIR . '/image/invalid-attributes.svg'));
