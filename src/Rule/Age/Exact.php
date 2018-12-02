@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Exact implements Rule
+final class Exact implements Rule
 {
     /** @var int */
     private $age;

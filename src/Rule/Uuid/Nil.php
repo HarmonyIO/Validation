@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Nil implements Rule
+final class Nil implements Rule
 {
     /**
      * {@inheritdoc}

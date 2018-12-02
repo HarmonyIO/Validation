@@ -6,7 +6,7 @@ use Amp\Promise;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class Any implements Rule
+final class Any implements Rule
 {
     /** @var Rule[] */
     private $rules = [];

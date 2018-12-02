@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Cyprus implements Rule
+final class Cyprus implements Rule
 {
     private const PATTERN = '~^CY\d{2}\d{3}\d{5}[a-zA-Z0-9]{16}$~';
 

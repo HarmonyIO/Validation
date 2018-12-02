@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\Validation\Rule\Rule;
 
-class VideoUrl implements Rule
+final class VideoUrl implements Rule
 {
     /** @var Client */
     private $httpClient;

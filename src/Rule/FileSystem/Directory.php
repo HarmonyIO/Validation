@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\File\isdir;
 
-class Directory implements Rule
+final class Directory implements Rule
 {
     /**
      * {@inheritdoc}

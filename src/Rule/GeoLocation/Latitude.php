@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Latitude implements Rule
+final class Latitude implements Rule
 {
     /**
      * {@inheritdoc}

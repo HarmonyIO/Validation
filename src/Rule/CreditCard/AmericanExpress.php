@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class AmericanExpress implements Rule
+final class AmericanExpress implements Rule
 {
     private const PATTERN = '~^3[47][0-9]{13}$~';
 

@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Andorra implements Rule
+final class Andorra implements Rule
 {
     private const PATTERN = '~^AD\d{2}\d{4}\d{4}[a–zA-Z0-9]{12}$~';
 

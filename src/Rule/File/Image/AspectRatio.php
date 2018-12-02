@@ -9,7 +9,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class AspectRatio implements Rule
+final class AspectRatio implements Rule
 {
     /** @var float */
     private $ratio;

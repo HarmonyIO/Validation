@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class AtLeast implements Rule
+final class AtLeast implements Rule
 {
     /** @var int */
     private $minimumNumberOfValidRules;

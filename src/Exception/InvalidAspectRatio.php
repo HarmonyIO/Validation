@@ -2,7 +2,7 @@
 
 namespace HarmonyIO\Validation\Exception;
 
-class InvalidAspectRatio extends Exception
+final class InvalidAspectRatio extends Exception
 {
     private const MESSAGE_TEMPLATE = 'The aspect ratio (`%s`) could not be parsed.';
 

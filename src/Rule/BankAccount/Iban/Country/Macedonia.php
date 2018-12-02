@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Macedonia implements Rule
+final class Macedonia implements Rule
 {
     private const PATTERN = '~^MK07\d{3}[a-zA-Z0-9]{12}$~';
 

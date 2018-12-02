@@ -2,6 +2,6 @@
 
 namespace HarmonyIO\Validation\Exception;
 
-class InvalidXml extends Exception
+final class InvalidXml extends Exception
 {
 }

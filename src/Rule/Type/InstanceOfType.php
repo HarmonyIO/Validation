@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Exception\InvalidFullyQualifiedClassOrInterfaceName;
 use HarmonyIO\Validation\Rule\Rule;
 
-class InstanceOfType implements Rule
+final class InstanceOfType implements Rule
 {
     /** @var string */
     private $fullyQualifiedClassOrInterfaceName;

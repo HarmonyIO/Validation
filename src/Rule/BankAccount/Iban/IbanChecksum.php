@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class IbanChecksum implements Rule
+final class IbanChecksum implements Rule
 {
     /**
      * {@inheritdoc}

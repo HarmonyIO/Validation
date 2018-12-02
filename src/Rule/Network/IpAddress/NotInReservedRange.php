@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class NotInReservedRange implements Rule
+final class NotInReservedRange implements Rule
 {
     /**
      * {@inheritdoc}

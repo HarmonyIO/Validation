@@ -2,6 +2,6 @@
 
 namespace HarmonyIO\Validation\Exception;
 
-class RequestFailed extends Exception
+final class RequestFailed extends Exception
 {
 }

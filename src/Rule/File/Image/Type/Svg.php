@@ -11,7 +11,7 @@ use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class Svg implements Rule
+final class Svg implements Rule
 {
     /**
      * {@inheritdoc}

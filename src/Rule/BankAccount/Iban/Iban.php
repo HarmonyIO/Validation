@@ -75,7 +75,7 @@ use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\UnitedKingdom;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class Iban implements Rule
+final class Iban implements Rule
 {
     private const COUNTRY_RULES = [
         Albania::class,

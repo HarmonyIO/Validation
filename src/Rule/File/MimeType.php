@@ -10,7 +10,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class MimeType implements Rule
+final class MimeType implements Rule
 {
     /** @var string */
     private $mimeType;

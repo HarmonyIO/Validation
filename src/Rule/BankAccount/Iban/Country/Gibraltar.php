@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Gibraltar implements Rule
+final class Gibraltar implements Rule
 {
     private const PATTERN = '~^GI\d{2}[A-Z]{4}[a-zA-Z0-9]{15}$~';
 

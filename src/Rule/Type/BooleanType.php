@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class BooleanType implements Rule
+final class BooleanType implements Rule
 {
     /**
      * {@inheritdoc}

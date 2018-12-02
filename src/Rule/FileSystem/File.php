@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\File\isfile;
 
-class File implements Rule
+final class File implements Rule
 {
     /**
      * {@inheritdoc}

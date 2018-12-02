@@ -8,7 +8,7 @@ use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use HarmonyIO\Validation\Rule\Rule;
 
-class RfcEmailAddress implements Rule
+final class RfcEmailAddress implements Rule
 {
     /**
      * {@inheritdoc}

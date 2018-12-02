@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Greenland implements Rule
+final class Greenland implements Rule
 {
     private const PATTERN = '~^GL\d{2}\d{4}\d{10}$~';
 

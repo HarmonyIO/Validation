@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Kazakhstan implements Rule
+final class Kazakhstan implements Rule
 {
     private const PATTERN = '~^KZ\d{2}\d{3}[a-zA-Z0-9]{13}$~';
 

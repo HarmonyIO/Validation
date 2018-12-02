@@ -2,7 +2,7 @@
 
 namespace HarmonyIO\Validation\Exception;
 
-class InvalidFullyQualifiedClassOrInterfaceName extends Exception
+final class InvalidFullyQualifiedClassOrInterfaceName extends Exception
 {
     private const MESSAGE_TEMPLATE = 'Expected type `%s` should be a valid fully qualified class or interface name.';
 

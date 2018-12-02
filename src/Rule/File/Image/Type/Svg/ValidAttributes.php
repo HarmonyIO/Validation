@@ -13,7 +13,7 @@ use HarmonyIO\Validation\Xml\SafeParser;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class ValidAttributes implements Rule
+final class ValidAttributes implements Rule
 {
     /** @var Attribute */
     private $attribute;

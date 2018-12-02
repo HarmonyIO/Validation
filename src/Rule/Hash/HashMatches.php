@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class HashMatches implements Rule
+final class HashMatches implements Rule
 {
     /** @var string */
     private $knownString;

@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Maximum implements Rule
+final class Maximum implements Rule
 {
     /** @var int */
     private $maximumAge;

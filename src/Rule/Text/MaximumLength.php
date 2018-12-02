@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class MaximumLength implements Rule
+final class MaximumLength implements Rule
 {
     /** @var int */
     private $length;

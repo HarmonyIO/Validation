@@ -8,7 +8,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class MinimumHeight implements Rule
+final class MinimumHeight implements Rule
 {
     /** @var int */
     private $minimumHeight;

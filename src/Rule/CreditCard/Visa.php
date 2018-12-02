@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Visa implements Rule
+final class Visa implements Rule
 {
     private const PATTERN = '~^4[0-9]{12}(?:[0-9]{3})?$~';
 

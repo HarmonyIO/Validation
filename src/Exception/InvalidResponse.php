@@ -2,6 +2,6 @@
 
 namespace HarmonyIO\Validation\Exception;
 
-class InvalidResponse extends Exception
+final class InvalidResponse extends Exception
 {
 }

@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Minimum implements Rule
+final class Minimum implements Rule
 {
     /** @var int */
     private $minimumAge;

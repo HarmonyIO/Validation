@@ -9,7 +9,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\File\size;
 
-class MaximumSize implements Rule
+final class MaximumSize implements Rule
 {
     /** @var int */
     private $maximumSizeInBytes;

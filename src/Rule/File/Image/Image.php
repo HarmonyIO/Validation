@@ -11,7 +11,7 @@ use HarmonyIO\Validation\Rule\File\Image\Type\Png;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class Image implements Rule
+final class Image implements Rule
 {
     private const IMAGE_TYPES = [
         Bmp::class,

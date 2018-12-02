@@ -10,7 +10,7 @@ use HarmonyIO\HttpClient\Message\Response;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class VideoId implements Rule
+final class VideoId implements Rule
 {
     private const BASE_URL = 'https://www.youtube.com/oembed?url=%s%s&format=json';
 

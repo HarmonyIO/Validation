@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Jordan implements Rule
+final class Jordan implements Rule
 {
     private const PATTERN = '~^JO\d{2}[A-Z]{4}\d{4}[a-zA-Z0-9]{18}$~';
 

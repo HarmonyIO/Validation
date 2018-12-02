@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Kosovo implements Rule
+final class Kosovo implements Rule
 {
     private const PATTERN = '~^XK\d{2}\d{4}[a-zA-Z0-9]{12}$~';
 

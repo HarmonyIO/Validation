@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Guatemala implements Rule
+final class Guatemala implements Rule
 {
     private const PATTERN = '~^GT\d{2}[A-Z]{4}\d{2}\d{2}[a-zA-Z0-9]{16}$~';
 

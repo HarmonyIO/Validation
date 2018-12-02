@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Palestine implements Rule
+final class Palestine implements Rule
 {
     private const PATTERN = '~^PS\d{2}[A-Z]{4}[a-zA-Z0-9]{21}$~';
 

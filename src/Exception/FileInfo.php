@@ -2,6 +2,6 @@
 
 namespace HarmonyIO\Validation\Exception;
 
-class FileInfo extends Exception
+final class FileInfo extends Exception
 {
 }

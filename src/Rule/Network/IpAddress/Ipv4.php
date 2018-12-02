@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Ipv4 implements Rule
+final class Ipv4 implements Rule
 {
     /**
      * {@inheritdoc}

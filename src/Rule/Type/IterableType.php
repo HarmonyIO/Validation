@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class IterableType implements Rule
+final class IterableType implements Rule
 {
     /**
      * {@inheritdoc}

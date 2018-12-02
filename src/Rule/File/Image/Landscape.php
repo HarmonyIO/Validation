@@ -8,7 +8,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class Landscape implements Rule
+final class Landscape implements Rule
 {
     /**
      * {@inheritdoc}

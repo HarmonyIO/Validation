@@ -47,7 +47,7 @@ use MyCLabs\Enum\Enum;
  * @method static RecordType MAILA()
  * @method static RecordType ALL()
  */
-class RecordType extends Enum
+final class RecordType extends Enum
 {
     // phpcs:disable SlevomatCodingStandard.Classes.UnusedPrivateElements.UnusedConstant
     private const A = Record::A;

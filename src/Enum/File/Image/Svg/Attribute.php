@@ -2,7 +2,7 @@
 
 namespace HarmonyIO\Validation\Enum\File\Image\Svg;
 
-class Attribute
+final class Attribute
 {
     public const ACCENT_HEIGHT = 'accent-height';
     public const ACCUMULATE = 'accumulate';

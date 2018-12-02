@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Lebanon implements Rule
+final class Lebanon implements Rule
 {
     private const PATTERN = '~^LB\d{2}\d{4}[a-zA-Z0-9]{20}$~';
 

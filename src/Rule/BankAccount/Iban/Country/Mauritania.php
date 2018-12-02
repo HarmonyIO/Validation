@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Mauritania implements Rule
+final class Mauritania implements Rule
 {
     private const PATTERN = '~^MR13\d{5}\d{5}\d{11}\d{2}$~';
 

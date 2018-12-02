@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Turkey implements Rule
+final class Turkey implements Rule
 {
     private const PATTERN = '~^TR\d{2}\d{5}0[a-zA-Z0-9]{16}$~';
 

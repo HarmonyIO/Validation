@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Luxembourg implements Rule
+final class Luxembourg implements Rule
 {
     private const PATTERN = '~^LU\d{2}\d{3}[a-zA-Z0-9]{13}$~';
 

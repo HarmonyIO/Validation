@@ -8,7 +8,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class MaximumHeight implements Rule
+final class MaximumHeight implements Rule
 {
     /** @var int */
     private $maximumHeight;

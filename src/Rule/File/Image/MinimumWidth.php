@@ -8,7 +8,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class MinimumWidth implements Rule
+final class MinimumWidth implements Rule
 {
     /** @var int */
     private $minimumWidth;

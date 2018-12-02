@@ -2,7 +2,7 @@
 
 namespace HarmonyIO\Validation\Exception;
 
-class InvalidCidrRange extends Exception
+final class InvalidCidrRange extends Exception
 {
     public function __construct(string $message, int $code)
     {

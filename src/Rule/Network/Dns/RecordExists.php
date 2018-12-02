@@ -10,7 +10,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\Dns\query;
 
-class RecordExists implements Rule
+final class RecordExists implements Rule
 {
     /** @var RecordType */
     private $recordType;

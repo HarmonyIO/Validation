@@ -10,7 +10,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\Dns\query;
 
-class MxRecord implements Rule
+final class MxRecord implements Rule
 {
     /**
      * {@inheritdoc}

@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class NumericType implements Rule
+final class NumericType implements Rule
 {
     /**
      * {@inheritdoc}

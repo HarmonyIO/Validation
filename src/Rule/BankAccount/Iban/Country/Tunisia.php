@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Tunisia implements Rule
+final class Tunisia implements Rule
 {
     private const PATTERN = '~^TN59\d{2}\d{3}\d{15}$~';
 

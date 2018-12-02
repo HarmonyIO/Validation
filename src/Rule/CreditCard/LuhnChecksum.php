@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class LuhnChecksum implements Rule
+final class LuhnChecksum implements Rule
 {
     /**
      * {@inheritdoc}

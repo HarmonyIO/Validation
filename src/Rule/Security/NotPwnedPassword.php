@@ -11,7 +11,7 @@ use HarmonyIO\HttpClient\Message\Response;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class NotPwnedPassword implements Rule
+final class NotPwnedPassword implements Rule
 {
     private const BASE_URL = 'https://api.pwnedpasswords.com/range/%s';
 

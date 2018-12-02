@@ -9,7 +9,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\File\size;
 
-class MinimumSize implements Rule
+final class MinimumSize implements Rule
 {
     /** @var int */
     private $minimumSizeInBytes;

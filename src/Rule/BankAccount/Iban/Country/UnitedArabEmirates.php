@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class UnitedArabEmirates implements Rule
+final class UnitedArabEmirates implements Rule
 {
     private const PATTERN = '~^AE\d{2}\d{3}\d{16}$~';
 

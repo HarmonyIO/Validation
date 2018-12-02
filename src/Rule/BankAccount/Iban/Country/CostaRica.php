@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class CostaRica implements Rule
+final class CostaRica implements Rule
 {
     private const PATTERN = '~^CR\d{2}0\d{3}\d{14}$~';
 

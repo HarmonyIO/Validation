@@ -6,7 +6,7 @@ use Amp\Promise;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class Negate implements Rule
+final class Negate implements Rule
 {
     /** @var Rule */
     private $rule;

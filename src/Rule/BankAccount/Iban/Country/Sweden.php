@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Sweden implements Rule
+final class Sweden implements Rule
 {
     private const PATTERN = '~^SE\d{2}\d{3}\d{17}$~';
 

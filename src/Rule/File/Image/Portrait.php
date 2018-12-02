@@ -8,7 +8,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class Portrait implements Rule
+final class Portrait implements Rule
 {
     /**
      * {@inheritdoc}

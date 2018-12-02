@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class NativeEmailAddress implements Rule
+final class NativeEmailAddress implements Rule
 {
     /**
      * {@inheritdoc}

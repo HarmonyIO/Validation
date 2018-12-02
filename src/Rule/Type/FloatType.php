@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class FloatType implements Rule
+final class FloatType implements Rule
 {
     /**
      * {@inheritdoc}

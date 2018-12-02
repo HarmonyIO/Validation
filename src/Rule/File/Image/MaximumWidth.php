@@ -8,7 +8,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class MaximumWidth implements Rule
+final class MaximumWidth implements Rule
 {
     /** @var int */
     private $maximumWidth;

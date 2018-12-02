@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Netherlands implements Rule
+final class Netherlands implements Rule
 {
     private const PATTERN = '~^NL\d{2}[A-Z]{4}\d{10}$~';
 

@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class NotInPrivateRange implements Rule
+final class NotInPrivateRange implements Rule
 {
     /**
      * {@inheritdoc}

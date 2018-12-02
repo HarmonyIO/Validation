@@ -8,7 +8,7 @@ use HarmonyIO\Validation\Exception\InvalidAgeRange;
 use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Range implements Rule
+final class Range implements Rule
 {
     /** @var int */
     private $minimumAge;

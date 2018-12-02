@@ -9,7 +9,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class Sha1 implements Rule
+final class Sha1 implements Rule
 {
     /** @var string string */
     private $hash;

@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Pakistan implements Rule
+final class Pakistan implements Rule
 {
     private const PATTERN = '~^PK\d{2}[A-Z]{4}[a-zA-Z0-9]{16}$~';
 

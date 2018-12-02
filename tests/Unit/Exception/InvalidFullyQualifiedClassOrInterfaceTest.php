@@ -27,7 +27,7 @@ class InvalidFullyQualifiedClassOrInterfaceTest extends TestCase
 
     public function testTheConstructorPassesThePreviousException(): void
     {
-        $previousException = new Exception();
+        $previousException = new \Exception();
 
         $typeException = new InvalidFullyQualifiedClassOrInterfaceName('Foo\\Bar', 0, $previousException);
 

@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Mauritius implements Rule
+final class Mauritius implements Rule
 {
     private const PATTERN = '~^MU\d{2}[A-Z]{4}[a-zA-Z0-9]{22}$~';
 

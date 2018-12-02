@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\ParallelFunctions\parallel;
 
-class PasswordMatches implements Rule
+final class PasswordMatches implements Rule
 {
     /** @var string */
     private $hash;

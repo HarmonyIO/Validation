@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Albania implements Rule
+final class Albania implements Rule
 {
     private const PATTERN = '~^AL\d{2}\d{8}[a–zA-Z0-9]{16}$~';
 

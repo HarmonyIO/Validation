@@ -11,7 +11,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class Bmp implements Rule
+final class Bmp implements Rule
 {
     /**
      * {@inheritdoc}

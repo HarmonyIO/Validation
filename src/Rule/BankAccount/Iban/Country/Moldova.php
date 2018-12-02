@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Moldova implements Rule
+final class Moldova implements Rule
 {
     private const PATTERN = '~^MD\d{2}[A-Z]{2}[a-zA-Z0-9]{18}$~';
 

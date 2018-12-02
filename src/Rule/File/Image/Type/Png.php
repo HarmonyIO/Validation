@@ -10,7 +10,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
 
-class Png implements Rule
+final class Png implements Rule
 {
     /**
      * {@inheritdoc}

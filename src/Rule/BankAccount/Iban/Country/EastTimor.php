@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class EastTimor implements Rule
+final class EastTimor implements Rule
 {
     private const PATTERN = '~^TL38\d{3}\d{16}$~';
 

@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Liechtenstein implements Rule
+final class Liechtenstein implements Rule
 {
     private const PATTERN = '~^LI\d{2}\d{5}[a-zA-Z0-9]{12}$~';
 

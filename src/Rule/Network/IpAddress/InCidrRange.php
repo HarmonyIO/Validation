@@ -8,7 +8,7 @@ use HarmonyIO\Validation\Exception\InvalidCidrRange;
 use HarmonyIO\Validation\Rule\Rule;
 use Wikimedia\IPSet;
 
-class InCidrRange implements Rule
+final class InCidrRange implements Rule
 {
     /** @var IPSet */
     private $cidrRanges;

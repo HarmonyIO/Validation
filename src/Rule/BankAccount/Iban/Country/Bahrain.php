@@ -7,7 +7,7 @@ use Amp\Success;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Bahrain implements Rule
+final class Bahrain implements Rule
 {
     private const PATTERN = '~^BH\d{2}[A-Z]{4}[a-zA-Z0-9]{14}$~';
 

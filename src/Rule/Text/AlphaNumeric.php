@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class AlphaNumeric implements Rule
+final class AlphaNumeric implements Rule
 {
     /**
      * {@inheritdoc}
