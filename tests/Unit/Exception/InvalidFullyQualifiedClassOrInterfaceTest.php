@@ -3,7 +3,6 @@
 namespace HarmonyIO\ValidationTest\Unit\Exception;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Exception\Exception;
 use HarmonyIO\Validation\Exception\InvalidFullyQualifiedClassOrInterfaceName;
 
 class InvalidFullyQualifiedClassOrInterfaceTest extends TestCase
