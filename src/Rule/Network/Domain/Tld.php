@@ -40,6 +40,9 @@ class Tld implements Rule
         });
     }
 
+    /**
+     * @return Promise<string>
+     */
     private function request(): Promise
     {
         return call(function () {
