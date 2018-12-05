@@ -49,6 +49,9 @@ final class NotPwnedPassword implements Rule
         });
     }
 
+    /**
+     * @return Promise<string>
+     */
     private function request(string $password): Promise
     {
         return call(function () use ($password) {

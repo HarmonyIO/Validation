@@ -17,6 +17,7 @@ class Validator
 
     /**
      * @param mixed $value
+     * @return Promise<bool>
      */
     public function validate($value): Promise
     {
