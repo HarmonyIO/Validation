@@ -11,7 +11,7 @@ use HarmonyIO\HttpClient\Message\Response;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
-class Tld implements Rule
+final class Tld implements Rule
 {
     private const SOURCE = 'https://data.iana.org/TLD/tlds-alpha-by-domain.txt';
 

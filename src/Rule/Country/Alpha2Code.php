@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class Alpha2Code implements Rule
+final class Alpha2Code implements Rule
 {
     private const CODES = [
         'AF',

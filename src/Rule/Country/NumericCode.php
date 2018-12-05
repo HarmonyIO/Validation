@@ -6,7 +6,7 @@ use Amp\Promise;
 use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
-class NumericCode implements Rule
+final class NumericCode implements Rule
 {
     private const CODES = [
         '004',
