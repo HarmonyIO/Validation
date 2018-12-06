@@ -66,7 +66,7 @@ class IsbnTest extends TestCase
 
     public function testValidateReturnsFalseWhenPassingInAnInvalidIsbn10(): void
     {
-        $this->assertFalse((new Isbn())->validate('0345391803'));
+            $this->assertFalse((new Isbn())->validate('0345391803'));
     }
 
     public function testValidateReturnsFalseWhenPassingInAnInvalidIsbn13(): void
@@ -76,11 +76,11 @@ class IsbnTest extends TestCase
 
     public function testValidateReturnsTrueWhenPassingInAValidIsbn10(): void
     {
-        $this->assertFalse((new Isbn())->validate('0345391802'));
+        $this->assertTrue((new Isbn())->validate('0345391802'));
     }
 
     public function testValidateReturnsTrueWhenPassingInAValidIsbn13(): void
     {
-        $this->assertFalse((new Isbn())->validate('9788970137506'));
+        $this->assertTrue((new Isbn())->validate('9788970137506'));
     }
 }
