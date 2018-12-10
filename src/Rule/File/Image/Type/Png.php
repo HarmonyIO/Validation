@@ -3,12 +3,15 @@
 namespace HarmonyIO\Validation\Rule\File\Image\Type;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\MimeType;
-use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Png implements Rule
 {
@@ -17,24 +20,23 @@ final class Png implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(static function () use ($value) {
-            if (!yield (new File())->validate($value)) {
-                return false;
-            }
+            /** @var Result $result */
+            $result = yield (new MimeType('image/png'))->validate($value);
 
-            if ((yield (new MimeType('image/png'))->validate($value)) === false) {
-                return false;
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
             return parallel(static function () use ($value) {
                 // @codeCoverageIgnoreStart
                 $image = @imagecreatefrompng($value);
 
-                return $image !== false;
+                if ($image !== false) {
+                    return succeed();
+                }
+
+                return fail(new Error('file.image.type.png'));
                 // @codeCoverageIgnoreEnd
             })();
         });

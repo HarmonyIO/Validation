@@ -3,8 +3,14 @@
 namespace HarmonyIO\Validation\Rule\Combinator;
 
 use Amp\Promise;
+use function HarmonyIO\Validation\fail;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Promise\Failure;
+use HarmonyIO\Validation\Result\Promise\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\succeed;
 
 final class Negate implements Rule
 {
@@ -22,7 +28,14 @@ final class Negate implements Rule
     public function validate($value): Promise
     {
         return call(function () use ($value) {
-            return !yield $this->rule->validate($value);
+            /** @var Result $result */
+            $result = yield $this->rule->validate($value);
+
+            if (!$result->isValid()) {
+                return succeed();
+            }
+
+            return fail(new Error($result->getErrors() . '.negated'));
         });
     }
 }

@@ -3,10 +3,16 @@
 namespace HarmonyIO\Validation\Rule\Network\IpAddress;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Exception\InvalidCidrRange;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
 use Wikimedia\IPSet;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class InCidrRange implements Rule
 {
@@ -33,10 +39,19 @@ final class InCidrRange implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function() use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return new Success($this->cidrRanges->match($value));
+            if (!$result->isValid()) {
+                return bubbleUp($result);
+            }
+
+            if ($this->cidrRanges->match($value)) {
+                return succeed();
+            }
+
+            return fail(new Error('Network.IpAddress.InCidrRange'));
+        });
     }
 }

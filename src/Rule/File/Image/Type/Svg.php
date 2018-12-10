@@ -3,13 +3,14 @@
 namespace HarmonyIO\Validation\Rule\File\Image\Type;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
+use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\File\Image\Type\Svg\ValidAttributes;
 use HarmonyIO\Validation\Rule\File\Image\Type\Svg\ValidElements;
 use HarmonyIO\Validation\Rule\File\MimeType;
-use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
 
 final class Svg implements Rule
 {
@@ -18,24 +19,15 @@ final class Svg implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(static function () use ($value) {
-            if (!yield (new File())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = (new MimeType('image/svg'))->validate($value);
+
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
-            if ((yield (new MimeType('image/svg'))->validate($value)) === false) {
-                return false;
-            }
-
-            if ((yield (new ValidElements())->validate($value)) === false) {
-                return false;
-            }
-
-            return yield (new ValidAttributes())->validate($value);
+            return (new All(new ValidElements(), new ValidAttributes()))->validate($value);
         });
     }
 }

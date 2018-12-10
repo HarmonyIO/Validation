@@ -3,9 +3,12 @@
 namespace HarmonyIO\Validation\Rule\Type;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Exception\InvalidFullyQualifiedClassOrInterfaceName;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Rule\Rule;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class InstanceOfType implements Rule
 {
@@ -28,10 +31,19 @@ final class InstanceOfType implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_object($value)) {
-            return new Success(false);
+        if (is_object($value) && is_a($value, $this->fullyQualifiedClassOrInterfaceName)) {
+            return succeed();
         }
 
-        return new Success(is_a($value, $this->fullyQualifiedClassOrInterfaceName));
+        return fail(new Error('Type.InstanceOfType', new Parameter('type', $this->getType($value))));
+    }
+
+    private function getType($value): string
+    {
+        if (!is_object($value)) {
+            return gettype($value);
+        }
+
+        return get_class($value);
     }
 }

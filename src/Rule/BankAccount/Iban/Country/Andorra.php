@@ -2,28 +2,14 @@
 
 namespace HarmonyIO\Validation\Rule\BankAccount\Iban\Country;
 
-use Amp\Promise;
-use Amp\Success;
-use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\BankAccount\Iban\Country;
 
-final class Andorra implements Rule
+final class Andorra extends Country
 {
     private const PATTERN = '~^AD\d{2}\d{4}\d{4}[a–zA-Z0-9]{12}$~';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value): Promise
+    public function __construct()
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
-        if (preg_match(self::PATTERN, $value, $matches) !== 1) {
-            return new Success(false);
-        }
-
-        return (new IbanChecksum())->validate($value);
+        parent::__construct(self::PATTERN, 'andorra');
     }
 }

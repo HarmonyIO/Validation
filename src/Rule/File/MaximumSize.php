@@ -3,11 +3,16 @@
 namespace HarmonyIO\Validation\Rule\File;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\File\size;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class MaximumSize implements Rule
 {
@@ -24,17 +29,23 @@ final class MaximumSize implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
-            if (!yield (new File())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new File())->validate($value);
+
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
             //phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses
-            return (yield size($value)) <= $this->maximumSizeInBytes;
+            if ((yield size($value)) <= $this->maximumSizeInBytes) {
+                return succeed();
+            }
+
+            return fail(new Error(
+                'file.maximumsize{maximumSize}',
+                new Parameter('maximumSize', $this->maximumSizeInBytes)
+            ));
         });
     }
 }

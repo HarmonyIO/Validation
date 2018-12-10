@@ -3,13 +3,19 @@
 namespace HarmonyIO\Validation\Rule\Security;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class NotPwnedPassword implements Rule
 {
@@ -34,18 +40,21 @@ final class NotPwnedPassword implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
-            $result = yield $this->request($value);
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-            if ($this->getNumberOfHits($result, $value) > $this->threshold) {
-                return new Success(false);
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
-            return new Success(true);
+            $response = yield $this->request($value);
+
+            if ($this->getNumberOfHits($response, $value) > $this->threshold) {
+                return fail(new Error('Security.NotPwnedPassword', new Parameter('threshold', $this->threshold)));
+            }
+
+            return succeed();
         });
     }
 

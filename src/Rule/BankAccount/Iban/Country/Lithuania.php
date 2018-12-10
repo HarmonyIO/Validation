@@ -2,28 +2,14 @@
 
 namespace HarmonyIO\Validation\Rule\BankAccount\Iban\Country;
 
-use Amp\Promise;
-use Amp\Success;
-use HarmonyIO\Validation\Rule\BankAccount\Iban\IbanChecksum;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\BankAccount\Iban\Country;
 
-final class Lithuania implements Rule
+final class Lithuania extends Country
 {
     private const PATTERN = '~^LT\d{2}\d{5}\d{11}$~';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value): Promise
+    public function __construct()
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
-        if (preg_match(self::PATTERN, $value, $matches) !== 1) {
-            return new Success(false);
-        }
-
-        return (new IbanChecksum())->validate($value);
+        parent::__construct(self::PATTERN, 'lithuania');
     }
 }

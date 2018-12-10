@@ -3,7 +3,10 @@
 namespace HarmonyIO\Validation\Rule\Combinator;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Promise\Failure;
+use HarmonyIO\Validation\Result\Promise\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 
@@ -27,23 +30,37 @@ final class AtLeast implements Rule
     public function validate($value): Promise
     {
         if ($this->minimumNumberOfValidRules === 0) {
-            return new Success(true);
+            return new Success();
         }
 
-        return call(function () use ($value) {
-            $validRules = 0;
+        $promises = array_reduce($this->rules, function(array $promises, Rule $rule) use ($value) {
+            $promises[] = $rule->validate($value);
 
-            foreach ($this->rules as $rule) {
-                if (yield $rule->validate($value)) {
-                    $validRules++;
+            return $promises;
+        }, []);
+
+        return call(function () use ($promises) {
+            /** @var Result[] $results */
+            $results = yield $promises;
+
+            $errors = array_reduce($results, function(array $errors, Result $result) {
+                if ($result->isValid()) {
+                    return $errors;
                 }
 
-                if ($validRules === $this->minimumNumberOfValidRules) {
-                    return true;
+                /** @var Error $error */
+                foreach ($result->getErrors() as $error) {
+                    $errors[] = $error;
                 }
+
+                return $errors;
+            }, []);
+
+            if (count($this->rules) - count($errors) >= $this->minimumNumberOfValidRules) {
+                return new Success();
             }
 
-            return false;
+            return new Failure(...$errors);
         });
     }
 }

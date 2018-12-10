@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Age;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Exception\InvalidAgeRange;
 use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\Rule;
@@ -31,10 +30,6 @@ final class Range implements Rule
      */
     public function validate($value): Promise
     {
-        if (!$value instanceof \DateTimeInterface) {
-            return new Success(false);
-        }
-
         return (new All(new Minimum($this->minimumAge), new Maximum($this->maximumAge)))->validate($value);
     }
 }

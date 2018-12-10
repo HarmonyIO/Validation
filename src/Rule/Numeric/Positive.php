@@ -3,8 +3,13 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Positive implements Rule
 {
@@ -14,12 +19,19 @@ final class Positive implements Rule
     public function validate($value): Promise
     {
         return call(static function () use ($value) {
-            if (!yield (new NumericType())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new NumericType())->validate($value);
+
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
             // phpcs:ignore SlevomatCodingStandard.ControlStructures.DisallowEqualOperators.DisallowedEqualOperator
-            return $value == 0 || $value > 0;
+            if ($value == 0 || $value > 0) {
+                return succeed();
+            }
+
+            return fail(new Error('Numeric.Positive'));
         });
     }
 }

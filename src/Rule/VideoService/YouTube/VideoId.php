@@ -3,12 +3,17 @@
 namespace HarmonyIO\Validation\Rule\VideoService\YouTube;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Response;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class VideoId implements Rule
 {
@@ -29,27 +34,34 @@ final class VideoId implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
+
+            if (!$result->isValid()) {
+                return bubbleUp($result);
+            }
+
             $url = sprintf(self::BASE_URL, rawurlencode(self::BASE_VIDEO_URL), rawurlencode($value));
 
             /** @var Response $response */
             $response = yield $this->httpClient->request(new CachingRequest(self::class, 3600, $url, 'GET'));
 
             if ($response->getNumericalStatusCode() !== 200) {
-                return false;
+                return fail(new Error('VideoService.YouTube.VideoId'));
             }
 
             $result = json_decode($response->getBody(), true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return false;
+                return fail(new Error('VideoService.YouTube.VideoId'));
             }
 
-            return array_key_exists('type', $result) && $result['type'] === 'video';
+            if (array_key_exists('type', $result) && $result['type'] === 'video') {
+                return succeed();
+            }
+
+            return fail(new Error('VideoService.YouTube.VideoId'));
         });
     }
 }

@@ -45,7 +45,10 @@
     "autoload": {
         "psr-4": {
             "HarmonyIO\\Validation\\": "src/"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

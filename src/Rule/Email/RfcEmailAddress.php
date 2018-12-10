@@ -3,10 +3,16 @@
 namespace HarmonyIO\Validation\Rule\Email;
 
 use Amp\Promise;
-use Amp\Success;
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\RFCValidation;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class RfcEmailAddress implements Rule
 {
@@ -15,10 +21,19 @@ final class RfcEmailAddress implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function() use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return new Success((new EmailValidator())->isValid($value, new RFCValidation()));
+            if (!$result->isValid()) {
+                return bubbleUp($result);
+            }
+
+            if ((new EmailValidator())->isValid($value, new RFCValidation())) {
+                return succeed();
+            }
+
+            return fail(new Error('email.RfcEmailAddress'));
+        });
     }
 }

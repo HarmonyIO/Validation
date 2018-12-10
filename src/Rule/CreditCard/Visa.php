@@ -3,8 +3,13 @@
 namespace HarmonyIO\Validation\Rule\CreditCard;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
 
 final class Visa implements Rule
 {
@@ -15,14 +20,19 @@ final class Visa implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function() use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        if (preg_match(self::PATTERN, $value) !== 1) {
-            return new Success(false);
-        }
+            if (!$result->isValid()) {
+                return bubbleUp($result);
+            }
 
-        return (new LuhnChecksum())->validate($value);
+            if (preg_match(self::PATTERN, $value) !== 1) {
+                return fail(new Error('creditcard.visa'));
+            }
+
+            return (new LuhnChecksum())->validate($value);
+        });
     }
 }

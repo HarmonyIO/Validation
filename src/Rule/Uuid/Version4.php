@@ -3,8 +3,14 @@
 namespace HarmonyIO\Validation\Rule\Uuid;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Version4 implements Rule
 {
@@ -13,12 +19,19 @@ final class Version4 implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function() use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return new Success(
-            preg_match('~^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$~i', $value) === 1
-        );
+            if (!$result->isValid()) {
+                return bubbleUp($result);
+            }
+
+            if (preg_match('~^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$~i', $value) === 1) {
+                return succeed();
+            }
+
+            return fail(new Error('Uuid.Version4'));
+        });
     }
 }

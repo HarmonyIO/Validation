@@ -3,8 +3,14 @@
 namespace HarmonyIO\Validation\Rule\Network\IpAddress;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Ipv6 implements Rule
 {
@@ -13,10 +19,19 @@ final class Ipv6 implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function() use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return new Success(filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false);
+            if (!$result->isValid()) {
+                return bubbleUp($result);
+            }
+
+            if (filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+                return succeed();
+            }
+
+            return fail(new Error('Network.IpAddress.Ipv4'));
+        });
     }
 }

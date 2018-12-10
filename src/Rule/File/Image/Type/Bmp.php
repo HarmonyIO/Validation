@@ -3,13 +3,17 @@
 namespace HarmonyIO\Validation\Rule\File\Image\Type;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\File\MimeType;
 use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Bmp implements Rule
 {
@@ -18,13 +22,12 @@ final class Bmp implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(static function () use ($value) {
-            if (!yield (new File())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new File())->validate($value);
+
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
             $mimeTypeValidators = [
@@ -32,15 +35,22 @@ final class Bmp implements Rule
                 new MimeType('image/x-ms-bmp'),
             ];
 
-            if ((yield (new Any(...$mimeTypeValidators))->validate($value)) === false) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new Any(...$mimeTypeValidators))->validate($value);
+
+            if (!$result->isValid()) {
+                return fail(new Error('file.image.type.bmp'));
             }
 
             return parallel(static function () use ($value) {
                 // @codeCoverageIgnoreStart
                 $image = @imagecreatefrombmp($value);
 
-                return $image !== false;
+                if ($image !== false) {
+                    return succeed();
+                }
+
+                return fail(new Error('file.image.type.bmp'));
                 // @codeCoverageIgnoreEnd
             })();
         });

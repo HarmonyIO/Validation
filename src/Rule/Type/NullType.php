@@ -3,8 +3,10 @@
 namespace HarmonyIO\Validation\Rule\Type;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Rule\Rule;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class NullType implements Rule
 {
@@ -13,6 +15,10 @@ final class NullType implements Rule
      */
     public function validate($value): Promise
     {
-        return new Success(is_null($value));
+        if (is_null($value)) {
+            return succeed();
+        }
+
+        return fail(new Error('Type.NullType'));
     }
 }

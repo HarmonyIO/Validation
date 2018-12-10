@@ -3,8 +3,14 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\BooleanType;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Integer implements Rule
 {
@@ -13,10 +19,19 @@ final class Integer implements Rule
      */
     public function validate($value): Promise
     {
-        if (is_bool($value)) {
-            return new Success(false);
-        }
+        return call(function() use ($value) {
+            /** @var Result $result */
+            $result = yield (new BooleanType())->validate($value);
 
-        return new Success(filter_var($value, FILTER_VALIDATE_INT) !== false);
+            if (!$result->isValid()) {
+                return bubbleUp($result);
+            }
+
+            if (filter_var($value, FILTER_VALIDATE_INT) !== false) {
+                return succeed();
+            }
+
+            return fail(new Error('Numeric.Integer'));
+        });
     }
 }

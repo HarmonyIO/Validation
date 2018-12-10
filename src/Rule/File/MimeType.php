@@ -4,11 +4,17 @@ namespace HarmonyIO\Validation\Rule\File;
 
 use Amp\Promise;
 use Amp\Success;
+use function HarmonyIO\Validation\bubbleUp;
 use HarmonyIO\Validation\Exception\FileInfo;
+use function HarmonyIO\Validation\fail;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
+use function HarmonyIO\Validation\succeed;
 
 final class MimeType implements Rule
 {
@@ -25,13 +31,12 @@ final class MimeType implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
-            if (!yield (new File())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new File())->validate($value);
+
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
             return parallel(function () use ($value) {
@@ -46,7 +51,11 @@ final class MimeType implements Rule
 
                 finfo_close($fileInfo);
 
-                return $mimeType === $this->mimeType;
+                if ($mimeType === $this->mimeType) {
+                    return succeed();
+                }
+
+                return fail(new Error('file.mimeType{mimeType}', new Parameter('mimeType', $this->mimeType)));
                 // @codeCoverageIgnoreEnd
             })();
         });

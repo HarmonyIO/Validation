@@ -4,12 +4,16 @@ namespace HarmonyIO\Validation\Rule\Network\Url;
 
 use Amp\Artax\DnsException;
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class OkResponse implements Rule
 {
@@ -26,23 +30,26 @@ final class OkResponse implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
-            if (!yield (new Url())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new Url())->validate($value);
+
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
             try {
                 /** @var Response $response */
                 $response = yield $this->httpClient->request(new Request($value));
             } catch (DnsException $e) {
-                return false;
+                return fail(new Error('Network.Url.OkResponse'));
             }
 
-            return $response->getNumericalStatusCode() === 200;
+            if ($response->getNumericalStatusCode() === 200) {
+                return succeed();
+            }
+
+            return fail(new Error('Network.Url.OkResponse'));
         });
     }
 }

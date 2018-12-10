@@ -3,8 +3,10 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Rule\Rule;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class NumericType implements Rule
 {
@@ -13,6 +15,10 @@ final class NumericType implements Rule
      */
     public function validate($value): Promise
     {
-        return new Success(is_numeric($value));
+        if (is_numeric($value)) {
+            return succeed();
+        }
+
+        return fail(new Error('numeric.numericType'));
     }
 }

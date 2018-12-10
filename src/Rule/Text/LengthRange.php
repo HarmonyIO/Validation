@@ -3,9 +3,13 @@
 namespace HarmonyIO\Validation\Rule\Text;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Exception\InvalidNumericalRange;
+use HarmonyIO\Validation\Result\Result;
+use HarmonyIO\Validation\Rule\Age\Minimum;
+use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function HarmonyIO\Validation\bubbleUp;
 use function Amp\call;
 
 final class LengthRange implements Rule
@@ -31,16 +35,18 @@ final class LengthRange implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function() use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return call(function () use ($value) {
-            if (!yield (new MinimumLength($this->minimumLength))->validate($value)) {
-                return false;
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
-            return (new MaximumLength($this->maximumLength))->validate($value);
+            return (new All(
+                new Minimum($this->minimumLength),
+                new MaximumLength($this->maximumLength)
+            ))->validate($value);
         });
     }
 }

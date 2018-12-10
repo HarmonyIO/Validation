@@ -3,9 +3,14 @@
 namespace HarmonyIO\Validation\Rule\VideoService\YouTube;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
+use HarmonyIO\Validation\Result\Error;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
 
 final class VideoUrl implements Rule
 {
@@ -22,15 +27,20 @@ final class VideoUrl implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        if (!$this->validateUrlStructure($value)) {
-            return new Success(false);
-        }
+            if (!$result->isValid()) {
+                return bubbleUp($result);
+            }
 
-        return (new VideoId($this->httpClient))->validate($this->getId($value));
+            if (!$this->validateUrlStructure($value)) {
+                return fail(new Error('VideoService.YouTube.VideoUrl'));
+            }
+
+            return (new VideoId($this->httpClient))->validate($this->getId($value));
+        });
     }
 
     private function validateUrlStructure(string $value): bool

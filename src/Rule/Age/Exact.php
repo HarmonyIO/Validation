@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Age;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
 
 final class Exact implements Rule
@@ -21,10 +20,6 @@ final class Exact implements Rule
      */
     public function validate($value): Promise
     {
-        if (!$value instanceof \DateTimeInterface) {
-            return new Success(false);
-        }
-
         return (new Range($this->age, $this->age))->validate($value);
     }
 }

@@ -3,12 +3,13 @@
 namespace HarmonyIO\Validation\Rule;
 
 use Amp\Promise;
+use HarmonyIO\Validation\Result\Result;
 
 interface Rule
 {
     /**
      * @param mixed $value
-     * @return Promise<bool>
+     * @return Promise<Result>
      */
     public function validate($value): Promise;
 }

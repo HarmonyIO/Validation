@@ -5,10 +5,11 @@ namespace HarmonyIO\Validation\Rule\GeoLocation;
 use Amp\Promise;
 use HarmonyIO\Validation\Exception\InvalidLongitude;
 use HarmonyIO\Validation\Exception\InvalidNumericalRange;
-use HarmonyIO\Validation\Rule\Numeric\NumericType;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Numeric\Range;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
 
 class LongitudeRange implements Rule
 {
@@ -47,15 +48,14 @@ class LongitudeRange implements Rule
     public function validate($value): Promise
     {
         return call(function () use ($value) {
-            if (!yield (new NumericType())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new Longitude())->validate($value);
+
+            if (!$result->isValid()) {
+                return bubbleUp($result);
             }
 
-            if (!yield (new Longitude())->validate($value)) {
-                return false;
-            }
-
-            return yield (new Range($this->minimumLongitude, $this->maximumLongitude))->validate($value);
+            return (new Range($this->minimumLongitude, $this->maximumLongitude))->validate($value);
         });
     }
 }
