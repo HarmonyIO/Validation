@@ -33,7 +33,7 @@ final class Negate implements Rule
                 return succeed();
             }
 
-            return fail(new Error($result->getErrors() . '.negated'));
+            return fail(new Error('Combinator.Negate'));
         });
     }
 }
