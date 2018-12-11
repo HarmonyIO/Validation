@@ -28,7 +28,7 @@ final class Length implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(function () use ($value) {
             /** @var Result $result */
             $result = yield (new StringType())->validate($value);
 

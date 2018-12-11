@@ -32,7 +32,7 @@ final class Landscape implements Rule
                 $imageSizeInformation = @getimagesize($value);
 
                 if (!$imageSizeInformation || $imageSizeInformation[0] <= $imageSizeInformation[1]) {
-                    return fail(new Error('file.image.landscape'));
+                    return fail(new Error('File.Image.Landscape'));
                 }
 
                 return succeed();

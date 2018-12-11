@@ -42,8 +42,8 @@ final class MinimumWidth implements Rule
 
                 if (!$imageSizeInformation || $imageSizeInformation[0] < $this->minimumWidth) {
                     return fail(new Error(
-                        'file.image.minimumWidth{minimumWidth}',
-                        new Parameter('minimumWidth', $this->minimumWidth)
+                        'File.Image.MinimumWidth',
+                        new Parameter('width', $this->minimumWidth)
                     ));
                 }
 

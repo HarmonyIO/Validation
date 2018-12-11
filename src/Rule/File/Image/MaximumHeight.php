@@ -42,8 +42,8 @@ final class MaximumHeight implements Rule
 
                 if (!$imageSizeInformation || $imageSizeInformation[1] > $this->maximumHeight) {
                     return fail(new Error(
-                        'file.image.maximumHeight{maximumHeight}',
-                        new Parameter('maximumHeight', $this->maximumHeight)
+                        'File.Image.MaximumHeight',
+                        new Parameter('height', $this->maximumHeight)
                     ));
                 }
 

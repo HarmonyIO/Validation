@@ -4,8 +4,10 @@ namespace HarmonyIO\Validation\Result;
 
 final class Result
 {
+    /** @var bool */
     private $valid;
 
+    /** @var Error[] */
     private $errors;
 
     public function __construct(bool $valid, Error ...$errors)
@@ -19,6 +21,9 @@ final class Result
         return $this->valid;
     }
 
+    /**
+     * @return Error[]
+     */
     public function getErrors(): array
     {
         return $this->errors;

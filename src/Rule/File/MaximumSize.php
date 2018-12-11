@@ -43,8 +43,8 @@ final class MaximumSize implements Rule
             }
 
             return fail(new Error(
-                'file.maximumsize{maximumSize}',
-                new Parameter('maximumSize', $this->maximumSizeInBytes)
+                'File.MaximumSize',
+                new Parameter('size', $this->maximumSizeInBytes)
             ));
         });
     }

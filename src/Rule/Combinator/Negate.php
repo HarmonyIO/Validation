@@ -3,13 +3,11 @@
 namespace HarmonyIO\Validation\Rule\Combinator;
 
 use Amp\Promise;
-use function HarmonyIO\Validation\fail;
 use HarmonyIO\Validation\Result\Error;
-use HarmonyIO\Validation\Result\Promise\Failure;
-use HarmonyIO\Validation\Result\Promise\Success;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
 final class Negate implements Rule

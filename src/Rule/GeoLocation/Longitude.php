@@ -19,7 +19,7 @@ final class Longitude implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(static function () use ($value) {
             /** @var Result $result */
             $result = yield (new NumericType())->validate($value);
 

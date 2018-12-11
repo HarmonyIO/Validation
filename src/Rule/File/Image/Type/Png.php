@@ -36,7 +36,7 @@ final class Png implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('file.image.type.png'));
+                return fail(new Error('File.Image.Type.Png'));
                 // @codeCoverageIgnoreEnd
             })();
         });

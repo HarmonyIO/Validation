@@ -7,6 +7,7 @@ final class Error
     /** @var string */
     private $message;
 
+    /** @var Parameter[] */
     private $parameters = [];
 
     public function __construct(string $message, Parameter ...$parameters)
@@ -20,6 +21,9 @@ final class Error
         return $this->message;
     }
 
+    /**
+     * @return Parameter[]
+     */
     public function getParameters(): array
     {
         return $this->parameters;

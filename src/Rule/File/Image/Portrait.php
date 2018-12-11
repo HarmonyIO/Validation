@@ -32,7 +32,7 @@ final class Portrait implements Rule
                 $imageSizeInformation = @getimagesize($value);
 
                 if (!$imageSizeInformation || $imageSizeInformation[0] >= $imageSizeInformation[1]) {
-                    return fail(new Error('file.image.portrait'));
+                    return fail(new Error('File.Image.Portrait'));
                 }
 
                 return succeed();

@@ -44,13 +44,13 @@ final class ValidElements implements Rule
                 try {
                     $xmlParser = new SafeParser(file_get_contents($value));
                 } catch (InvalidXml $e) {
-                    return fail(new Error('file.image.type.svg.elements'));
+                    return fail(new Error('File.Image.Type.Svg.ValidElements'));
                 }
 
                 /** @var \DOMElement $node */
                 foreach ($xmlParser->getElementsByTagName('*') as $node) {
                     if (!$this->element->exists($node->nodeName)) {
-                        return fail(new Error('file.image.type.svg.elements'));
+                        return fail(new Error('File.Image.Type.Svg.ValidElements'));
                     }
                 }
 

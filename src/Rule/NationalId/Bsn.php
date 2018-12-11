@@ -16,7 +16,7 @@ final class Bsn implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(function () use ($value) {
             if (!$this->validateValueType($value)) {
                 return fail(new Error('NationalId.Bsn'));
             }
@@ -31,7 +31,7 @@ final class Bsn implements Rule
                 return succeed();
             }
 
-            return fail(new Error('NationalId.Bsn'));;
+            return fail(new Error('NationalId.Bsn'));
         });
     }
 

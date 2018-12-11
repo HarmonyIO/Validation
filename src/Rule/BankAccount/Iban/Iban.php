@@ -3,9 +3,6 @@
 namespace HarmonyIO\Validation\Rule\BankAccount\Iban;
 
 use Amp\Promise;
-use Amp\Success;
-use function HarmonyIO\Validation\bubbleUp;
-use function HarmonyIO\Validation\fail;
 use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Albania;
@@ -78,8 +75,10 @@ use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\UnitedArabEmirates;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\UnitedKingdom;
 use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\Rule;
-use function Amp\call;
 use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
 final class Iban implements Rule
@@ -160,7 +159,7 @@ final class Iban implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(static function () use ($value) {
             /** @var Result $result */
             $result = yield (new StringType())->validate($value);
 
@@ -181,7 +180,7 @@ final class Iban implements Rule
                 return succeed();
             }
 
-            return fail(new Error('iban'));
+            return fail(new Error('BankAccount.Iban.Iban'));
         });
     }
 }

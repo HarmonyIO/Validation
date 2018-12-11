@@ -42,7 +42,7 @@ final class Sha1 implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('file.integrity.sha1'));
+                return fail(new Error('File.Integrity.Sha1'));
                 // @codeCoverageIgnoreEnd
             })();
         });

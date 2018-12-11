@@ -20,7 +20,7 @@ final class Discover implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(static function () use ($value) {
             /** @var Result $result */
             $result = yield (new StringType())->validate($value);
 
@@ -29,7 +29,7 @@ final class Discover implements Rule
             }
 
             if (preg_match(self::PATTERN, $value) !== 1) {
-                return fail(new Error('creditcard.discover'));
+                return fail(new Error('CreditCard.Discover'));
             }
 
             return (new LuhnChecksum())->validate($value);

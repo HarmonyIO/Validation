@@ -42,8 +42,8 @@ final class MaximumWidth implements Rule
 
                 if (!$imageSizeInformation || $imageSizeInformation[0] > $this->maximumWidth) {
                     return fail(new Error(
-                        'file.image.maximumWidth{maximumWidth}',
-                        new Parameter('maximumWidth', $this->maximumWidth)
+                        'File.Image.MaximumWidth',
+                        new Parameter('width', $this->maximumWidth)
                     ));
                 }
 

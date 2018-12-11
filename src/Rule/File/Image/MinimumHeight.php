@@ -42,8 +42,8 @@ final class MinimumHeight implements Rule
 
                 if (!$imageSizeInformation || $imageSizeInformation[1] < $this->minimumHeight) {
                     return fail(new Error(
-                        'file.image.minimumHeight{minimumHeight}',
-                        new Parameter('minimumHeight', $this->minimumHeight)
+                        'File.Image.MinimumHeight',
+                        new Parameter('height', $this->minimumHeight)
                     ));
                 }
 

@@ -43,8 +43,8 @@ final class MinimumSize implements Rule
             }
 
             return fail(new Error(
-                'file.minimumSize{minimumSize}',
-                new Parameter('minimumSize', $this->minimumSizeInBytes)
+                'File.MinimumSize',
+                new Parameter('size', $this->minimumSizeInBytes)
             ));
         });
     }

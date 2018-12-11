@@ -13,14 +13,16 @@ use function HarmonyIO\Validation\fail;
 
 abstract class Country implements Rule
 {
+    /** @var string */
     private $pattern;
 
+    /** @var string */
     private $errorMessage;
 
     public function __construct(string $pattern, string $errorMessage)
     {
         $this->pattern      = $pattern;
-        $this->errorMessage = sprintf('iban.country.', $errorMessage);
+        $this->errorMessage = sprintf('BankAccount.Iban.Country.%s', ucfirst($errorMessage));
     }
 
     /**
@@ -28,7 +30,7 @@ abstract class Country implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(function () use ($value) {
             /** @var Result $result */
             $result = yield (new StringType())->validate($value);
 
@@ -40,7 +42,7 @@ abstract class Country implements Rule
                 return fail(new Error($this->errorMessage));
             }
 
-            return (new IbanChecksum())->validate($value);
+            return (new Checksum())->validate($value);
         });
     }
 }

@@ -29,7 +29,7 @@ final class Maximum implements Rule
     public function validate($value): Promise
     {
         // prevent returning promises and instead create a custom function which takes a result *or* a promise
-        return call(function() use ($value) {
+        return call(function () use ($value) {
             /** @var Result $result */
             $result = yield (new InstanceOfType(\DateTimeInterface::class))->validate($value);
 
@@ -48,7 +48,7 @@ final class Maximum implements Rule
                 return succeed();
             }
 
-            return fail(new Error('age.maximum{maximum}', new Parameter('maximum', $this->maximumAge)));
+            return fail(new Error('Age.Maximum', new Parameter('maximum', $this->maximumAge)));
         });
     }
 }

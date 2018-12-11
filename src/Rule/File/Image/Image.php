@@ -42,7 +42,7 @@ final class Image implements Rule
             $imageTypes = [];
 
             foreach (self::IMAGE_TYPES as $type) {
-                $imageTypes[] = new $type;
+                $imageTypes[] = new $type();
             }
 
             /** @var Result $result */
@@ -52,7 +52,7 @@ final class Image implements Rule
                 return succeed();
             }
 
-            return fail(new Error('file.image'));
+            return fail(new Error('File.Image.Image'));
         });
     }
 }

@@ -36,7 +36,7 @@ final class Gif implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('file.image.type.gif'));
+                return fail(new Error('File.Image.Type.Gif'));
                 // @codeCoverageIgnoreEnd
             })();
         });

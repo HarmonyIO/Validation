@@ -25,7 +25,7 @@ final class Any implements Rule
      */
     public function validate($value): Promise
     {
-        $promises = array_reduce($this->rules, function(array $promises, Rule $rule) use ($value) {
+        $promises = array_reduce($this->rules, static function (array $promises, Rule $rule) use ($value) {
             $promises[] = $rule->validate($value);
 
             return $promises;
@@ -35,7 +35,7 @@ final class Any implements Rule
             /** @var Result[] $results */
             $results = yield $promises;
 
-            $errors = array_reduce($results, function(array $errors, Result $result) {
+            $errors = array_reduce($results, static function (array $errors, Result $result) {
                 if ($result->isValid()) {
                     return $errors;
                 }

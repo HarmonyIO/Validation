@@ -19,6 +19,6 @@ final class NumericType implements Rule
             return succeed();
         }
 
-        return fail(new Error('numeric.numericType'));
+        return fail(new Error('Numeric.NumericType'));
     }
 }

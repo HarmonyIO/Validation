@@ -32,6 +32,7 @@
         "egulias/email-validator": "^2.1",
         "harmonyio/http-client": "dev-master",
         "myclabs/php-enum": "^1.6",
+        "react/promise": "^2.7",
         "wikimedia/ip-set": "^1.2"
     },
     "require-dev": {

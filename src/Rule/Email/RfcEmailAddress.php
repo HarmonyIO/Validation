@@ -21,7 +21,7 @@ final class RfcEmailAddress implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(static function () use ($value) {
             /** @var Result $result */
             $result = yield (new StringType())->validate($value);
 
@@ -33,7 +33,7 @@ final class RfcEmailAddress implements Rule
                 return succeed();
             }
 
-            return fail(new Error('email.RfcEmailAddress'));
+            return fail(new Error('Email.RfcEmailAddress'));
         });
     }
 }

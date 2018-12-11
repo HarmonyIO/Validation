@@ -42,7 +42,7 @@ final class Md5 implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('file.integrity.md5'));
+                return fail(new Error('File.Integrity.Md5'));
                 // @codeCoverageIgnoreEnd
             })();
         });

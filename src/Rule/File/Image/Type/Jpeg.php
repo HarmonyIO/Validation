@@ -36,7 +36,7 @@ final class Jpeg implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('file.image.type.jpeg'));
+                return fail(new Error('File.Image.Type.Jpeg'));
                 // @codeCoverageIgnoreEnd
             })();
         });

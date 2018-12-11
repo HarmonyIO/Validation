@@ -3,10 +3,7 @@
 namespace HarmonyIO\Validation\Rule\File;
 
 use Amp\Promise;
-use Amp\Success;
-use function HarmonyIO\Validation\bubbleUp;
 use HarmonyIO\Validation\Exception\FileInfo;
-use function HarmonyIO\Validation\fail;
 use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
@@ -14,6 +11,8 @@ use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
 final class MimeType implements Rule
@@ -55,7 +54,7 @@ final class MimeType implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('file.mimeType{mimeType}', new Parameter('mimeType', $this->mimeType)));
+                return fail(new Error('File.MimeType', new Parameter('mimeType', $this->mimeType)));
                 // @codeCoverageIgnoreEnd
             })();
         });

@@ -11,6 +11,7 @@ use React\Promise\PromiseInterface as ReactPromise;
 
 final class Failure implements Promise
 {
+    /** @var Error[] */
     private $errors = [];
 
     public function __construct(Error $error, Error ...$errors)
@@ -25,7 +26,8 @@ final class Failure implements Promise
     /**
      * {@inheritdoc}
      */
-    public function onResolve(callable $onResolved) {
+    public function onResolve(callable $onResolved)
+    {
         try {
             $result = $onResolved(null, new Result(false, ...$this->errors));
 
@@ -41,7 +43,7 @@ final class Failure implements Promise
                 Promise\rethrow($result);
             }
         } catch (\Throwable $exception) {
-            Loop::defer(static function () use ($exception) {
+            Loop::defer(static function () use ($exception): void {
                 throw $exception;
             });
         }

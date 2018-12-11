@@ -9,8 +9,8 @@ use HarmonyIO\Validation\Rule\Age\Minimum;
 use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
-use function HarmonyIO\Validation\bubbleUp;
 use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
 
 final class LengthRange implements Rule
 {
@@ -35,7 +35,7 @@ final class LengthRange implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(function () use ($value) {
             /** @var Result $result */
             $result = yield (new StringType())->validate($value);
 

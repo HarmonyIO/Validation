@@ -38,6 +38,9 @@ final class InstanceOfType implements Rule
         return fail(new Error('Type.InstanceOfType', new Parameter('type', $this->getType($value))));
     }
 
+    /**
+     * @param mixed $value
+     */
     private function getType($value): string
     {
         if (!is_object($value)) {

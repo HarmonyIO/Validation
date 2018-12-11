@@ -12,14 +12,14 @@ use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
-final class IbanChecksum implements Rule
+final class Checksum implements Rule
 {
     /**
      * {@inheritdoc}
      */
     public function validate($value): Promise
     {
-        return call(function() use ($value) {
+        return call(function () use ($value) {
             /** @var Result $result */
             $result = yield (new StringType())->validate($value);
 
@@ -31,7 +31,7 @@ final class IbanChecksum implements Rule
                 return succeed();
             }
 
-            return fail(new Error('iban.checksum'));
+            return fail(new Error('BankAccount.Iban.Checksum'));
         });
     }
 

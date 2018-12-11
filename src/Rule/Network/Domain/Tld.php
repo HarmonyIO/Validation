@@ -3,18 +3,17 @@
 namespace HarmonyIO\Validation\Rule\Network\Domain;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
-use function HarmonyIO\Validation\bubbleUp;
-use function HarmonyIO\Validation\fail;
 use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
-use function Amp\call;
 use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\bubbleUp;
+use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
 final class Tld implements Rule

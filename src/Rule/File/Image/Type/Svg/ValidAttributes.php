@@ -9,7 +9,6 @@ use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\MimeType;
 use HarmonyIO\Validation\Rule\Rule;
-use HarmonyIO\Validation\Rule\Type\StringType;
 use HarmonyIO\Validation\Xml\SafeParser;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
@@ -45,13 +44,13 @@ final class ValidAttributes implements Rule
                 try {
                     $xmlParser = new SafeParser(file_get_contents($value));
                 } catch (InvalidXml $e) {
-                    return fail(new Error('file.image.type.svg.attributes'));
+                    return fail(new Error('File.Image.Type.Svg.ValidAttributes'));
                 }
 
                 foreach ($xmlParser->getElementsByTagName('*') as $node) {
                     foreach ($node->attributes as $attribute) {
                         if (!$this->attribute->exists($attribute->nodeName)) {
-                            return fail(new Error('file.image.type.svg.attributes'));
+                            return fail(new Error('File.Image.Type.Svg.ValidAttributes'));
                         }
                     }
                 }
