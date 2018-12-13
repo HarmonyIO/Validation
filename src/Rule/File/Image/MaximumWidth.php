@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -40,10 +39,10 @@ final class MaximumWidth implements Rule
                 $imageSizeInformation = @getimagesize($value);
 
                 if (!$imageSizeInformation || $imageSizeInformation[0] > $this->maximumWidth) {
-                    return fail(new Error(
+                    return fail(
                         'File.Image.MaximumWidth',
                         new Parameter('width', $this->maximumWidth)
-                    ));
+                    );
                 }
 
                 return succeed();

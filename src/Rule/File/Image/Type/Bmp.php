@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File\Image\Type;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\File\MimeType;
@@ -38,7 +37,7 @@ final class Bmp implements Rule
             $result = yield (new Any(...$mimeTypeValidators))->validate($value);
 
             if (!$result->isValid()) {
-                return fail(new Error('File.Image.Type.Bmp'));
+                return fail('File.Image.Type.Bmp');
             }
 
             return parallel(static function () use ($value) {
@@ -49,7 +48,7 @@ final class Bmp implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('File.Image.Type.Bmp'));
+                return fail('File.Image.Type.Bmp');
                 // @codeCoverageIgnoreEnd
             })();
         });

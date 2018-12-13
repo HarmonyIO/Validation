@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\FileSystem;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -31,7 +30,7 @@ final class File implements Rule
                 return succeed();
             }
 
-            return fail(new Error('FileSystem.File'));
+            return fail('FileSystem.File');
         });
     }
 }

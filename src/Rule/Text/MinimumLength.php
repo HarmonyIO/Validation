@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Text;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -39,7 +38,7 @@ final class MinimumLength implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Text.MinimumLength', new Parameter('length', $this->length)));
+            return fail('Text.MinimumLength', new Parameter('length', $this->length));
         });
     }
 }

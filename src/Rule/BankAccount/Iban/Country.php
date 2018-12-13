@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\BankAccount\Iban;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -38,7 +37,7 @@ abstract class Country implements Rule
             }
 
             if (preg_match($this->pattern, $value, $matches) !== 1) {
-                return fail(new Error($this->errorMessage));
+                return fail($this->errorMessage);
             }
 
             return (new Checksum())->validate($value);

@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Country;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -283,7 +282,7 @@ final class Alpha2Code implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Country.Alpha2Code', new Parameter('codes', self::CODES)));
+            return fail('Country.Alpha2Code', new Parameter('codes', self::CODES));
         });
     }
 }

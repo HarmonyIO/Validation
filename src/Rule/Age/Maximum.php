@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Age;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -47,7 +46,7 @@ final class Maximum implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Age.Maximum', new Parameter('age', $this->maximumAge)));
+            return fail('Age.Maximum', new Parameter('age', $this->maximumAge));
         });
     }
 }

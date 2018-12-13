@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File\Integrity;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
@@ -41,7 +40,7 @@ final class Sha1 implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('File.Integrity.Sha1'));
+                return fail('File.Integrity.Sha1');
                 // @codeCoverageIgnoreEnd
             })();
         });

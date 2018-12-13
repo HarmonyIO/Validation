@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Hash;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -38,7 +37,7 @@ final class HashMatches implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Hash.HashMatches'));
+            return fail('Hash.HashMatches');
         });
     }
 }

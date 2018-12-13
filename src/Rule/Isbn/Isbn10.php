@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Isbn;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -29,14 +28,14 @@ class Isbn10 implements Rule
             }
 
             if (preg_match(self::PATTERN, $value) !== 1) {
-                return fail(new Error('Isbn.Isbn10'));
+                return fail('Isbn.Isbn10');
             }
 
             if ($this->isCheckDigitValid($value)) {
                 return succeed();
             }
 
-            return fail(new Error('Isbn.Isbn10'));
+            return fail('Isbn.Isbn10');
         });
     }
 

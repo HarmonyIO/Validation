@@ -6,7 +6,6 @@ use Amp\Promise;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
@@ -52,13 +51,13 @@ class Exists implements Rule
             );
 
             if ($response->getNumericalStatusCode() !== 200) {
-                return fail(new Error('Isbn.Exists'));
+                return fail('Isbn.Exists');
             }
 
             $result = json_decode($response->getBody(), true);
 
             if (json_last_error() !== JSON_ERROR_NONE || $result['totalItems'] === 0) {
-                return fail(new Error('Isbn.Exists'));
+                return fail('Isbn.Exists');
             }
 
             return succeed();

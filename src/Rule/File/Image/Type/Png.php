@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File\Image\Type;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\MimeType;
 use HarmonyIO\Validation\Rule\Rule;
@@ -35,7 +34,7 @@ final class Png implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('File.Image.Type.Png'));
+                return fail('File.Image.Type.Png');
                 // @codeCoverageIgnoreEnd
             })();
         });

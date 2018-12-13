@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
@@ -30,7 +29,7 @@ final class Positive implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Numeric.Positive'));
+            return fail('Numeric.Positive');
         });
     }
 }

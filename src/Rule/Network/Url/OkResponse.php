@@ -7,7 +7,6 @@ use Amp\Promise;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
@@ -41,14 +40,14 @@ final class OkResponse implements Rule
                 /** @var Response $response */
                 $response = yield $this->httpClient->request(new Request($value));
             } catch (DnsException $e) {
-                return fail(new Error('Network.Url.OkResponse'));
+                return fail('Network.Url.OkResponse');
             }
 
             if ($response->getNumericalStatusCode() === 200) {
                 return succeed();
             }
 
-            return fail(new Error('Network.Url.OkResponse'));
+            return fail('Network.Url.OkResponse');
         });
     }
 }

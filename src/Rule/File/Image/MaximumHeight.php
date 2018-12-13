@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -40,10 +39,10 @@ final class MaximumHeight implements Rule
                 $imageSizeInformation = @getimagesize($value);
 
                 if (!$imageSizeInformation || $imageSizeInformation[1] > $this->maximumHeight) {
-                    return fail(new Error(
+                    return fail(
                         'File.Image.MaximumHeight',
                         new Parameter('height', $this->maximumHeight)
-                    ));
+                    );
                 }
 
                 return succeed();

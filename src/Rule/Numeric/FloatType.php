@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Combinator\Negate;
 use HarmonyIO\Validation\Rule\Rule;
@@ -24,14 +23,14 @@ final class FloatType implements Rule
             $result = yield (new Negate(new BooleanType()))->validate($value);
 
             if (!$result->isValid()) {
-                return fail(new Error('Numeric.FloatType'));
+                return fail('Numeric.FloatType');
             }
 
             if (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) {
                 return succeed();
             }
 
-            return fail(new Error('Numeric.FloatType'));
+            return fail('Numeric.FloatType');
         });
     }
 }

@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\NationalId;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function HarmonyIO\Validation\fail;
@@ -18,20 +17,20 @@ final class Bsn implements Rule
     {
         return call(function () use ($value) {
             if (!$this->validateValueType($value)) {
-                return fail(new Error('NationalId.Bsn'));
+                return fail('NationalId.Bsn');
             }
 
             $value = (string) $value;
 
             if (strlen($value) !== 9) {
-                return fail(new Error('NationalId.Bsn'));
+                return fail('NationalId.Bsn');
             }
 
             if ($this->isCheckDigitValid($value)) {
                 return succeed();
             }
 
-            return fail(new Error('NationalId.Bsn'));
+            return fail('NationalId.Bsn');
         });
     }
 

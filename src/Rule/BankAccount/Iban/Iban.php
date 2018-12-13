@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\BankAccount\Iban;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Albania;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Andorra;
@@ -179,7 +178,7 @@ final class Iban implements Rule
                 return succeed();
             }
 
-            return fail(new Error('BankAccount.Iban.Iban'));
+            return fail('BankAccount.Iban.Iban');
         });
     }
 }

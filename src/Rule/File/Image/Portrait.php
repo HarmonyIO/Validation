@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
@@ -31,7 +30,7 @@ final class Portrait implements Rule
                 $imageSizeInformation = @getimagesize($value);
 
                 if (!$imageSizeInformation || $imageSizeInformation[0] >= $imageSizeInformation[1]) {
-                    return fail(new Error('File.Image.Portrait'));
+                    return fail('File.Image.Portrait');
                 }
 
                 return succeed();

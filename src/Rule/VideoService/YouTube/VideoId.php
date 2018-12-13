@@ -6,7 +6,6 @@ use Amp\Promise;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -47,20 +46,20 @@ final class VideoId implements Rule
             $response = yield $this->httpClient->request(new CachingRequest(self::class, 3600, $url, 'GET'));
 
             if ($response->getNumericalStatusCode() !== 200) {
-                return fail(new Error('VideoService.YouTube.VideoId'));
+                return fail('VideoService.YouTube.VideoId');
             }
 
             $result = json_decode($response->getBody(), true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return fail(new Error('VideoService.YouTube.VideoId'));
+                return fail('VideoService.YouTube.VideoId');
             }
 
             if (array_key_exists('type', $result) && $result['type'] === 'video') {
                 return succeed();
             }
 
-            return fail(new Error('VideoService.YouTube.VideoId'));
+            return fail('VideoService.YouTube.VideoId');
         });
     }
 }

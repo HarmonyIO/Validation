@@ -7,7 +7,6 @@ use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -50,7 +49,7 @@ final class NotPwnedPassword implements Rule
             $response = yield $this->request($value);
 
             if ($this->getNumberOfHits($response, $value) > $this->threshold) {
-                return fail(new Error('Security.NotPwnedPassword', new Parameter('threshold', $this->threshold)));
+                return fail('Security.NotPwnedPassword', new Parameter('threshold', $this->threshold));
             }
 
             return succeed();

@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\CreditCard;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -30,7 +29,7 @@ final class LuhnChecksum implements Rule
                 return succeed();
             }
 
-            return fail(new Error('CreditCard.LuhnChecksum'));
+            return fail('CreditCard.LuhnChecksum');
         });
     }
 

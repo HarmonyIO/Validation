@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -40,10 +39,10 @@ final class MinimumHeight implements Rule
                 $imageSizeInformation = @getimagesize($value);
 
                 if (!$imageSizeInformation || $imageSizeInformation[1] < $this->minimumHeight) {
-                    return fail(new Error(
+                    return fail(
                         'File.Image.MinimumHeight',
                         new Parameter('height', $this->minimumHeight)
-                    ));
+                    );
                 }
 
                 return succeed();

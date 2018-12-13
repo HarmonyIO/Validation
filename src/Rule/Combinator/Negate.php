@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Combinator;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
@@ -33,7 +32,7 @@ final class Negate implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Combinator.Negate'));
+            return fail('Combinator.Negate');
         });
     }
 }

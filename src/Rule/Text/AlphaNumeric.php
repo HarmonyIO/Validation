@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Text;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -30,7 +29,7 @@ final class AlphaNumeric implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Text.AlphaNumeric'));
+            return fail('Text.AlphaNumeric');
         });
     }
 }

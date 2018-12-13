@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Type;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Rule\Rule;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
@@ -19,6 +18,6 @@ final class BooleanType implements Rule
             return succeed();
         }
 
-        return fail(new Error('Type.BooleanType'));
+        return fail('Type.BooleanType');
     }
 }

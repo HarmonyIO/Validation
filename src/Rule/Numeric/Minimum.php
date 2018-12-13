@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -43,7 +42,7 @@ final class Minimum implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Numeric.Minimum', new Parameter('minimum', $this->minimum)));
+            return fail('Numeric.Minimum', new Parameter('minimum', $this->minimum));
         });
     }
 }

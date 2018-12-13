@@ -4,7 +4,6 @@ namespace HarmonyIO\Validation\Rule\Type;
 
 use Amp\Promise;
 use HarmonyIO\Validation\Exception\InvalidFullyQualifiedClassOrInterfaceName;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Rule\Rule;
 use function HarmonyIO\Validation\fail;
@@ -35,7 +34,7 @@ final class InstanceOfType implements Rule
             return succeed();
         }
 
-        return fail(new Error('Type.InstanceOfType', new Parameter('type', $this->getType($value))));
+        return fail('Type.InstanceOfType', new Parameter('type', $this->getType($value)));
     }
 
     /**

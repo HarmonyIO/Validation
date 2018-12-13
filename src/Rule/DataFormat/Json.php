@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\DataFormat;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -32,7 +31,7 @@ final class Json implements Rule
                 return succeed();
             }
 
-            return fail(new Error('DataFormat.Json'));
+            return fail('DataFormat.Json');
         });
     }
 }

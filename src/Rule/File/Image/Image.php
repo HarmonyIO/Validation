@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\File\Image\Type\Bmp;
@@ -53,7 +52,7 @@ final class Image implements Rule
                 return succeed();
             }
 
-            return fail(new Error('File.Image.Image'));
+            return fail('File.Image.Image');
         });
     }
 }

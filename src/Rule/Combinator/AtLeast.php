@@ -7,7 +7,7 @@ use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
-use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\failWithError;
 use function HarmonyIO\Validation\succeed;
 
 final class AtLeast implements Rule
@@ -60,7 +60,7 @@ final class AtLeast implements Rule
                 return succeed();
             }
 
-            return fail(...$errors);
+            return failWithError(...$errors);
         });
     }
 }

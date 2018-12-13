@@ -4,7 +4,6 @@ namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
 use HarmonyIO\Validation\Exception\InvalidAspectRatio;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
@@ -54,10 +53,10 @@ final class AspectRatio implements Rule
                 $imageSizeInformation = @getimagesize($value);
 
                 if (!$imageSizeInformation || $this->ratio !== $imageSizeInformation[0] / $imageSizeInformation[1]) {
-                    return fail(new Error(
+                    return fail(
                         'File.Image.AspectRatio',
                         new Parameter('ratio', sprintf('%s:%s', $this->x, $this->y))
-                    ));
+                    );
                 }
 
                 return succeed();

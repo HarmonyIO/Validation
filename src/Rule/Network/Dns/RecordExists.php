@@ -5,7 +5,6 @@ namespace HarmonyIO\Validation\Rule\Network\Dns;
 use Amp\Dns\NoRecordException;
 use Amp\Promise;
 use HarmonyIO\Validation\Enum\Network\Dns\RecordType;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -42,7 +41,7 @@ final class RecordExists implements Rule
 
                 return succeed();
             } catch (NoRecordException $e) {
-                return fail(new Error('Network.Dns.RecordExists'));
+                return fail('Network.Dns.RecordExists');
             }
         });
     }

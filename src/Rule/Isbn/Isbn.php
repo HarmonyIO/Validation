@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Isbn;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\Rule;
@@ -34,7 +33,7 @@ class Isbn implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Isbn.Isbn'));
+            return fail('Isbn.Isbn');
         });
     }
 }

@@ -4,7 +4,6 @@ namespace HarmonyIO\Validation\Rule\VideoService\YouTube;
 
 use Amp\Promise;
 use HarmonyIO\HttpClient\Client\Client;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -35,7 +34,7 @@ final class VideoUrl implements Rule
             }
 
             if (!$this->validateUrlStructure($value)) {
-                return fail(new Error('VideoService.YouTube.VideoUrl'));
+                return fail('VideoService.YouTube.VideoUrl');
             }
 
             return (new VideoId($this->httpClient))->validate($this->getId($value));

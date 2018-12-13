@@ -4,7 +4,6 @@ namespace HarmonyIO\Validation\Rule\File;
 
 use Amp\Promise;
 use HarmonyIO\Validation\Exception\FileInfo;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\FileSystem\File;
@@ -53,7 +52,7 @@ final class MimeType implements Rule
                     return succeed();
                 }
 
-                return fail(new Error('File.MimeType', new Parameter('mimeType', $this->mimeType)));
+                return fail('File.MimeType', new Parameter('mimeType', $this->mimeType));
                 // @codeCoverageIgnoreEnd
             })();
         });

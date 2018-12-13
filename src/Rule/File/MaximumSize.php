@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\File;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Parameter;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\FileSystem\File;
@@ -41,10 +40,10 @@ final class MaximumSize implements Rule
                 return succeed();
             }
 
-            return fail(new Error(
+            return fail(
                 'File.MaximumSize',
                 new Parameter('size', $this->maximumSizeInBytes)
-            ));
+            );
         });
     }
 }

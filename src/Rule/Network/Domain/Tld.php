@@ -7,7 +7,6 @@ use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -46,7 +45,7 @@ final class Tld implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Network.Domain.Tld'));
+            return fail('Network.Domain.Tld');
         });
     }
 

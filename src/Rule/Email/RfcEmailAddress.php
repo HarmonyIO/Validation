@@ -5,7 +5,6 @@ namespace HarmonyIO\Validation\Rule\Email;
 use Amp\Promise;
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\RFCValidation;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -32,7 +31,7 @@ final class RfcEmailAddress implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Email.RfcEmailAddress'));
+            return fail('Email.RfcEmailAddress');
         });
     }
 }

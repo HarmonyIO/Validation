@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\CreditCard;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -28,7 +27,7 @@ final class MasterCard implements Rule
             }
 
             if (preg_match(self::PATTERN, $value) !== 1) {
-                return fail(new Error('CreditCard.MasterCard'));
+                return fail('CreditCard.MasterCard');
             }
 
             return (new LuhnChecksum())->validate($value);
