@@ -6,87 +6,51 @@ use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Network\Url\OkResponse;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Amp\Promise\wait;
 
-class OkResponseTest extends TestCase
+class OkResponseTest extends StringTestCase
 {
     /** @var MockObject|Client */
     private $httpClient;
+
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    {
+        $this->httpClient = $this->createMock(Client::class);
+
+        parent::__construct($name, $data, $dataName, OkResponse::class, $this->httpClient);
+    }
 
     //phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
     public function setUp()
     {
         $this->httpClient = $this->createMock(Client::class);
-    }
-    
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new OkResponse($this->httpClient));
+
+        parent::setUp();
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAUrlWithoutProtocol(): void
     {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate(1));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('pieterhordijk.com'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.Url', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAUrlWithoutHost(): void
     {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate(1.1));
-    }
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('https://'));
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new OkResponse($this->httpClient))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAUrlWithoutProtocol(): void
-    {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate('pieterhordijk.com'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAUrlWithoutHost(): void
-    {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate('https://'));
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.Url', $result->getFirstError()->getMessage());
     }
 
     public function testValidatePassesUrlToClient(): void
@@ -110,7 +74,7 @@ class OkResponseTest extends TestCase
         wait((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com'));
     }
 
-    public function testValidateReturnsFalseWhenRequestResultsInANon200Response(): void
+    public function testValidateFailsWhenRequestResultsInANon200Response(): void
     {
         $this->httpClient
             ->method('request')
@@ -133,7 +97,11 @@ class OkResponseTest extends TestCase
             })
         ;
 
-        $this->assertFalse((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com/foobar'));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com/foobar'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.OkResponse', $result->getFirstError()->getMessage());
     }
 
     public function testValidateReturnsTrueWhenClientReturnsOkResponse(): void
@@ -159,6 +127,10 @@ class OkResponseTest extends TestCase
             })
         ;
 
-        $this->assertTrue((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com/contact'));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com/contact'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

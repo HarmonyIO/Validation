@@ -17,7 +17,7 @@ final class Minimum implements Rule
     /** @var int */
     private $minimum;
 
-    public function __construct(int $minimum)
+    public function __construct(float $minimum)
     {
         $this->minimum = $minimum;
     }

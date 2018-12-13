@@ -2,75 +2,45 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Country\Alpha2Code;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class Alpha2CodeTest extends TestCase
+class Alpha2CodeTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Alpha2Code());
+        parent::__construct($name, $data, $dataName, Alpha2Code::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsOnAnInvalidAlpha2CountryCode(): void
     {
-        $this->assertFalse((new Alpha2Code())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Alpha2Code())->validate('XX'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Country.Alpha2Code', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsOnAValidLowercaseAlpha2CountryCode(): void
     {
-        $this->assertFalse((new Alpha2Code())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Alpha2Code())->validate('nl'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsOnAValidUppercaseAlpha2CountryCode(): void
     {
-        $this->assertFalse((new Alpha2Code())->validate(true));
-    }
+        /** @var Result $result */
+        $result = wait((new Alpha2Code())->validate('NL'));
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Alpha2Code())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Alpha2Code())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Alpha2Code())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Alpha2Code())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Alpha2Code())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidAlpha2CountryCode(): void
-    {
-        $this->assertTrue((new Alpha2Code())->validate('NL'));
-    }
-
-    public function testValidateReturnsFalseWhenAnInvalidAlpha2CountryCode(): void
-    {
-        $this->assertFalse((new Alpha2Code())->validate('XX'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

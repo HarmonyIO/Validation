@@ -2,95 +2,72 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\File\Image;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\Image\Image;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\FileTestCase;
+use function Amp\Promise\wait;
 
-class ImageTest extends TestCase
+class ImageTest extends FileTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Image());
+        parent::__construct($name, $data, $dataName, Image::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnUnsupportedFile(): void
     {
-        $this->assertFalse((new Image())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Image())->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Image', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingABmpFile(): void
     {
-        $this->assertFalse((new Image())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Image())->validate(TEST_DATA_DIR . '/image/mspaint.bmp'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAGifFile(): void
     {
-        $this->assertFalse((new Image())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Image())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingAJpegFile(): void
     {
-        $this->assertFalse((new Image())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Image())->validate(TEST_DATA_DIR . '/image/mspaint.jpeg'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateSucceedsWhenPassingAPngFile(): void
     {
-        $this->assertFalse((new Image())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Image())->validate(TEST_DATA_DIR . '/image/mspaint.png'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateSucceedsWhenPassingAnSvgFile(): void
     {
-        $this->assertFalse((new Image())->validate(null));
-    }
+        /** @var Result $result */
+        $result = wait((new Image())->validate(TEST_DATA_DIR . '/image/example.svg'));
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Image())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Image())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenFileDoesNotExists(): void
-    {
-        $this->assertFalse((new Image())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingABmpFile(): void
-    {
-        $this->assertTrue((new Image())->validate(TEST_DATA_DIR . '/image/mspaint.bmp'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAGifFile(): void
-    {
-        $this->assertTrue((new Image())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAJpegFile(): void
-    {
-        $this->assertTrue((new Image())->validate(TEST_DATA_DIR . '/image/mspaint.jpeg'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAPngFile(): void
-    {
-        $this->assertTrue((new Image())->validate(TEST_DATA_DIR . '/image/mspaint.png'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnUnsupportedFile(): void
-    {
-        $this->assertFalse((new Image())->validate(TEST_DATA_DIR . '/image/file-mime-type-test.txt'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -5,89 +5,54 @@ namespace HarmonyIO\ValidationTest\Unit\Rule\Isbn;
 use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Isbn\Exists;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use function Amp\Promise\wait;
 
-class ExistsTest extends TestCase
+class ExistsTest extends StringTestCase
 {
     /** @var MockObject|Client */
     private $httpClient;
+
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    {
+        $this->httpClient = $this->createMock(Client::class);
+
+        parent::__construct($name, $data, $dataName, Exists::class, $this->httpClient, '12345');
+    }
 
     //phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
     public function setUp()
     {
         $this->httpClient = $this->createMock(Client::class);
+
+        parent::setUp();
     }
-    
-    public function testRuleImplementsInterface(): void
+
+    public function testValidateFailsWhenPassingInAnInvalidIsbn10(): void
     {
-        $this->assertInstanceOf(Rule::class, new Exists($this->httpClient, '12345'));
+        /** @var Result $result */
+        $result = wait((new Exists($this->httpClient, '12345'))->validate('0345391803'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Isbn', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingInAnInvalidIsbn13(): void
     {
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate(1));
+        /** @var Result $result */
+        $result = wait((new Exists($this->httpClient, '12345'))->validate('9788970137507'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Isbn', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInAnInvalidIsbn10(): void
-    {
-            $this->assertFalse((new Exists($this->httpClient, '12345'))->validate('0345391803'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInAnInvalidIsbn13(): void
-    {
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate('9788970137507'));
-    }
-
-    public function testValidateReturnsFalseWhenServiceReturnsANon200Response(): void
+    public function testValidateFailsWhenServiceReturnsANon200Response(): void
     {
         $response = $this->createMock(Response::class);
 
@@ -106,10 +71,14 @@ class ExistsTest extends TestCase
             ->willReturn(new Success($response))
         ;
 
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+        /** @var Result $result */
+        $result = wait((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Exists', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenServiceReturnsInvalidJson(): void
+    public function testValidateFailsWhenServiceReturnsInvalidJson(): void
     {
         $response = $this->createMock(Response::class);
 
@@ -128,10 +97,14 @@ class ExistsTest extends TestCase
             ->willReturn(new Success($response))
         ;
 
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+        /** @var Result $result */
+        $result = wait((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Exists', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenIsbnDoesNotExist(): void
+    public function testValidateFailsWhenIsbnDoesNotExist(): void
     {
         $response = $this->createMock(Response::class);
 
@@ -150,10 +123,14 @@ class ExistsTest extends TestCase
             ->willReturn(new Success($response))
         ;
 
-        $this->assertFalse((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+        /** @var Result $result */
+        $result = wait((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Exists', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenIsbnDoesExist(): void
+    public function testValidateSucceedsWhenIsbnDoesExist(): void
     {
         $response = $this->createMock(Response::class);
 
@@ -172,10 +149,14 @@ class ExistsTest extends TestCase
             ->willReturn(new Success($response))
         ;
 
-        $this->assertTrue((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+        /** @var Result $result */
+        $result = wait((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenMultipleBooksWithIsbnExist(): void
+    public function testValidateSucceedsWhenMultipleBooksWithIsbnExist(): void
     {
         $response = $this->createMock(Response::class);
 
@@ -194,6 +175,10 @@ class ExistsTest extends TestCase
             ->willReturn(new Success($response))
         ;
 
-        $this->assertTrue((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+        /** @var Result $result */
+        $result = wait((new Exists($this->httpClient, '12345'))->validate('9788970137506'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

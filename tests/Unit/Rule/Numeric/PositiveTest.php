@@ -2,105 +2,117 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Numeric\Positive;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\NumericTestCase;
+use function Amp\Promise\wait;
 
-class PositiveTest extends TestCase
+class PositiveTest extends NumericTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Positive());
+        parent::__construct($name, $data, $dataName, Positive::class);
     }
 
-    public function testValidateReturnsTrueWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingInANegativeInteger(): void
     {
-        $this->assertTrue((new Positive())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate(-1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Positive', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingInANegativeIntegerAsAString(): void
     {
-        $this->assertTrue((new Positive())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate('-1'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Positive', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenPassingInANegativeFloat(): void
     {
-        $this->assertFalse((new Positive())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate(-0.1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Positive', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenPassingInANegativeFloatAsAString(): void
     {
-        $this->assertFalse((new Positive())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate('-0.1'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Positive', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateSucceedsWhenPassingInZeroAsAnInteger(): void
     {
-        $this->assertFalse((new Positive())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate(0));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateSucceedsWhenPassingInZeroAsAFloat(): void
     {
-        $this->assertFalse((new Positive())->validate(null));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate(0.0));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateSucceedsWhenPassingInZeroAsAString(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Positive())->validate('0.0'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Positive())->validate($resource));
-
-        fclose($resource);
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateSucceedsWhenPassingInAPositiveInteger(): void
     {
-        $this->assertFalse((new Positive())->validate(static function (): void {
-        }));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate(1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerAsAString(): void
+    public function testValidateSucceedsWhenPassingInAPositiveIntegerAsAString(): void
     {
-        $this->assertTrue((new Positive())->validate('1'));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate('1'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatAsAString(): void
+    public function testValidateSucceedsWhenPassingInAPositiveFloat(): void
     {
-        $this->assertTrue((new Positive())->validate('1.1'));
+        /** @var Result $result */
+        $result = wait((new Positive())->validate(0.1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenPassingInZeroAsAString(): void
+    public function testValidateSucceedsWhenPassingInAPositiveFloatAsAString(): void
     {
-        $this->assertTrue((new Positive())->validate('0'));
-    }
+        /** @var Result $result */
+        $result = wait((new Positive())->validate('0.1'));
 
-    public function testValidateReturnsTrueWhenPassingInZeroAsAnInteger(): void
-    {
-        $this->assertTrue((new Positive())->validate(0));
-    }
-
-    public function testValidateReturnsTrueWhenPassingInZeroAsAFloat(): void
-    {
-        $this->assertTrue((new Positive())->validate(0.0));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInANegativeAsAString(): void
-    {
-        $this->assertFalse((new Positive())->validate('-1'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInANegativeAsAnInteger(): void
-    {
-        $this->assertFalse((new Positive())->validate(-1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInANegativeAsAFloat(): void
-    {
-        $this->assertFalse((new Positive())->validate(-0.1));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

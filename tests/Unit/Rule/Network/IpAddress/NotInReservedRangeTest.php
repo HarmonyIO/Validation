@@ -2,119 +2,67 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Network\IpAddress;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Network\IpAddress\NotInReservedRange;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class NotInReservedRangeTest extends TestCase
+class NotInReservedRangeTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new NotInReservedRange());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new NotInReservedRange())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new NotInReservedRange())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new NotInReservedRange())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new NotInReservedRange())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new NotInReservedRange())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new NotInReservedRange())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new NotInReservedRange())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new NotInReservedRange())->validate(static function (): void {
-        }));
-    }
-
     /**
-     * @dataProvider provideValidIpv4Addresses
+     * @param mixed[] $data
      */
-    public function testValidateReturnsTrueWhenPassingAnIpv4AddressThatIsNotWithinThePrivateRange(string $ipAddress): void
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertTrue((new NotInReservedRange())->validate($ipAddress));
+        parent::__construct($name, $data, $dataName, NotInReservedRange::class);
     }
 
     /**
      * @dataProvider provideInvalidIpv4Addresses
      */
-    public function testValidateReturnsFalseWhenPassingAnIpv4AddressThatIsWithinThePrivateRange(string $ipAddress): void
+    public function testValidateFailsWhenPassingAnIpv4AddressThatIsWithinTheReservedRange(string $ipAddress): void
     {
-        $this->assertFalse((new NotInReservedRange())->validate($ipAddress));
-    }
+        /** @var Result $result */
+        $result = wait((new NotInReservedRange())->validate($ipAddress));
 
-    /**
-     * @dataProvider provideValidIpv6Addresses
-     */
-    public function xtestValidateReturnsTrueWhenPassingAnIpv6AddressThatIsNotWithinThePrivateRange(string $ipAddress): void
-    {
-        $this->assertTrue((new NotInReservedRange())->validate($ipAddress));
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.IpAddress.NotInReservedRange', $result->getFirstError()->getMessage());
     }
 
     /**
      * @dataProvider provideInvalidIpv6Addresses
      */
-    public function testValidateReturnsFalseWhenPassingAnIpv6AddressThatIsWithinThePrivateRange(string $ipAddress): void
+    public function testValidateFailsWhenPassingAnIpv6AddressThatIsWithinTheReservedRange(string $ipAddress): void
     {
-        $this->assertFalse((new NotInReservedRange())->validate($ipAddress));
+        /** @var Result $result */
+        $result = wait((new NotInReservedRange())->validate($ipAddress));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.IpAddress.NotInReservedRange', $result->getFirstError()->getMessage());
     }
 
     /**
-     * @return string[]
+     * @dataProvider provideValidIpv4Addresses
      */
-    public function provideValidIpv4Addresses(): array
+    public function testValidateSucceedsWhenPassingAnIpv4AddressThatIsNotWithinTheReservedRange(string $ipAddress): void
     {
-        return [
-            ['1.1.1.1'],
-            ['100.63.255.255'],
-            ['100.128.0.0'],
-            ['126.255.255.255'],
-            ['128.0.0.0'],
-            ['169.253.255.255'],
-            ['169.255.0.0'],
-            ['198.51.99.255'],
-            ['198.51.101.0'],
-            ['203.0.112.255'],
-            ['203.0.114.0'],
-            ['223.255.255.255'],
-        ];
+        /** @var Result $result */
+        $result = wait((new NotInReservedRange())->validate($ipAddress));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @dataProvider provideValidIpv6Addresses
+     */
+    public function testValidateSucceedsWhenPassingAnIpv6AddressThatIsNotWithinTheReservedRange(string $ipAddress): void
+    {
+        /** @var Result $result */
+        $result = wait((new NotInReservedRange())->validate($ipAddress));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
     /**
@@ -146,25 +94,6 @@ class NotInReservedRangeTest extends TestCase
     /**
      * @return string[]
      */
-    public function provideValidIpv6Addresses(): array
-    {
-        return [
-            ['::'],
-            ['::2'],
-            ['99::ffff:ffff:ffff:ffff'],
-            ['101::'],
-            ['2001:db7:ffff:ffff:ffff:ffff:ffff:ffff'],
-            ['2001:db9::'],
-            ['fbff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
-            ['fe00::'],
-            ['fe79:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
-            ['fecf::'],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
     public function provideInvalidIpv6Addresses(): array
     {
         return [
@@ -180,6 +109,45 @@ class NotInReservedRangeTest extends TestCase
             ['febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
             ['ff00::'],
             ['ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideValidIpv4Addresses(): array
+    {
+        return [
+            ['1.1.1.1'],
+            ['100.63.255.255'],
+            ['100.128.0.0'],
+            ['126.255.255.255'],
+            ['128.0.0.0'],
+            ['169.253.255.255'],
+            ['169.255.0.0'],
+            ['198.51.99.255'],
+            ['198.51.101.0'],
+            ['203.0.112.255'],
+            ['203.0.114.0'],
+            ['223.255.255.255'],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideValidIpv6Addresses(): array
+    {
+        return [
+            ['::2'],
+            ['99::ffff:ffff:ffff:ffff'],
+            ['101::'],
+            ['2001:db7:ffff:ffff:ffff:ffff:ffff:ffff'],
+            ['2001:db9::'],
+            ['fbff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
+            ['fe00::'],
+            ['fe79:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
+            ['fecf::'],
         ];
     }
 }

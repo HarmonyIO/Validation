@@ -2,90 +2,56 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\File\Image;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\Image\MaximumWidth;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\FileTestCase;
+use function Amp\Promise\wait;
 
-class MaximumWidthTest extends TestCase
+class MaximumWidthTest extends FileTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new MaximumWidth(200));
+        parent::__construct($name, $data, $dataName, MaximumWidth::class, 200);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnUnsupportedImage(): void
     {
-        $this->assertFalse((new MaximumWidth(200))->validate(1));
+        /** @var Result $result */
+        $result = wait((new MaximumWidth(200))->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Image', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAnImageWhichIsLargerThanTheMaximum(): void
     {
-        $this->assertFalse((new MaximumWidth(200))->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new MaximumWidth(199))->validate(TEST_DATA_DIR . '/image/200x400.png'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.MaximumWidth', $result->getFirstError()->getMessage());
+        $this->assertSame('width', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(199, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAnImageWhichExactlyMatchesTheMaximum(): void
     {
-        $this->assertFalse((new MaximumWidth(200))->validate(true));
+        /** @var Result $result */
+        $result = wait((new MaximumWidth(200))->validate(TEST_DATA_DIR . '/image/200x400.png'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingAnImageWhichIsSmallerThanTheMaximum(): void
     {
-        $this->assertFalse((new MaximumWidth(200))->validate([]));
-    }
+        /** @var Result $result */
+        $result = wait((new MaximumWidth(201))->validate(TEST_DATA_DIR . '/image/200x400.png'));
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new MaximumWidth(200))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new MaximumWidth(200))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new MaximumWidth(200))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new MaximumWidth(200))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnNonExistentImage(): void
-    {
-        $this->assertFalse((new MaximumWidth(200))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnUnsupportedImage(): void
-    {
-        $this->assertFalse((new MaximumWidth(200))->validate(TEST_DATA_DIR . '/image/file-mime-type-test.txt'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnImageWhichExactlyMatchesTheMaximum(): void
-    {
-        $this->assertTrue((new MaximumWidth(200))->validate(TEST_DATA_DIR . '/image/200x400.png'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnImageWhichIsSmallerThanTheMaximum(): void
-    {
-        $this->assertTrue((new MaximumWidth(201))->validate(TEST_DATA_DIR . '/image/200x400.png'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnImageWhichIsLargerThanTheMaximum(): void
-    {
-        $this->assertFalse((new MaximumWidth(199))->validate(TEST_DATA_DIR . '/image/200x400.png'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

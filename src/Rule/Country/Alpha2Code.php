@@ -277,7 +277,7 @@ final class Alpha2Code implements Rule
             $result = yield (new StringType())->validate($value);
 
             if (!$result->isValid()) {
-                bubbleUp($result);
+                return bubbleUp($result);
             }
 
             if (in_array(strtoupper($value), self::CODES, true)) {

@@ -2,100 +2,90 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Palestine;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class PalestineTest extends TestCase
+class PalestineTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Palestine());
+        parent::__construct($name, $data, $dataName, Palestine::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithCountryCode(): void
     {
-        $this->assertFalse((new Palestine())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Palestine())->validate('XS92PALS000000000400123456702'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Palestine', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringDoesNotHaveChecksum(): void
     {
-        $this->assertFalse((new Palestine())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Palestine())->validate('PSx2PALS000000000400123456702'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Palestine', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringDoesNotHaveBankAndBranchCode(): void
     {
-        $this->assertFalse((new Palestine())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Palestine())->validate('PS92pALS000000000400123456702'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Palestine', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenStringDoesNotHaveAccountNumber(): void
     {
-        $this->assertFalse((new Palestine())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Palestine())->validate('PS92PALS00000000040012345670!'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Palestine', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $this->assertFalse((new Palestine())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Palestine())->validate('PS92PALS00000000040012345670'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Palestine', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $this->assertFalse((new Palestine())->validate(null));
+        /** @var Result $result */
+        $result = wait((new Palestine())->validate('PS92PALS0000000004001234567022'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Palestine', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenChecksumFails(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Palestine())->validate('PS92PALS000000000400123456703'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Palestine())->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    
+    public function testValidateSucceedsWhenPassingAValidIbanString(): void
     {
-        $this->assertFalse((new Palestine())->validate(static function (): void {
-        }));
-    }
+        /** @var Result $result */
+        $result = wait((new Palestine())->validate('PS92PALS000000000400123456702'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithCountryCode(): void
-    {
-        $this->assertFalse((new Palestine())->validate('XS92PALS000000000400123456702'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveChecksum(): void
-    {
-        $this->assertFalse((new Palestine())->validate('PSx2PALS000000000400123456702'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveBankAndBranchCode(): void
-    {
-        $this->assertFalse((new Palestine())->validate('PS92pALS000000000400123456702'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAccountNumber(): void
-    {
-        $this->assertFalse((new Palestine())->validate('PS92PALS00000000040012345670!'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new Palestine())->validate('PS92PALS00000000040012345670'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new Palestine())->validate('PS92PALS0000000004001234567022'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIbanString(): void
-    {
-        $this->assertTrue((new Palestine())->validate('PS92PALS000000000400123456702'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

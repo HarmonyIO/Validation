@@ -2,85 +2,54 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Network\Url;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Network\Url\Url;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class UrlTest extends TestCase
+class UrlTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Url());
+        parent::__construct($name, $data, $dataName, Url::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAUrlWithoutProtocol(): void
     {
-        $this->assertFalse((new Url())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Url())->validate('pieterhordijk.com'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.Url', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAUrlWithoutHost(): void
     {
-        $this->assertFalse((new Url())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Url())->validate('https://'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.Url', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAValidUrl(): void
     {
-        $this->assertFalse((new Url())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Url())->validate('https://pieterhordijk.com'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingAValidUrlWithPort(): void
     {
-        $this->assertFalse((new Url())->validate([]));
-    }
+        /** @var Result $result */
+        $result = wait((new Url())->validate('https://pieterhordijk.com:1337'));
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Url())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Url())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Url())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Url())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAUrlWithoutProtocol(): void
-    {
-        $this->assertFalse((new Url())->validate('pieterhordijk.com'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAUrlWithoutHost(): void
-    {
-        $this->assertFalse((new Url())->validate('https://'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidUrl(): void
-    {
-        $this->assertTrue((new Url())->validate('https://pieterhordijk.com'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidUrlWithPort(): void
-    {
-        $this->assertTrue((new Url())->validate('https://pieterhordijk.com:1337'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

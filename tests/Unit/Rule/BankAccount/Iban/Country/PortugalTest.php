@@ -2,100 +2,90 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Portugal;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class PortugalTest extends TestCase
+class PortugalTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Portugal());
+        parent::__construct($name, $data, $dataName, Portugal::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithCountryCode(): void
     {
-        $this->assertFalse((new Portugal())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Portugal())->validate('XT50000201231234567890154'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Portugal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringDoesNotHaveChecksum(): void
     {
-        $this->assertFalse((new Portugal())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Portugal())->validate('PTx0000201231234567890154'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Portugal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringDoesNotHaveBankAndBranchCode(): void
     {
-        $this->assertFalse((new Portugal())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Portugal())->validate('PT50x00201231234567890154'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Portugal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenStringDoesNotHaveAccountNumber(): void
     {
-        $this->assertFalse((new Portugal())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Portugal())->validate('PT5000020123123456789015x'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Portugal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $this->assertFalse((new Portugal())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Portugal())->validate('PT5000020123123456789015'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Portugal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $this->assertFalse((new Portugal())->validate(null));
+        /** @var Result $result */
+        $result = wait((new Portugal())->validate('PT500002012312345678901544'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Portugal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenChecksumFails(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Portugal())->validate('PT50000201231234567890155'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Portugal())->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    
+    public function testValidateSucceedsWhenPassingAValidIbanString(): void
     {
-        $this->assertFalse((new Portugal())->validate(static function (): void {
-        }));
-    }
+        /** @var Result $result */
+        $result = wait((new Portugal())->validate('PT50000201231234567890154'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithCountryCode(): void
-    {
-        $this->assertFalse((new Portugal())->validate('XT50000201231234567890154'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveChecksum(): void
-    {
-        $this->assertFalse((new Portugal())->validate('PT60000201231234567890154'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveBankAndBranchCode(): void
-    {
-        $this->assertFalse((new Portugal())->validate('PT50x00201231234567890154'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAccountNumber(): void
-    {
-        $this->assertFalse((new Portugal())->validate('PT50000201231234567890x54'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new Portugal())->validate('PT5000020123123456789015'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new Portugal())->validate('PT500002012312345678901544'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIbanString(): void
-    {
-        $this->assertTrue((new Portugal())->validate('PT50000201231234567890154'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -2,100 +2,90 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Malta;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class MaltaTest extends TestCase
+class MaltaTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Malta());
+        parent::__construct($name, $data, $dataName, Malta::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithCountryCode(): void
     {
-        $this->assertFalse((new Malta())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Malta())->validate('XT84MALT011000012345MTLCAST001S'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Malta', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringDoesNotHaveChecksum(): void
     {
-        $this->assertFalse((new Malta())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Malta())->validate('MTx4MALT011000012345MTLCAST001S'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Malta', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringDoesNotHaveBankAndBranchCode(): void
     {
-        $this->assertFalse((new Malta())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Malta())->validate('MT84mALT011000012345MTLCAST001S'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Malta', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenStringDoesNotHaveAccountNumber(): void
     {
-        $this->assertFalse((new Malta())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Malta())->validate('MT84MALT011000012345MTLCAST001!'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Malta', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $this->assertFalse((new Malta())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Malta())->validate('MT84MALT011000012345MTLCAST001'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Malta', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $this->assertFalse((new Malta())->validate(null));
+        /** @var Result $result */
+        $result = wait((new Malta())->validate('MT84MALT011000012345MTLCAST001SS'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Malta', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenChecksumFails(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Malta())->validate('MT84MALT011000012345MTLCAST001T'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Malta())->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateSucceedsWhenPassingAValidIbanString(): void
     {
-        $this->assertFalse((new Malta())->validate(static function (): void {
-        }));
-    }
+        /** @var Result $result */
+        $result = wait((new Malta())->validate('MT84MALT011000012345MTLCAST001S'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithCountryCode(): void
-    {
-        $this->assertFalse((new Malta())->validate('XT84MALT011000012345MTLCAST001S'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveChecksum(): void
-    {
-        $this->assertFalse((new Malta())->validate('MTx4MALT011000012345MTLCAST001S'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveBankAndBranchCode(): void
-    {
-        $this->assertFalse((new Malta())->validate('MT84mALT011000012345MTLCAST001S'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAccountNumber(): void
-    {
-        $this->assertFalse((new Malta())->validate('MT84MALT011000012345MTLCAST001!'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new Malta())->validate('MT84MALT011000012345MTLCAST001'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new Malta())->validate('MT84MALT011000012345MTLCAST001SS'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIbanString(): void
-    {
-        $this->assertTrue((new Malta())->validate('MT84MALT011000012345MTLCAST001S'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

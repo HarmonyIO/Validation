@@ -2,80 +2,45 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\FileSystem;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\FileSystem\Exists;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class ExistsTest extends TestCase
+class ExistsTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Exists());
+        parent::__construct($name, $data, $dataName, Exists::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnUnExistingPath(): void
     {
-        $this->assertFalse((new Exists())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Exists())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('FileSystem.Exists', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingAnExistingDirectory(): void
     {
-        $this->assertFalse((new Exists())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Exists())->validate(TEST_DATA_DIR . '/file-system/existing'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAnExistingFile(): void
     {
-        $this->assertFalse((new Exists())->validate(true));
-    }
+        /** @var Result $result */
+        $result = wait((new Exists())->validate(TEST_DATA_DIR . '/file-system/existing/existing.txt'));
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Exists())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Exists())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Exists())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Exists())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Exists())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnUnExistingPath(): void
-    {
-        $this->assertFalse((new Exists())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnExistingDirectory(): void
-    {
-        $this->assertTrue((new Exists())->validate(TEST_DATA_DIR . '/file-system/existing'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnExistingFile(): void
-    {
-        $this->assertTrue((new Exists())->validate(TEST_DATA_DIR . '/file-system/existing/existing.txt'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

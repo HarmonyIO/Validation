@@ -2,42 +2,35 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Combinator;
 
-use Amp\Success;
 use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Combinator\Negate;
 use HarmonyIO\Validation\Rule\Rule;
-use PHPUnit\Framework\MockObject\MockObject;
+use HarmonyIO\Validation\Rule\Text\MinimumLength;
+use function Amp\Promise\wait;
 
 class NegateTest extends TestCase
 {
-    /** @var MockObject|Rule */
-    private $rule;
-
-    //phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
-    public function setUp()
-    {
-        $this->rule = $this->createMock(Rule::class);
-
-        $this->rule
-            ->method('validate')
-            ->willReturnCallback(static function (bool $value) {
-                return new Success($value);
-            })
-        ;
-    }
-
     public function testRuleImplementsInterface(): void
     {
-        $this->assertInstanceOf(Rule::class, new Negate($this->rule));
+        $this->assertInstanceOf(Rule::class, new Negate(new MinimumLength(10)));
     }
 
-    public function testValidateReturnsFalseWhenRuleReturnsTrue(): void
+    public function testValidateFailsWhenRuleSucceeds(): void
     {
-        $this->assertFalse((new Negate($this->rule))->validate(true));
+        /** @var Result $result */
+        $result = wait((new Negate(new MinimumLength(10)))->validate('1234567890'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Combinator.Negate', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenRuleReturnsFalse(): void
+    public function testValidateSucceedsWhenRuleFails(): void
     {
-        $this->assertTrue((new Negate($this->rule))->validate(false));
+        /** @var Result $result */
+        $result = wait((new Negate(new MinimumLength(10)))->validate('123456789'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -2,85 +2,38 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\File;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\MimeType;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\FileTestCase;
+use function Amp\Promise\wait;
 
-class MimeTypeTest extends TestCase
+class MimeTypeTest extends FileTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new MimeType('plain/text'));
+        parent::__construct($name, $data, $dataName, MimeType::class, 'text/plain');
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenNotMatchingMimeType(): void
     {
-        $this->assertFalse((new MimeType('plain/text'))->validate(1));
+        /** @var Result $result */
+        $result = wait((new MimeType('application/json'))->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.MimeType', $result->getFirstError()->getMessage());
+        $this->assertSame('mimeType', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('application/json', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenFileMatchesMimeType(): void
     {
-        $this->assertFalse((new MimeType('plain/text'))->validate(1.1));
-    }
+        /** @var Result $result */
+        $result = wait((new MimeType('text/plain'))->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new MimeType('plain/text'))->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new MimeType('plain/text'))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new MimeType('plain/text'))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new MimeType('plain/text'))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new MimeType('plain/text'))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new MimeType('plain/text'))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenFileDoesNotExists(): void
-    {
-        $this->assertFalse((new MimeType('plain/text'))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInADirectory(): void
-    {
-        $this->assertFalse((new MimeType('plain/text'))->validate(TEST_DATA_DIR . '/file-system/existing'));
-    }
-
-    public function testValidateReturnsTrueWhenFileMatchesMimeType(): void
-    {
-        $this->assertTrue((new MimeType('text/plain'))->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));
-    }
-
-    public function testValidateReturnsFalseWhenNotMatchingMimeType(): void
-    {
-        $this->assertFalse((new MimeType('application/json'))->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -2,75 +2,45 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Network\IpAddress;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Network\IpAddress\Ipv4;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class Ipv4Test extends TestCase
+class Ipv4Test extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Ipv4());
+        parent::__construct($name, $data, $dataName, Ipv4::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnIpv6Address(): void
     {
-        $this->assertFalse((new Ipv4())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Ipv4())->validate('2001:0db8:85a3:0000:0000:8a2e:0370:7334'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.IpAddress.Ipv4', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAnInvalidIpv4Address(): void
     {
-        $this->assertFalse((new Ipv4())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Ipv4())->validate('x.1.2.3'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.IpAddress.Ipv4', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAValidIpv4Address(): void
     {
-        $this->assertFalse((new Ipv4())->validate(true));
-    }
+        /** @var Result $result */
+        $result = wait((new Ipv4())->validate('192.168.1.1'));
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Ipv4())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Ipv4())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Ipv4())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Ipv4())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Ipv4())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIpv4Address(): void
-    {
-        $this->assertTrue((new Ipv4())->validate('192.168.1.1'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnIpv6Address(): void
-    {
-        $this->assertFalse((new Ipv4())->validate('2001:0db8:85a3:0000:0000:8a2e:0370:7334'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

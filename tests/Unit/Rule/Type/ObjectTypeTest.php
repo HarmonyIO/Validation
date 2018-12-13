@@ -3,8 +3,10 @@
 namespace HarmonyIO\ValidationTest\Unit\Rule\Type;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\ObjectType;
+use function Amp\Promise\wait;
 
 class ObjectTypeTest extends TestCase
 {
@@ -13,37 +15,52 @@ class ObjectTypeTest extends TestCase
         $this->assertInstanceOf(Rule::class, new ObjectType());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnInteger(): void
     {
-        $this->assertFalse((new ObjectType())->validate(1));
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate(1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.ObjectType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAFloat(): void
     {
-        $this->assertFalse((new ObjectType())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate(1.1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.ObjectType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingABoolean(): void
+    public function testValidateFailsWhenPassingABoolean(): void
     {
-        $this->assertFalse((new ObjectType())->validate(true));
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate(true));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.ObjectType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenPassingAnArray(): void
     {
-        $this->assertFalse((new ObjectType())->validate([]));
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate([]));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.ObjectType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnObject(): void
+    public function testValidateFailsWhenPassingNull(): void
     {
-        $this->assertTrue((new ObjectType())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate(null));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.ObjectType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new ObjectType())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenPassingAResource(): void
     {
         $resource = fopen('php://memory', 'r');
 
@@ -53,19 +70,40 @@ class ObjectTypeTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new ObjectType())->validate($resource));
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate($resource));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.ObjectType', $result->getFirstError()->getMessage());
 
         fclose($resource);
     }
 
-    public function testValidateReturnsTrueWhenPassingACallable(): void
+    public function testValidateFailsWhenPassingAString(): void
     {
-        $this->assertTrue((new ObjectType())->validate(static function (): void {
-        }));
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate('€'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.ObjectType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAString(): void
+    public function testValidateSucceedsWhenPassingACallable(): void
     {
-        $this->assertFalse((new ObjectType())->validate('€'));
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate(static function (): void {
+        }));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    public function testValidateSucceedsWhenPassingAnObject(): void
+    {
+        /** @var Result $result */
+        $result = wait((new ObjectType())->validate(new \DateTimeImmutable()));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

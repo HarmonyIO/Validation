@@ -10,6 +10,7 @@ use HarmonyIO\Validation\Rule\File\Image\Type\Bmp;
 use HarmonyIO\Validation\Rule\File\Image\Type\Gif;
 use HarmonyIO\Validation\Rule\File\Image\Type\Jpeg;
 use HarmonyIO\Validation\Rule\File\Image\Type\Png;
+use HarmonyIO\Validation\Rule\File\Image\Type\Svg;
 use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
@@ -24,6 +25,7 @@ final class Image implements Rule
         Gif::class,
         Jpeg::class,
         Png::class,
+        Svg::class,
     ];
 
     /**

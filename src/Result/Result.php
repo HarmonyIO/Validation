@@ -21,6 +21,15 @@ final class Result
         return $this->valid;
     }
 
+    public function getFirstError(): ?Error
+    {
+        if (!$this->errors) {
+            return null;
+        }
+
+        return $this->errors[0];
+    }
+
     /**
      * @return Error[]
      */

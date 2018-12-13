@@ -21,7 +21,7 @@ final class Svg implements Rule
     {
         return call(static function () use ($value) {
             /** @var Result $result */
-            $result = (new MimeType('image/svg'))->validate($value);
+            $result = yield (new MimeType('image/svg'))->validate($value);
 
             if (!$result->isValid()) {
                 return bubbleUp($result);

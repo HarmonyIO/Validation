@@ -48,7 +48,7 @@ final class Any implements Rule
                 return $errors;
             }, []);
 
-            if (count($errors) < count($this->rules)) {
+            if (count($this->rules) === 0 || count($errors) < count($this->rules)) {
                 return succeed();
             }
 

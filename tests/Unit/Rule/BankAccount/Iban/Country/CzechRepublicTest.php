@@ -2,100 +2,90 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\CzechRepublic;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class CzechRepublicTest extends TestCase
+class CzechRepublicTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new CzechRepublic());
+        parent::__construct($name, $data, $dataName, CzechRepublic::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithCountryCode(): void
     {
-        $this->assertFalse((new CzechRepublic())->validate(1));
+        /** @var Result $result */
+        $result = wait((new CzechRepublic())->validate('XZ6508000000192000145399'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CzechRepublic', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringDoesNotHaveChecksum(): void
     {
-        $this->assertFalse((new CzechRepublic())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new CzechRepublic())->validate('CZx508000000192000145399'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CzechRepublic', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringDoesNotHaveBankAndBranchCode(): void
     {
-        $this->assertFalse((new CzechRepublic())->validate(true));
+        /** @var Result $result */
+        $result = wait((new CzechRepublic())->validate('CZ65x8000000192000145399'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CzechRepublic', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenStringDoesNotHaveAccountNumber(): void
     {
-        $this->assertFalse((new CzechRepublic())->validate([]));
+        /** @var Result $result */
+        $result = wait((new CzechRepublic())->validate('CZ650800000019200014539x'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CzechRepublic', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $this->assertFalse((new CzechRepublic())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new CzechRepublic())->validate('CZ650800000019200014539'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CzechRepublic', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $this->assertFalse((new CzechRepublic())->validate(null));
+        /** @var Result $result */
+        $result = wait((new CzechRepublic())->validate('CZ65080000001920001453999'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CzechRepublic', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenChecksumFails(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new CzechRepublic())->validate('CZ6508000000192000145390'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new CzechRepublic())->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateSucceedsWhenPassingAValidIbanString(): void
     {
-        $this->assertFalse((new CzechRepublic())->validate(static function (): void {
-        }));
-    }
+        /** @var Result $result */
+        $result = wait((new CzechRepublic())->validate('CZ6508000000192000145399'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithCountryCode(): void
-    {
-        $this->assertFalse((new CzechRepublic())->validate('XZ6508000000192000145399'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveChecksum(): void
-    {
-        $this->assertFalse((new CzechRepublic())->validate('CZx508000000192000145399'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveBankAndBranchCode(): void
-    {
-        $this->assertFalse((new CzechRepublic())->validate('CZ65x8000000192000145399'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAccountNumber(): void
-    {
-        $this->assertFalse((new CzechRepublic())->validate('CZ650800000019200014539x'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new CzechRepublic())->validate('CZ650800000019200014539'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new CzechRepublic())->validate('CZ65080000001920001453999'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIbanString(): void
-    {
-        $this->assertTrue((new CzechRepublic())->validate('CZ6508000000192000145399'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

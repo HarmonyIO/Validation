@@ -2,100 +2,90 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Luxembourg;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class LuxembourgTest extends TestCase
+class LuxembourgTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Luxembourg());
+        parent::__construct($name, $data, $dataName, Luxembourg::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithCountryCode(): void
     {
-        $this->assertFalse((new Luxembourg())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Luxembourg())->validate('XU280019400644750000'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Luxembourg', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringDoesNotHaveChecksum(): void
     {
-        $this->assertFalse((new Luxembourg())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Luxembourg())->validate('LUx80019400644750000'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Luxembourg', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringDoesNotHaveBankAndBranchCode(): void
     {
-        $this->assertFalse((new Luxembourg())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Luxembourg())->validate('LU28x019400644750000'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Luxembourg', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenStringDoesNotHaveAccountNumber(): void
     {
-        $this->assertFalse((new Luxembourg())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Luxembourg())->validate('LU28001940064475000!'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Luxembourg', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $this->assertFalse((new Luxembourg())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Luxembourg())->validate('LU28001940064475000'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Luxembourg', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $this->assertFalse((new Luxembourg())->validate(null));
+        /** @var Result $result */
+        $result = wait((new Luxembourg())->validate('LU2800194006447500000'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Luxembourg', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenChecksumFails(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Luxembourg())->validate('LU280019400644750001'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Luxembourg())->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    
+    public function testValidateSucceedsWhenPassingAValidIbanString(): void
     {
-        $this->assertFalse((new Luxembourg())->validate(static function (): void {
-        }));
-    }
+        /** @var Result $result */
+        $result = wait((new Luxembourg())->validate('LU280019400644750000'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithCountryCode(): void
-    {
-        $this->assertFalse((new Luxembourg())->validate('XU280019400644750000'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveChecksum(): void
-    {
-        $this->assertFalse((new Luxembourg())->validate('LUx80019400644750000'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveBankAndBranchCode(): void
-    {
-        $this->assertFalse((new Luxembourg())->validate('LU28x019400644750000'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAccountNumber(): void
-    {
-        $this->assertFalse((new Luxembourg())->validate('LU28001940064475000!'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new Luxembourg())->validate('LU28001940064475000'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new Luxembourg())->validate('LU2800194006447500000'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIbanString(): void
-    {
-        $this->assertTrue((new Luxembourg())->validate('LU280019400644750000'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

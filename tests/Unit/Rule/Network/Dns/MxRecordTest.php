@@ -2,75 +2,36 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Network\Dns;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Network\Dns\MxRecord;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class MxRecordTest extends TestCase
+class MxRecordTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new MxRecord());
+        parent::__construct($name, $data, $dataName, MxRecord::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingADomainWithoutAnMxRecord(): void
     {
-        $this->assertFalse((new MxRecord())->validate(1));
+        /** @var Result $result */
+        $result = wait((new MxRecord())->validate('example.com'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Dns.MxRecord', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingADomainWithAnMxRecord(): void
     {
-        $this->assertFalse((new MxRecord())->validate(1.1));
-    }
+        /** @var Result $result */
+        $result = wait((new MxRecord())->validate('gmail.com'));
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new MxRecord())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new MxRecord())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new MxRecord())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new MxRecord())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new MxRecord())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new MxRecord())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsTrueWhenPassingADomainWithAnMxRecord(): void
-    {
-        $this->assertTrue((new MxRecord())->validate('gmail.com'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingADomainWithoutAnMxRecord(): void
-    {
-        $this->assertFalse((new MxRecord())->validate('example.com'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -48,7 +48,7 @@ final class Maximum implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Age.Maximum', new Parameter('maximum', $this->maximumAge)));
+            return fail(new Error('Age.Maximum', new Parameter('age', $this->maximumAge)));
         });
     }
 }

@@ -2,75 +2,36 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Country\NumericCode;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class NumericCodeTest extends TestCase
+class NumericCodeTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new NumericCode());
+        parent::__construct($name, $data, $dataName, NumericCode::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenAnInvalidAlpha2CountryCode(): void
     {
-        $this->assertFalse((new NumericCode())->validate(1));
+        /** @var Result $result */
+        $result = wait((new NumericCode())->validate('529'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Country.NumericCode', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingAValidAlpha2CountryCode(): void
     {
-        $this->assertFalse((new NumericCode())->validate(1.1));
-    }
+        /** @var Result $result */
+        $result = wait((new NumericCode())->validate('528'));
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new NumericCode())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new NumericCode())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new NumericCode())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new NumericCode())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new NumericCode())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new NumericCode())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidAlpha2CountryCode(): void
-    {
-        $this->assertTrue((new NumericCode())->validate('528'));
-    }
-
-    public function testValidateReturnsFalseWhenAnInvalidAlpha2CountryCode(): void
-    {
-        $this->assertFalse((new NumericCode())->validate('529'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

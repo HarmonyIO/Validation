@@ -2,95 +2,56 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\File\Image\Type\Svg;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\Image\Type\Svg\ValidElements;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\FileTestCase;
+use function Amp\Promise\wait;
 
-class ValidElementsTest extends TestCase
+class ValidElementsTest extends FileTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new ValidElements());
+        parent::__construct($name, $data, $dataName, ValidElements::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenNotMatchingMimeType(): void
     {
-        $this->assertFalse((new ValidElements())->validate(1));
+        /** @var Result $result */
+        $result = wait((new ValidElements())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.MimeType', $result->getFirstError()->getMessage());
+        $this->assertSame('mimeType', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('image/svg', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenImageContainsBrokenXml(): void
     {
-        $this->assertFalse((new ValidElements())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new ValidElements())->validate(TEST_DATA_DIR . '/image/broken.svg'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Type.Svg.ValidElements', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenImageContainsInvalidElements(): void
     {
-        $this->assertFalse((new ValidElements())->validate(true));
+        /** @var Result $result */
+        $result = wait((new ValidElements())->validate(TEST_DATA_DIR . '/image/invalid-elements.svg'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Type.Svg.ValidElements', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenImageIsValid(): void
     {
-        $this->assertFalse((new ValidElements())->validate([]));
-    }
+        /** @var Result $result */
+        $result = wait((new ValidElements())->validate(TEST_DATA_DIR . '/image/example.svg'));
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new ValidElements())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new ValidElements())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new ValidElements())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new ValidElements())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenFileDoesNotExists(): void
-    {
-        $this->assertFalse((new ValidElements())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInADirectory(): void
-    {
-        $this->assertFalse((new ValidElements())->validate(TEST_DATA_DIR . '/file-system/existing'));
-    }
-
-    public function testValidateReturnsFalseWhenNotMatchingMimeType(): void
-    {
-        $this->assertFalse((new ValidElements())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
-    }
-
-    public function testValidateReturnsFalseWhenImageContainsBrokenXml(): void
-    {
-        $this->assertFalse((new ValidElements())->validate(TEST_DATA_DIR . '/image/broken.svg'));
-    }
-
-    public function testValidateReturnsFalseWhenImageContainsInvalidElements(): void
-    {
-        $this->assertFalse((new ValidElements())->validate(TEST_DATA_DIR . '/image/invalid-elements.svg'));
-    }
-
-    public function testValidateReturnsTrueWhenImageIsValid(): void
-    {
-        $this->assertTrue((new ValidElements())->validate(TEST_DATA_DIR . '/image/example.svg'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -5,191 +5,123 @@ namespace HarmonyIO\ValidationTest\Unit\Rule\VideoService\YouTube;
 use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\VideoService\YouTube\VideoUrl;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use function Amp\Promise\wait;
 
-class VideoUrlTest extends TestCase
+class VideoUrlTest extends StringTestCase
 {
     /** @var MockObject|Client */
     private $httpClient;
+
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    {
+        $this->httpClient = $this->createMock(Client::class);
+
+        parent::__construct($name, $data, $dataName, VideoUrl::class, $this->httpClient);
+    }
 
     //phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
     public function setUp()
     {
         $this->httpClient = $this->createMock(Client::class);
-    }
-    
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new VideoUrl($this->httpClient));
+
+        parent::setUp();
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseOnUnrecognizedUrlProtocol(): void
+    public function testValidateFailsOnUnrecognizedUrlProtocol(): void
     {
         $this->httpClient
             ->expects($this->never())
             ->method('request')
         ;
 
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate('ftp://youtube.com/watch?v=jNQXAC9IVRw'));
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate('ftp://youtube.com/watch?v=jNQXAC9IVRw'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('VideoService.YouTube.VideoUrl', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseOnUnrecognizedDomain(): void
+    public function testValidateFailsOnUnrecognizedDomain(): void
     {
         $this->httpClient
             ->expects($this->never())
             ->method('request')
         ;
 
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate('https://notyoutube.com/watch?v=jNQXAC9IVRw'));
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate('https://notyoutube.com/watch?v=jNQXAC9IVRw'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('VideoService.YouTube.VideoUrl', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseOnMissingPath(): void
+    public function testValidateFailsOnMissingPath(): void
     {
         $this->httpClient
             ->expects($this->never())
             ->method('request')
         ;
 
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate('https://youtube.com/'));
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate('https://youtube.com/'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('VideoService.YouTube.VideoUrl', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenWatchIsNotInPath(): void
-    {
-        $response = $this->createMock(Response::class);
-
-        $response
-            ->method('getBody')
-            ->willReturn(json_encode(['type' => 'video']))
-        ;
-
-        $response
-            ->method('getNumericalStatusCode')
-            ->willReturn(200)
-        ;
-
-        $this->httpClient
-            ->expects($this->once())
-            ->method('request')
-            ->willReturn(new Success($response))
-        ;
-
-        $this->assertTrue((new VideoUrl($this->httpClient))->validate('https://youtube.com/foobar'));
-    }
-
-    public function testValidateReturnsFalseWhenWatchIsInPathButMissingAQueryString(): void
+    public function testValidateFailsWhenWatchIsInPathButMissingAQueryString(): void
     {
         $this->httpClient
             ->expects($this->never())
             ->method('request')
         ;
 
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate('https://youtube.com/watch'));
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate('https://youtube.com/watch'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('VideoService.YouTube.VideoUrl', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenWatchIsInPathButMissingTheVQueryStringParameter(): void
+    public function testValidateFailsWhenWatchIsInPathButMissingTheVQueryStringParameter(): void
     {
         $this->httpClient
             ->expects($this->never())
             ->method('request')
         ;
 
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate('https://youtube.com/watch?foo=bar'));
-    }
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate('https://youtube.com/watch?foo=bar'));
 
-    public function testValidateReturnsTrueWhenUrlContainsBothTheWatchPathAndTheVQueryStringParameter(): void
-    {
-        $response = $this->createMock(Response::class);
-
-        $response
-            ->method('getBody')
-            ->willReturn(json_encode(['type' => 'video']))
-        ;
-
-        $response
-            ->method('getNumericalStatusCode')
-            ->willReturn(200)
-        ;
-
-        $this->httpClient
-            ->expects($this->once())
-            ->method('request')
-            ->willReturn(new Success($response))
-        ;
-
-        $this->assertTrue((new VideoUrl($this->httpClient))->validate('https://youtube.com/watch?v=bar'));
+        $this->assertFalse($result->isValid());
+        $this->assertSame('VideoService.YouTube.VideoUrl', $result->getFirstError()->getMessage());
     }
 
     /**
      * @dataProvider provideInvalidYouTubeUrls
      */
-    public function testValidateReturnsFalseForInvalidYouTubeUrl(string $url): void
+    public function testValidateFailsForInvalidYouTubeUrl(string $url): void
     {
         $this->httpClient
             ->expects($this->never())
             ->method('request')
         ;
 
-        $this->assertFalse((new VideoUrl($this->httpClient))->validate($url));
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate($url));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('VideoService.YouTube.VideoUrl', $result->getFirstError()->getMessage());
     }
 
-    /**
-     * @dataProvider provideValidYouTubeUrls
-     */
-    public function testValidateReturnsTrueForValidYouTubeUrl(string $url): void
+    public function testValidateSucceedsWhenWatchIsNotInPath(): void
     {
         $response = $this->createMock(Response::class);
 
@@ -209,7 +141,68 @@ class VideoUrlTest extends TestCase
             ->willReturn(new Success($response))
         ;
 
-        $this->assertTrue((new VideoUrl($this->httpClient))->validate($url));
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate('https://youtube.com/foobar'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    public function testValidateSucceedsWhenUrlContainsBothTheWatchPathAndTheVQueryStringParameter(): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $response
+            ->method('getBody')
+            ->willReturn(json_encode(['type' => 'video']))
+        ;
+
+        $response
+            ->method('getNumericalStatusCode')
+            ->willReturn(200)
+        ;
+
+        $this->httpClient
+            ->expects($this->once())
+            ->method('request')
+            ->willReturn(new Success($response))
+        ;
+
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate('https://youtube.com/watch?v=bar'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @dataProvider provideValidYouTubeUrls
+     */
+    public function testValidateSucceedsForValidYouTubeUrl(string $url): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $response
+            ->method('getBody')
+            ->willReturn(json_encode(['type' => 'video']))
+        ;
+
+        $response
+            ->method('getNumericalStatusCode')
+            ->willReturn(200)
+        ;
+
+        $this->httpClient
+            ->expects($this->once())
+            ->method('request')
+            ->willReturn(new Success($response))
+        ;
+
+        /** @var Result $result */
+        $result = wait((new VideoUrl($this->httpClient))->validate($url));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
     /**

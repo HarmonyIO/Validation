@@ -3,47 +3,58 @@
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Numeric\FloatType;
 use HarmonyIO\Validation\Rule\Rule;
+use function Amp\Promise\wait;
 
 class FloatTypeTest extends TestCase
 {
+    /**
+     * @param mixed[] $data
+     */
     public function testRuleImplementsInterface(): void
     {
         $this->assertInstanceOf(Rule::class, new FloatType());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingABoolean(): void
     {
-        $this->assertTrue((new FloatType())->validate(1));
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate(true));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.FloatType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAnArray(): void
     {
-        $this->assertTrue((new FloatType())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate([]));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.FloatType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenPassingAnObject(): void
     {
-        $this->assertFalse((new FloatType())->validate(true));
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate(new \DateTimeImmutable()));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.FloatType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenPassingNull(): void
     {
-        $this->assertFalse((new FloatType())->validate([]));
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate(null));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.FloatType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new FloatType())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new FloatType())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenPassingAResource(): void
     {
         $resource = fopen('php://memory', 'r');
 
@@ -53,24 +64,58 @@ class FloatTypeTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new FloatType())->validate($resource));
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate($resource));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.FloatType', $result->getFirstError()->getMessage());
 
         fclose($resource);
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateFailsWhenPassingACallable(): void
     {
-        $this->assertFalse((new FloatType())->validate(static function (): void {
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate(static function (): void {
         }));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.FloatType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerAsAString(): void
+    public function testValidateSucceedsWhenPassingAnInteger(): void
     {
-        $this->assertTrue((new FloatType())->validate('1'));
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate(1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatAsAString(): void
+    public function testValidateSucceedsWhenPassingAFloat(): void
     {
-        $this->assertTrue((new FloatType())->validate('1.1'));
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate(1.1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+    
+    public function testValidateSucceedsWhenPassingAnIntegerAsAString(): void
+    {
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate('1'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    public function testValidateSucceedsWhenPassingAFloatAsAString(): void
+    {
+        /** @var Result $result */
+        $result = wait((new FloatType())->validate('1.1'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

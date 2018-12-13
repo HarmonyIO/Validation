@@ -2,75 +2,36 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Uuid;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Uuid\Nil;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class NilTest extends TestCase
+class NilTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Nil());
+        parent::__construct($name, $data, $dataName, Nil::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnInvalidNilUuidString(): void
     {
-        $this->assertFalse((new Nil())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Nil())->validate('00000000-0000-0000-0000-000000000001'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Uuid.Nil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingAValidNilUuidString(): void
     {
-        $this->assertFalse((new Nil())->validate(1.1));
-    }
+        /** @var Result $result */
+        $result = wait((new Nil())->validate('00000000-0000-0000-0000-000000000000'));
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Nil())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Nil())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Nil())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Nil())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Nil())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Nil())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidNilUuidString(): void
-    {
-        $this->assertTrue((new Nil())->validate('00000000-0000-0000-0000-000000000000'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInvalidNilUuidString(): void
-    {
-        $this->assertFalse((new Nil())->validate('00000000-0000-0000-0000-000000000001'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

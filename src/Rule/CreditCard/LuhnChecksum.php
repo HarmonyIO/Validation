@@ -19,7 +19,7 @@ final class LuhnChecksum implements Rule
      */
     public function validate($value): Promise
     {
-        return call(static function () use ($value) {
+        return call(function () use ($value) {
             /** @var Result $result */
             $result = yield (new StringType())->validate($value);
 

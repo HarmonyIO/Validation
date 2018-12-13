@@ -2,105 +2,99 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\CostaRica;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class CostaRicaTest extends TestCase
+class CostaRicaTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new CostaRica());
+        parent::__construct($name, $data, $dataName, CostaRica::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithCountryCode(): void
     {
-        $this->assertFalse((new CostaRica())->validate(1));
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('XR05015202001026284066'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CostaRica', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringDoesNotHaveChecksum(): void
     {
-        $this->assertFalse((new CostaRica())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('CRx5015202001026284066'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CostaRica', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringDoesNotHaveReserveNumber(): void
     {
-        $this->assertFalse((new CostaRica())->validate(true));
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('CR05115202001026284066'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CostaRica', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenStringDoesNotHaveBankAndBranchCode(): void
     {
-        $this->assertFalse((new CostaRica())->validate([]));
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('CR050x5202001026284066'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CostaRica', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenStringDoesNotHaveAccountNumber(): void
     {
-        $this->assertFalse((new CostaRica())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('CR0501520200102628406x'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CostaRica', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $this->assertFalse((new CostaRica())->validate(null));
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('CR0501520200102628406'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CostaRica', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('CR050152020010262840666'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new CostaRica())->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.CostaRica', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateFailsWhenChecksumFails(): void
     {
-        $this->assertFalse((new CostaRica())->validate(static function (): void {
-        }));
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('CR05015202001026284067'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithCountryCode(): void
+    public function testValidateSucceedsWhenPassingAValidIbanString(): void
     {
-        $this->assertFalse((new CostaRica())->validate('XR05015202001026284066'));
-    }
+        /** @var Result $result */
+        $result = wait((new CostaRica())->validate('CR05015202001026284066'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotHaveChecksum(): void
-    {
-        $this->assertFalse((new CostaRica())->validate('CRx5015202001026284066'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveReserveNumber(): void
-    {
-        $this->assertFalse((new CostaRica())->validate('CR05115202001026284066'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveBankAndBranchCode(): void
-    {
-        $this->assertFalse((new CostaRica())->validate('CR050x5202001026284066'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAccountNumber(): void
-    {
-        $this->assertFalse((new CostaRica())->validate('CR0501520200102628406x'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new CostaRica())->validate('CR0501520200102628406'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new CostaRica())->validate('CR050152020010262840666'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIbanString(): void
-    {
-        $this->assertTrue((new CostaRica())->validate('CR05015202001026284066'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

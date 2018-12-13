@@ -2,82 +2,81 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\CreditCard;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\CreditCard\MasterCard;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class MasterCardTest extends TestCase
+class MasterCardTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new MasterCard());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new MasterCard())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new MasterCard())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new MasterCard())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new MasterCard())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new MasterCard())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new MasterCard())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new MasterCard())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new MasterCard())->validate(static function (): void {
-        }));
-    }
-
     /**
-     * @dataProvider provideValidCreditCardNumbers
+     * @param mixed[] $data
      */
-    public function testValidateReturnsTrueWhenPassingAValidCreditCardNumber(string $creditCardNumber): void
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertTrue((new MasterCard())->validate($creditCardNumber));
+        parent::__construct($name, $data, $dataName, MasterCard::class);
     }
 
     /**
      * @dataProvider provideInvalidCreditCardNumbers
      */
-    public function testValidateReturnsFalseWhenPassingAnInvalidCreditCardNumber(string $creditCardNumber): void
+    public function testValidateFailsOnInvalidCreditCardNumber(string $creditCardNumber): void
     {
-        $this->assertFalse((new MasterCard())->validate($creditCardNumber));
+        /** @var Result $result */
+        $result = wait((new MasterCard())->validate($creditCardNumber));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('CreditCard.MasterCard', $result->getFirstError()->getMessage());
+    }
+
+    /**
+     * @dataProvider provideInvalidCreditCardCheckSums
+     */
+    public function testValidateFailsOnInvalidCreditCardCheckSums(string $creditCardNumber): void
+    {
+        /** @var Result $result */
+        $result = wait((new MasterCard())->validate($creditCardNumber));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('CreditCard.LuhnChecksum', $result->getFirstError()->getMessage());
+    }
+
+    /**
+     * @dataProvider provideValidCreditCardNumbers
+     */
+    public function testValidateSucceedsOnValidCreditCardNumber(string $creditCardNumber): void
+    {
+        /** @var Result $result */
+        $result = wait((new MasterCard())->validate($creditCardNumber));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideInvalidCreditCardNumbers(): array
+    {
+        return [
+            ['540587363827692'],
+            ['55117936800718355'],
+            ['5638013614388422'],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideInvalidCreditCardCheckSums(): array
+    {
+        return [
+            ['5405873638276924'],
+            ['5511793680071836'],
+            ['5185497765654616'],
+            ['5317787159451483'],
+            ['5244891802525954'],
+        ];
     }
 
     /**
@@ -96,19 +95,6 @@ class MasterCardTest extends TestCase
             ['5516328401914735'],
             ['5571989499167494'],
             ['5572696289787568'],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function provideInvalidCreditCardNumbers(): array
-    {
-        return [
-            ['540587363827692'],
-            ['55117936800718355'],
-            ['5638013614388422'],
-            ['5185497765654616'],
         ];
     }
 }

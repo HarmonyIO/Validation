@@ -2,11 +2,9 @@
 
 namespace HarmonyIO\Validation\Result\Promise;
 
-use Amp\Coroutine;
 use Amp\Loop;
 use Amp\Promise;
 use HarmonyIO\Validation\Result\Result;
-use React\Promise\PromiseInterface as ReactPromise;
 
 final class Success implements Promise
 {
@@ -16,19 +14,7 @@ final class Success implements Promise
     public function onResolve(callable $onResolved)
     {
         try {
-            $result = $onResolved(null, new Result(true));
-
-            if ($result === null) {
-                return;
-            }
-
-            if ($result instanceof \Generator) {
-                $result = new Coroutine($result);
-            }
-
-            if ($result instanceof Promise || $result instanceof ReactPromise) {
-                Promise\rethrow($result);
-            }
+            $onResolved(null, new Result(true));
         } catch (\Throwable $exception) {
             Loop::defer(static function () use ($exception): void {
                 throw $exception;

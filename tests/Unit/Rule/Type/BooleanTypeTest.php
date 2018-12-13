@@ -3,8 +3,10 @@
 namespace HarmonyIO\ValidationTest\Unit\Rule\Type;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\BooleanType;
+use function Amp\Promise\wait;
 
 class BooleanTypeTest extends TestCase
 {
@@ -13,37 +15,52 @@ class BooleanTypeTest extends TestCase
         $this->assertInstanceOf(Rule::class, new BooleanType());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnInteger(): void
     {
-        $this->assertFalse((new BooleanType())->validate(1));
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate(1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.BooleanType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAFloat(): void
     {
-        $this->assertFalse((new BooleanType())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate(1.1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.BooleanType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingABoolean(): void
+    public function testValidateFailsWhenPassingAnArray(): void
     {
-        $this->assertTrue((new BooleanType())->validate(true));
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate([]));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.BooleanType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenPassingAnObject(): void
     {
-        $this->assertFalse((new BooleanType())->validate([]));
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate(new \DateTimeImmutable()));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.BooleanType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenPassingNull(): void
     {
-        $this->assertFalse((new BooleanType())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate(null));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.BooleanType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new BooleanType())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenPassingAResource(): void
     {
         $resource = fopen('php://memory', 'r');
 
@@ -53,19 +70,40 @@ class BooleanTypeTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new BooleanType())->validate($resource));
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate($resource));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.BooleanType', $result->getFirstError()->getMessage());
 
         fclose($resource);
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateFailsWhenPassingACallable(): void
     {
-        $this->assertFalse((new BooleanType())->validate(static function (): void {
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate(static function (): void {
         }));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.BooleanType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAString(): void
+    public function testValidateFailsWhenPassingAString(): void
     {
-        $this->assertFalse((new BooleanType())->validate('€'));
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate('€'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.BooleanType', $result->getFirstError()->getMessage());
+    }
+
+    public function testValidateSucceedsWhenPassingABoolean(): void
+    {
+        /** @var Result $result */
+        $result = wait((new BooleanType())->validate(true));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

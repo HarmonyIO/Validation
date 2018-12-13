@@ -6,77 +6,33 @@ use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Security\NotPwnedPassword;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Amp\Promise\wait;
 
-class NotPwnedPasswordTest extends TestCase
+class NotPwnedPasswordTest extends StringTestCase
 {
     /** @var MockObject|Client */
     private $httpClient;
+
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    {
+        $this->httpClient = $this->createMock(Client::class);
+
+        parent::__construct($name, $data, $dataName, NotPwnedPassword::class, $this->httpClient, 10);
+    }
 
     //phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
     public function setUp()
     {
         $this->httpClient = $this->createMock(Client::class);
-    }
 
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new NotPwnedPassword($this->httpClient, 10));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate(static function (): void {
-        }));
+        parent::setUp();
     }
 
     public function testValidatePassesCorrectHashToPwnedPasswordsService(): void
@@ -100,7 +56,7 @@ class NotPwnedPasswordTest extends TestCase
         wait((new NotPwnedPassword($this->httpClient, 10))->validate('password'));
     }
 
-    public function testValidateReturnsFalseWhenOverThreshold(): void
+    public function testValidateFailsWhenOverThreshold(): void
     {
         $this->httpClient
             ->method('request')
@@ -122,10 +78,16 @@ class NotPwnedPasswordTest extends TestCase
             })
         ;
 
-        $this->assertFalse((new NotPwnedPassword($this->httpClient, 10))->validate('password'));
+        /** @var Result $result */
+        $result = wait((new NotPwnedPassword($this->httpClient, 10))->validate('password'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Security.NotPwnedPassword', $result->getFirstError()->getMessage());
+        $this->assertSame('threshold', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenExactlyThreshold(): void
+    public function testValidateSucceedsWhenExactlyThreshold(): void
     {
         $this->httpClient
             ->method('request')
@@ -147,7 +109,11 @@ class NotPwnedPasswordTest extends TestCase
             })
         ;
 
-        $this->assertTrue((new NotPwnedPassword($this->httpClient, 10))->validate('password'));
+        /** @var Result $result */
+        $result = wait((new NotPwnedPassword($this->httpClient, 10))->validate('password'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
     public function testValidateReturnsTrueWhenBelowThreshold(): void
@@ -172,6 +138,10 @@ class NotPwnedPasswordTest extends TestCase
             })
         ;
 
-        $this->assertTrue((new NotPwnedPassword($this->httpClient, 10))->validate('password'));
+        /** @var Result $result */
+        $result = wait((new NotPwnedPassword($this->httpClient, 10))->validate('password'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -17,7 +17,7 @@ final class Maximum implements Rule
     /** @var int */
     private $maximum;
 
-    public function __construct(int $maximum)
+    public function __construct(float $maximum)
     {
         $this->maximum = $maximum;
     }

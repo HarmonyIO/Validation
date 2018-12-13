@@ -2,82 +2,43 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Iban;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class IbanTest extends TestCase
+class IbanTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Iban());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new Iban())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Iban())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Iban())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Iban())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Iban())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Iban())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Iban())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Iban())->validate(static function (): void {
-        }));
+        parent::__construct($name, $data, $dataName, Iban::class);
     }
 
     /**
      * @dataProvider provideInvalidIbanCodes
      */
-    public function testValidateChecksumReturnsFalseOnInvalidChecksum(string $ibanCode): void
+    public function testValidateFailsOnInvalidIban(string $ibanCode): void
     {
-        $this->assertFalse((new Iban())->validate($ibanCode));
+        /** @var Result $result */
+        $result = wait((new Iban())->validate($ibanCode));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Iban', $result->getFirstError()->getMessage());
     }
 
     /**
      * @dataProvider provideValidIbanCodes
      */
-    public function testValidateChecksumReturnsTrueOnValidChecksum(string $ibanCode): void
+    public function testValidateSucceedsOnValidIban(string $ibanCode): void
     {
-        $this->assertTrue((new Iban())->validate($ibanCode));
+        /** @var Result $result */
+        $result = wait((new Iban())->validate($ibanCode));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
     /**

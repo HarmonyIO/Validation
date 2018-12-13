@@ -2,16 +2,20 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\File\Image;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Exception\InvalidAspectRatio;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\Image\AspectRatio;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\FileTestCase;
+use function Amp\Promise\wait;
 
-class AspectRatioTest extends TestCase
+class AspectRatioTest extends FileTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new AspectRatio('4:3'));
+        parent::__construct($name, $data, $dataName, AspectRatio::class, '4:3');
     }
 
     public function testConstructorThrowsWhenPassingInAnInvalidAspectRatioString(): void
@@ -22,74 +26,32 @@ class AspectRatioTest extends TestCase
         new AspectRatio('a:a');
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenNotMatchingMimeType(): void
     {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(1));
+        /** @var Result $result */
+        $result = wait((new AspectRatio('4:3'))->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Image', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAnImageWithIncorrectAspectRatio(): void
     {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new AspectRatio('4:3'))->validate(TEST_DATA_DIR . '/image/aspect-ratio-16-9.png'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.AspectRatio', $result->getFirstError()->getMessage());
+        $this->assertSame('ratio', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('4:3', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAnImageWithCorrectAspectRatio(): void
     {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(true));
-    }
+        /** @var Result $result */
+        $result = wait((new AspectRatio('4:3'))->validate(TEST_DATA_DIR . '/image/aspect-ratio-4-3.png'));
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new AspectRatio('4:3'))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new AspectRatio('4:3'))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnNonExistentImage(): void
-    {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnUnsupportedImage(): void
-    {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(TEST_DATA_DIR . '/image/file-mime-type-test.txt'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnImageWithIncorrectAspectRatio(): void
-    {
-        $this->assertFalse((new AspectRatio('4:3'))->validate(TEST_DATA_DIR . '/image/aspect-ratio-16-9.png'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnImageWithCorrectAspectRatio(): void
-    {
-        $this->assertTrue((new AspectRatio('4:3'))->validate(TEST_DATA_DIR . '/image/aspect-ratio-4-3.png'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

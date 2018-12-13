@@ -2,105 +2,99 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Turkey;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class TurkeyTest extends TestCase
+class TurkeyTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Turkey());
+        parent::__construct($name, $data, $dataName, Turkey::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithCountryCode(): void
     {
-        $this->assertFalse((new Turkey())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('XR330006100519786457841326'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Turkey', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringDoesNotHaveChecksum(): void
     {
-        $this->assertFalse((new Turkey())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('TRx30006100519786457841326'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Turkey', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringDoesNotHaveBankAndBranchCode(): void
     {
-        $this->assertFalse((new Turkey())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('TR33x006100519786457841326'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Turkey', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenStringDoesNotHaveReservedNumber(): void
     {
-        $this->assertFalse((new Turkey())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('TR330006110519786457841326'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Turkey', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenStringDoesNotHaveAccountNumber(): void
     {
-        $this->assertFalse((new Turkey())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('TR33000610051978645784132!'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Turkey', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $this->assertFalse((new Turkey())->validate(null));
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('TR33000610051978645784132'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Turkey', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('TR3300061005197864578413266'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Turkey())->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Turkey', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateFailsWhenChecksumFails(): void
     {
-        $this->assertFalse((new Turkey())->validate(static function (): void {
-        }));
-    }
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('TR330006100519786457841327'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithCountryCode(): void
-    {
-        $this->assertFalse((new Turkey())->validate('XR330006100519786457841326'));
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveChecksum(): void
+    
+    public function testValidateSucceedsWhenPassingAValidIbanString(): void
     {
-        $this->assertFalse((new Turkey())->validate('TRx30006100519786457841326'));
-    }
+        /** @var Result $result */
+        $result = wait((new Turkey())->validate('TR330006100519786457841326'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotHaveBankAndBranchCode(): void
-    {
-        $this->assertFalse((new Turkey())->validate('TR33x006100519786457841326'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveReservedNumber(): void
-    {
-        $this->assertFalse((new Turkey())->validate('TR330006110519786457841326'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAccountNumber(): void
-    {
-        $this->assertFalse((new Turkey())->validate('TR33000610051978645784132!'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new Turkey())->validate('TR33000610051978645784132'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new Turkey())->validate('TR3300061005197864578413266'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIbanString(): void
-    {
-        $this->assertTrue((new Turkey())->validate('TR330006100519786457841326'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -5,7 +5,6 @@ namespace HarmonyIO\Validation\Rule\Text;
 use Amp\Promise;
 use HarmonyIO\Validation\Exception\InvalidNumericalRange;
 use HarmonyIO\Validation\Result\Result;
-use HarmonyIO\Validation\Rule\Age\Minimum;
 use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
@@ -44,7 +43,7 @@ final class LengthRange implements Rule
             }
 
             return (new All(
-                new Minimum($this->minimumLength),
+                new MinimumLength($this->minimumLength),
                 new MaximumLength($this->maximumLength)
             ))->validate($value);
         });

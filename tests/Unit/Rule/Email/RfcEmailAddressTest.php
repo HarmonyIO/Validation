@@ -2,75 +2,36 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Email;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Email\RfcEmailAddress;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class RfcEmailAddressTest extends TestCase
+class RfcEmailAddressTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new RfcEmailAddress());
+        parent::__construct($name, $data, $dataName, RfcEmailAddress::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenEmailAddressIsInvalid(): void
     {
-        $this->assertFalse((new RfcEmailAddress())->validate(1));
+        /** @var Result $result */
+        $result = wait((new RfcEmailAddress())->validate('invalid-email-address'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Email.RfcEmailAddress', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenEmailAddressIsValid(): void
     {
-        $this->assertFalse((new RfcEmailAddress())->validate(1.1));
-    }
+        /** @var Result $result */
+        $result = wait((new RfcEmailAddress())->validate('test@example.com'));
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new RfcEmailAddress())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new RfcEmailAddress())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new RfcEmailAddress())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new RfcEmailAddress())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new RfcEmailAddress())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new RfcEmailAddress())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenEmailAddressIsInvalid(): void
-    {
-        $this->assertFalse((new RfcEmailAddress())->validate('invalid-email-address'));
-    }
-
-    public function testValidateReturnsFalseWhenEmailAddressIsValid(): void
-    {
-        $this->assertTrue((new RfcEmailAddress())->validate('test@example.com'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

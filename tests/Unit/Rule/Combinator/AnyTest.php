@@ -3,10 +3,12 @@
 namespace HarmonyIO\ValidationTest\Unit\Rule\Combinator;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Text\MaximumLength;
 use HarmonyIO\Validation\Rule\Text\MinimumLength;
+use function Amp\Promise\wait;
 
 class AnyTest extends TestCase
 {
@@ -15,40 +17,62 @@ class AnyTest extends TestCase
         $this->assertInstanceOf(Rule::class, new Any());
     }
 
-    public function testValidateReturnsFalseWhenNoRulesAreAdded(): void
+    public function testValidateSucceedsWhenNoRulesAreAdded(): void
     {
-        $this->assertFalse((new Any())->validate('Test value'));
+        /** @var Result $result */
+        $result = wait((new Any())->validate('Test value'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenBothRulesAreValid(): void
+    public function testValidateSucceedsWhenBothRulesAreValid(): void
     {
-        $this->assertTrue((new Any(
+        /** @var Result $result */
+        $result = wait((new Any(
             new MinimumLength(3),
             new MaximumLength(15)
         ))->validate('Test value'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenFirstRuleIsInvalid(): void
+    public function testValidateSucceedsWhenFirstRuleIsValid(): void
     {
-        $this->assertTrue((new Any(
+        /** @var Result $result */
+        $result = wait((new Any(
             new MinimumLength(11),
             new MaximumLength(15)
         ))->validate('Test value'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenLastRuleIsInvalid(): void
+    public function testValidateSucceedsWhenLastRuleIsValid(): void
     {
-        $this->assertTrue((new Any(
+        /** @var Result $result */
+        $result = wait((new Any(
             new MinimumLength(3),
             new MaximumLength(9)
         ))->validate('Test value'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenAllRulesAreInvalid(): void
+    public function testValidateFailsWhenAllRulesAreInvalid(): void
     {
-        $this->assertFalse((new Any(
+        /** @var Result $result */
+        $result = wait((new Any(
             new MinimumLength(11),
             new MaximumLength(9)
         ))->validate('Test value'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertCount(2, $result->getErrors());
+        $this->assertSame('Text.MinimumLength', $result->getFirstError()->getMessage());
+        $this->assertSame('Text.MaximumLength', $result->getErrors()[1]->getMessage());
     }
 }

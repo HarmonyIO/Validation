@@ -5,6 +5,7 @@ namespace HarmonyIO\Validation\Rule\Network\IpAddress;
 use Amp\Promise;
 use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
+use HarmonyIO\Validation\Rule\Combinator\Negate;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
@@ -40,7 +41,7 @@ final class NotInReservedRange implements Rule
             }
 
             /** @var Result $result */
-            $result = yield (new InCidrRange(...self::RESERVED_RANGES))->validate($value);
+            $result = yield (new Negate(new InCidrRange(...self::RESERVED_RANGES)))->validate($value);
 
             if (!$result->isValid() || filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE) === false) {
                 return fail(new Error('Network.IpAddress.NotInReservedRange'));

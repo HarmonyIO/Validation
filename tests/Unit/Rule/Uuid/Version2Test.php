@@ -2,66 +2,31 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Uuid;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Uuid\Version2;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class Version2Test extends TestCase
+class Version2Test extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Version2());
+        parent::__construct($name, $data, $dataName, Version2::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    /**
+     * @dataProvider provideInvalidUuids
+     */
+    public function testValidateFailsWhenPassingAnInvalidV2UuidString(string $uuid): void
     {
-        $this->assertFalse((new Version2())->validate(1));
-    }
+        /** @var Result $result */
+        $result = wait((new Version2())->validate($uuid));
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Version2())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Version2())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Version2())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Version2())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Version2())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Version2())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Version2())->validate(static function (): void {
-        }));
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Uuid.Version2', $result->getFirstError()->getMessage());
     }
 
     /**
@@ -69,15 +34,29 @@ class Version2Test extends TestCase
      */
     public function testValidateReturnsTrueWhenPassingAValidV2UuidString(string $uuid): void
     {
-        $this->assertTrue((new Version2())->validate($uuid));
+        /** @var Result $result */
+        $result = wait((new Version2())->validate($uuid));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
     /**
-     * @dataProvider provideInvalidUuids
+     * @return string[]
      */
-    public function testValidateReturnsFalseWhenPassingAnInvalidV2UuidString(string $uuid): void
+    public function provideInvalidUuids(): array
     {
-        $this->assertFalse((new Version2())->validate($uuid));
+        return [
+            ['00000000-0000-0000-0000-000000000001'],
+            ['5ba4e31e-e99d-11e8-9f32-f2801f1b9fd1'],
+            ['5ba4eb16-e99d-21e8-9f32-f2801f1b9fdg'],
+            ['5ba4e490-e99d-31e8-9f32-f2801f1b9fd1'],
+            ['5ba4e5e4-e99d-41e8-9f32-f2801f1b9fd1'],
+            ['5ba4e72e-e99d-51e8-9f32-f2801f1b9fd1'],
+            ['5ba4eb16-e99d-61e8-9f32-f2801f1b9fd1'],
+            ['incorrect-string'],
+            [''],
+        ];
     }
 
     /**
@@ -136,24 +115,6 @@ class Version2Test extends TestCase
             ['5ba537d8-e99d-21e8-9f32-f2801f1b9fd1'],
             ['5ba5392c-e99d-21e8-9f32-f2801f1b9fd1'],
             ['5ba53a62-e99d-21e8-9f32-f2801f1b9fd1'],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function provideInvalidUuids(): array
-    {
-        return [
-            ['00000000-0000-0000-0000-000000000001'],
-            ['5ba4e31e-e99d-11e8-9f32-f2801f1b9fd1'],
-            ['5ba4eb16-e99d-21e8-9f32-f2801f1b9fdg'],
-            ['5ba4e490-e99d-31e8-9f32-f2801f1b9fd1'],
-            ['5ba4e5e4-e99d-41e8-9f32-f2801f1b9fd1'],
-            ['5ba4e72e-e99d-51e8-9f32-f2801f1b9fd1'],
-            ['5ba4eb16-e99d-61e8-9f32-f2801f1b9fd1'],
-            ['incorrect-string'],
-            [''],
         ];
     }
 }

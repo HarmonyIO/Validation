@@ -48,7 +48,7 @@ final class Minimum implements Rule
                 return succeed();
             }
 
-            return fail(new Error('Age.Minimum', new Parameter('minimum', $this->minimumAge)));
+            return fail(new Error('Age.Minimum', new Parameter('age', $this->minimumAge)));
         });
     }
 }

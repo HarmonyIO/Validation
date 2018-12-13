@@ -4,8 +4,10 @@ namespace HarmonyIO\ValidationTest\Unit\Rule\Type;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Exception\InvalidFullyQualifiedClassOrInterfaceName;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\InstanceOfType;
+use function Amp\Promise\wait;
 
 class InstanceofTypeTest extends TestCase
 {
@@ -21,49 +23,62 @@ class InstanceofTypeTest extends TestCase
         new InstanceOfType('Foo\\Bar');
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnInteger(): void
     {
-        $this->assertFalse((new InstanceOfType(\DateTimeImmutable::class))->validate(1));
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate(1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.InstanceOfType', $result->getFirstError()->getMessage());
+        $this->assertSame('type', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('integer', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAFloat(): void
     {
-        $this->assertFalse((new InstanceOfType(\DateTimeImmutable::class))->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate(1.1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.InstanceOfType', $result->getFirstError()->getMessage());
+        $this->assertSame('type', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('double', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingABoolean(): void
+    public function testValidateFailsWhenPassingABoolean(): void
     {
-        $this->assertFalse((new InstanceOfType(\DateTimeImmutable::class))->validate(true));
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate(true));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.InstanceOfType', $result->getFirstError()->getMessage());
+        $this->assertSame('type', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('boolean', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenPassingAnArray(): void
     {
-        $this->assertFalse((new InstanceOfType(\DateTimeImmutable::class))->validate([]));
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate([]));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.InstanceOfType', $result->getFirstError()->getMessage());
+        $this->assertSame('type', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('array', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnObjectMatchedAgainstSelf(): void
+    public function testValidateFailsWhenPassingNull(): void
     {
-        $this->assertTrue((new InstanceOfType(\DateTimeImmutable::class))->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate(null));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.InstanceOfType', $result->getFirstError()->getMessage());
+        $this->assertSame('type', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('NULL', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnObjectMatchedAgainstParent(): void
-    {
-        $this->assertTrue(
-            (new InstanceOfType(\ReflectionFunctionAbstract::class))->validate(new \ReflectionFunction('strlen'))
-        );
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnObjectMatchedAgainstInterface(): void
-    {
-        $this->assertTrue((new InstanceOfType(\DateTimeInterface::class))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new InstanceOfType(\DateTimeImmutable::class))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenPassingAResource(): void
     {
         $resource = fopen('php://memory', 'r');
 
@@ -73,19 +88,64 @@ class InstanceofTypeTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new InstanceOfType(\DateTimeImmutable::class))->validate($resource));
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate($resource));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.InstanceOfType', $result->getFirstError()->getMessage());
+        $this->assertSame('type', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('resource', $result->getFirstError()->getParameters()[0]->getValue());
 
         fclose($resource);
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateFailsWhenPassingACallable(): void
     {
-        $this->assertFalse((new InstanceOfType(\DateTimeImmutable::class))->validate(static function (): void {
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate(static function (): void {
         }));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.InstanceOfType', $result->getFirstError()->getMessage());
+        $this->assertSame('type', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('Closure', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAString(): void
+    public function testValidateFailsWhenPassingAString(): void
     {
-        $this->assertFalse((new InstanceOfType(\DateTimeImmutable::class))->validate('€'));
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate('€'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.InstanceOfType', $result->getFirstError()->getMessage());
+        $this->assertSame('type', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('string', $result->getFirstError()->getParameters()[0]->getValue());
+    }
+
+    public function testValidateSucceedsWhenPassingAnObjectMatchedAgainstSelf(): void
+    {
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeImmutable::class))->validate(new \DateTimeImmutable()));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    public function testValidateSucceedsWhenPassingAnObjectMatchedAgainstParent(): void
+    {
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\ReflectionFunctionAbstract::class))->validate(new \ReflectionFunction('strlen')));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    public function testValidateSucceedsWhenPassingAnObjectMatchedAgainstInterface(): void
+    {
+        /** @var Result $result */
+        $result = wait((new InstanceOfType(\DateTimeInterface::class))->validate(new \DateTimeImmutable()));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

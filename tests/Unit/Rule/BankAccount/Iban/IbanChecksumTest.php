@@ -2,66 +2,19 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Checksum;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class IbanChecksumTest extends TestCase
+class IbanChecksumTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Checksum());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new Checksum())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Checksum())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Checksum())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Checksum())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Checksum())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Checksum())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Checksum())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Checksum())->validate(static function (): void {
-        }));
+        parent::__construct($name, $data, $dataName, Checksum::class);
     }
 
     /**
@@ -69,7 +22,11 @@ class IbanChecksumTest extends TestCase
      */
     public function testValidateChecksumReturnsFalseOnInvalidChecksum(string $ibanCode): void
     {
-        $this->assertFalse((new Checksum())->validate($ibanCode));
+        /** @var Result $result */
+        $result = wait((new Checksum())->validate($ibanCode));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
 
     /**
@@ -77,7 +34,11 @@ class IbanChecksumTest extends TestCase
      */
     public function testValidateChecksumReturnsTrueOnValidChecksum(string $ibanCode): void
     {
-        $this->assertTrue((new Checksum())->validate($ibanCode));
+        /** @var Result $result */
+        $result = wait((new Checksum())->validate($ibanCode));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
     /**

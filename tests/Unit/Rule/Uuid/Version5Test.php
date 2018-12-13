@@ -2,82 +2,61 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Uuid;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Uuid\Version5;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class Version5Test extends TestCase
+class Version5Test extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new Version5());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new Version5())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Version5())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Version5())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Version5())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Version5())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Version5())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Version5())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Version5())->validate(static function (): void {
-        }));
-    }
-
     /**
-     * @dataProvider provideValidUuids
+     * @param mixed[] $data
      */
-    public function testValidateReturnsTrueWhenPassingAValidV4UuidString(string $uuid): void
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertTrue((new Version5())->validate($uuid));
+        parent::__construct($name, $data, $dataName, Version5::class);
     }
 
     /**
      * @dataProvider provideInvalidUuids
      */
-    public function testValidateReturnsFalseWhenPassingAnInvalidV4UuidString(string $uuid): void
+    public function testValidateFailsWhenPassingAnInvalidV4UuidString(string $uuid): void
     {
-        $this->assertFalse((new Version5())->validate($uuid));
+        /** @var Result $result */
+        $result = wait((new Version5())->validate($uuid));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Uuid.Version5', $result->getFirstError()->getMessage());
+    }
+
+    /**
+     * @dataProvider provideValidUuids
+     */
+    public function testValidateSucceedsWhenPassingAValidV4UuidString(string $uuid): void
+    {
+        /** @var Result $result */
+        $result = wait((new Version5())->validate($uuid));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideInvalidUuids(): array
+    {
+        return [
+            ['00000000-0000-0000-0000-000000000001'],
+            ['5ba4e31e-e99d-11e8-9f32-f2801f1b9fd1'],
+            ['5ba4e31e-e99d-21e8-9f32-f2801f1b9fd1'],
+            ['5ba4e490-e99d-31e8-9f32-f2801f1b9fd1'],
+            ['5ba4e490-e99d-41e8-9f32-f2801f1b9fd1'],
+            ['5ba4e72e-e99d-51e8-9f32-f2801f1b9fdg'],
+            ['5ba4eb16-e99d-61e8-9f32-f2801f1b9fd1'],
+            ['incorrect-string'],
+            [''],
+        ];
     }
 
     /**
@@ -136,24 +115,6 @@ class Version5Test extends TestCase
             ['12a2a81b-096c-5416-b052-4a9487f13449'],
             ['ac389e7a-5d12-53d9-8b6b-1a2b39733c74'],
             ['50b099bf-4536-5998-9392-bade6dc6e11a'],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function provideInvalidUuids(): array
-    {
-        return [
-            ['00000000-0000-0000-0000-000000000001'],
-            ['5ba4e31e-e99d-11e8-9f32-f2801f1b9fd1'],
-            ['5ba4e31e-e99d-21e8-9f32-f2801f1b9fd1'],
-            ['5ba4e490-e99d-31e8-9f32-f2801f1b9fd1'],
-            ['5ba4e490-e99d-41e8-9f32-f2801f1b9fd1'],
-            ['5ba4e72e-e99d-51e8-9f32-f2801f1b9fdg'],
-            ['5ba4eb16-e99d-61e8-9f32-f2801f1b9fd1'],
-            ['incorrect-string'],
-            [''],
         ];
     }
 }

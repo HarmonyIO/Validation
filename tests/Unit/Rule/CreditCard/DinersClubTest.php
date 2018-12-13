@@ -2,82 +2,83 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\CreditCard;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\CreditCard\DinersClub;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class DinersClubTest extends TestCase
+class DinersClubTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new DinersClub());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new DinersClub())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new DinersClub())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new DinersClub())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new DinersClub())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new DinersClub())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new DinersClub())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new DinersClub())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new DinersClub())->validate(static function (): void {
-        }));
-    }
-
     /**
-     * @dataProvider provideValidCreditCardNumbers
+     * @param mixed[] $data
      */
-    public function testValidateReturnsTrueWhenPassingAValidCreditCardNumber(string $creditCardNumber): void
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertTrue((new DinersClub())->validate($creditCardNumber));
+        parent::__construct($name, $data, $dataName, DinersClub::class);
     }
 
     /**
      * @dataProvider provideInvalidCreditCardNumbers
      */
-    public function testValidateReturnsFalseWhenPassingAnInvalidCreditCardNumber(string $creditCardNumber): void
+    public function testValidateFailsOnInvalidCreditCardNumber(string $creditCardNumber): void
     {
-        $this->assertFalse((new DinersClub())->validate($creditCardNumber));
+        /** @var Result $result */
+        $result = wait((new DinersClub())->validate($creditCardNumber));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('CreditCard.DinersClub', $result->getFirstError()->getMessage());
+    }
+
+    /**
+     * @dataProvider provideInvalidCreditCardCheckSums
+     */
+    public function testValidateFailsOnInvalidCreditCardCheckSums(string $creditCardNumber): void
+    {
+        /** @var Result $result */
+        $result = wait((new DinersClub())->validate($creditCardNumber));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('CreditCard.LuhnChecksum', $result->getFirstError()->getMessage());
+    }
+
+    /**
+     * @dataProvider provideValidCreditCardNumbers
+     */
+    public function testValidateSucceedsOnValidCreditCardNumber(string $creditCardNumber): void
+    {
+        /** @var Result $result */
+        $result = wait((new DinersClub())->validate($creditCardNumber));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideInvalidCreditCardNumbers(): array
+    {
+        return [
+            ['3695911359168'],
+            ['389002510007633'],
+            ['40036290155579'],
+            ['30636290155579'],
+            ['37755763114193'],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideInvalidCreditCardCheckSums(): array
+    {
+        return [
+            ['36959113591685'],
+            ['38900251000764'],
+            ['30036290155570'],
+            ['36755763114194'],
+            ['38915532819170'],
+        ];
     }
 
     /**
@@ -96,20 +97,6 @@ class DinersClubTest extends TestCase
             ['30028631487803'],
             ['30056498652045'],
             ['30071971913772'],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function provideInvalidCreditCardNumbers(): array
-    {
-        return [
-            ['3695911359168'],
-            ['389002510007633'],
-            ['40036290155579'],
-            ['30636290155579'],
-            ['37755763114193'],
         ];
     }
 }

@@ -7,7 +7,9 @@ use Amp\Redis\Client as RedisClient;
 use HarmonyIO\Cache\Provider\Redis;
 use HarmonyIO\HttpClient\Client\ArtaxClient;
 use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Network\Url\OkResponse;
+use function Amp\Promise\wait;
 
 class OkResponseTest extends TestCase
 {
@@ -20,33 +22,57 @@ class OkResponseTest extends TestCase
         $this->httpClient = new ArtaxClient(new DefaultClient(), new Redis(new RedisClient('tcp://localhost:6379')));
     }
 
-    public function testValidateReturnsFalseOnNotFoundResponse(): void
+    public function testValidateFailsOnNotFoundResponse(): void
     {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate('http://pieterhordijk.com/dlksjksjfkhdsfjk'));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('http://pieterhordijk.com/dlksjksjfkhdsfjk'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.OkResponse', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseOnNonExistingDomain(): void
+    public function testValidateFailsOnNonExistingDomain(): void
     {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate('http://dkhj3kry43iufhr3e.example.com'));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('http://dkhj3kry43iufhr3e.example.com'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.OkResponse', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenResponseHasErrorStatusCode(): void
+    public function testValidateFailsWhenResponseHasErrorStatusCode(): void
     {
-        $this->assertFalse((new OkResponse($this->httpClient))->validate('https://httpbin.org/status/500'));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('https://httpbin.org/status/500'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.OkResponse', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueOnRedirectedOkResponse(): void
+    public function testValidateSucceedsOnRedirectedOkResponse(): void
     {
-        $this->assertTrue((new OkResponse($this->httpClient))->validate('http://pieterhordijk.com'));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('http://pieterhordijk.com'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueOnOkResponse(): void
+    public function testValidateSucceedsOnOkResponse(): void
     {
-        $this->assertTrue((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com'));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueOnOkResponseWithPath(): void
+    public function testValidateSucceedsOnOkResponseWithPath(): void
     {
-        $this->assertTrue((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com/contact'));
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com/contact'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }
