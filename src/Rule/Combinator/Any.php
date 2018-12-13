@@ -34,7 +34,7 @@ final class Any implements Rule
             return $promises;
         }, []);
 
-        return call(function () use ($promises) {
+        return call(static function () use ($promises) {
             /** @var Result[] $results */
             $results = yield $promises;
 
