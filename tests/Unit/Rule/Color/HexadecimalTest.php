@@ -58,8 +58,8 @@ class HexadecimalTest extends StringTestCase
         /** @var Result $result */
         $result = wait((new Hexadecimal())->validate('#ff3300'));
 
-        $this->assertFalse($result->isValid());
-        $this->assertSame('Color.Hexadecimal', $result->getFirstError()->getMessage());
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
     public function testValidateSucceedsOnValidUpperCaseValue(): void
@@ -67,7 +67,7 @@ class HexadecimalTest extends StringTestCase
         /** @var Result $result */
         $result = wait((new Hexadecimal())->validate('#FF3300'));
 
-        $this->assertFalse($result->isValid());
-        $this->assertSame('Color.Hexadecimal', $result->getFirstError()->getMessage());
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

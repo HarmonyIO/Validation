@@ -25,7 +25,7 @@ final class Hexadecimal implements Rule
                 return $result;
             }
 
-            if (preg_match('~^#[[:xdigit:]]$~', $value) === 1) {
+            if (preg_match('~^#[[:xdigit:]]{6}$~', $value) === 1) {
                 return succeed();
             }
 
