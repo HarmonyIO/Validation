@@ -109,7 +109,7 @@ class OkResponseTest extends StringTestCase
     {
         $this->httpClient
             ->method('request')
-            ->willReturnCallback(function (Request $request) {
+            ->willReturnCallback(function (Request $request): void {
                 $this->assertSame('https://pieterhordijk.com/foobar', $request->getArtaxRequest()->getUri());
 
                 throw new DnsException();
