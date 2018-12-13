@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Combinator;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
@@ -43,20 +42,18 @@ final class AtLeast implements Rule
             /** @var Result[] $results */
             $results = yield $promises;
 
-            $errors = array_reduce($results, static function (array $errors, Result $result) {
+            $validRules = 0;
+            $errors     = [];
+
+            foreach ($results as $result) {
                 if ($result->isValid()) {
-                    return $errors;
+                    $validRules++;
                 }
 
-                /** @var Error $error */
-                foreach ($result->getErrors() as $error) {
-                    $errors[] = $error;
-                }
+                $errors = array_merge($errors, $result->getErrors());
+            }
 
-                return $errors;
-            }, []);
-
-            if (count($this->rules) - count($errors) >= $this->minimumNumberOfValidRules) {
+            if ($validRules >= $this->minimumNumberOfValidRules) {
                 return succeed();
             }
 

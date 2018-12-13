@@ -3,7 +3,6 @@
 namespace HarmonyIO\Validation\Rule\Combinator;
 
 use Amp\Promise;
-use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
@@ -25,6 +24,10 @@ final class Any implements Rule
      */
     public function validate($value): Promise
     {
+        if (count($this->rules) === 0) {
+            return succeed();
+        }
+
         $promises = array_reduce($this->rules, static function (array $promises, Rule $rule) use ($value) {
             $promises[] = $rule->validate($value);
 
@@ -35,20 +38,18 @@ final class Any implements Rule
             /** @var Result[] $results */
             $results = yield $promises;
 
-            $errors = array_reduce($results, static function (array $errors, Result $result) {
+            $valid  = false;
+            $errors = [];
+
+            foreach ($results as $result) {
                 if ($result->isValid()) {
-                    return $errors;
+                    $valid = true;
                 }
 
-                /** @var Error $error */
-                foreach ($result->getErrors() as $error) {
-                    $errors[] = $error;
-                }
+                $errors = array_merge($errors, $result->getErrors());
+            }
 
-                return $errors;
-            }, []);
-
-            if (count($this->rules) === 0 || count($errors) < count($this->rules)) {
+            if ($valid) {
                 return succeed();
             }
 

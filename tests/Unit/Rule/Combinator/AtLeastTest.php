@@ -4,6 +4,7 @@ namespace HarmonyIO\ValidationTest\Unit\Rule\Combinator;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Result\Result;
+use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\Combinator\AtLeast;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Text\MaximumLength;
@@ -61,6 +62,19 @@ class AtLeastTest extends TestCase
             new MinimumLength(3),
             new MaximumLength(15)
         ))->validate('Test value'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    public function testValidateSucceedsWhenRulesContainAllRuleWithMoreErrorsThanAtLeastRules(): void
+    {
+        /** @var Result $result */
+        $result = wait((new AtLeast(2, new All(
+            new MaximumLength(3),
+            new MaximumLength(3),
+            new MaximumLength(3)
+        ), new MinimumLength(3), new MinimumLength(3)))->validate('Test value'));
 
         $this->assertTrue($result->isValid());
         $this->assertNull($result->getFirstError());
