@@ -2,92 +2,56 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Age;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Age\Minimum;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\DateTimeTestCase;
+use function Amp\Promise\wait;
 
-class MinimumTest extends TestCase
+class MinimumTest extends DateTimeTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Minimum(18));
+        parent::__construct($name, $data, $dataName, Minimum::class, 18);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenAgeIsLessThanMinimum(): void
     {
-        $this->assertFalse((new Minimum(18))->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Minimum(18))->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Minimum(18))->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Minimum(18))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Minimum(18))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Minimum(18))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Minimum(18))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAString(): void
-    {
-        $this->assertFalse((new Minimum(18))->validate('1980-01-01'));
-    }
-
-    public function testValidateReturnsFalseWhenValueIsYoungerThanMaximum(): void
-    {
-        // phpcs:ignore PSR2.Methods.FunctionCallSignature.SpaceBeforeCloseBracket
-        $this->assertFalse((new Minimum(1))->validate(
+        /** @var Result $result */
+        $result = wait((new Minimum(18))->validate(
             // phpcs:ignore PSR2.Methods.FunctionCallSignature.Indent,PSR2.Methods.FunctionCallSignature.CloseBracketLine
-            (new \DateTimeImmutable())->sub(new \DateInterval('P1Y'))->add(new \DateInterval('P1D')))
-        );
+            (new \DateTimeImmutable())->sub(new \DateInterval('P18Y'))->add(new \DateInterval('P1D'))
+        ));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Age.Minimum', $result->getErrors()[0]->getMessage());
+        $this->assertSame('age', $result->getErrors()[0]->getParameters()[0]->getKey());
+        $this->assertSame(18, $result->getErrors()[0]->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenValueIsExactlyMaximum(): void
+    public function testValidateSucceedsWhenAgeIsExactlyMinimum(): void
     {
-        // phpcs:ignore PSR2.Methods.FunctionCallSignature.SpaceBeforeCloseBracket
-        $this->assertTrue((new Minimum(1))->validate(
+        /** @var Result $result */
+        $result = wait((new Minimum(18))->validate(
             // phpcs:ignore PSR2.Methods.FunctionCallSignature.Indent,PSR2.Methods.FunctionCallSignature.CloseBracketLine
-            (new \DateTimeImmutable())->sub(new \DateInterval('P1Y')))
-        );
+            (new \DateTimeImmutable())->sub(new \DateInterval('P18Y'))
+        ));
+
+        $this->assertTrue($result->isValid());
+        $this->assertCount(0, $result->getErrors());
     }
 
-    public function testValidateReturnsTrueWhenValueIsOlderThanMaximum(): void
+    public function testValidateSucceedsWhenAgeIsMoreThanMinimum(): void
     {
-        // phpcs:ignore PSR2.Methods.FunctionCallSignature.SpaceBeforeCloseBracket
-        $this->assertTrue((new Minimum(1))->validate(
+        /** @var Result $result */
+        $result = wait((new Minimum(18))->validate(
             // phpcs:ignore PSR2.Methods.FunctionCallSignature.Indent,PSR2.Methods.FunctionCallSignature.CloseBracketLine
-            (new \DateTimeImmutable())->sub(new \DateInterval('P2Y1D')))
-        );
+            (new \DateTimeImmutable())->sub(new \DateInterval('P18Y1D'))
+        ));
+
+        $this->assertTrue($result->isValid());
+        $this->assertCount(0, $result->getErrors());
     }
 }

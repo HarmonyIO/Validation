@@ -2,77 +2,38 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Hash;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Hash\PasswordMatches;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class PasswordMatchesTest extends TestCase
+class PasswordMatchesTest extends StringTestCase
 {
     private const TEST_HASH = '$2y$10$PcRLWTmmlKptOuNnAZfmneSKIL7sSZ.j2ELZuNSncVSzqoovWNVzC';
-    
-    public function testRuleImplementsInterface(): void
+
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new PasswordMatches(self::TEST_HASH));
+        parent::__construct($name, $data, $dataName, PasswordMatches::class, self::TEST_HASH);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPasswordIsInvalid(): void
     {
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate(1));
+        /** @var Result $result */
+        $result = wait((new PasswordMatches(self::TEST_HASH))->validate('123456789'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Hash.PasswordMatches', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPasswordIsValid(): void
     {
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate(1.1));
-    }
+        /** @var Result $result */
+        $result = wait((new PasswordMatches(self::TEST_HASH))->validate('1234567890'));
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPasswordIsInvalid(): void
-    {
-        $this->assertFalse((new PasswordMatches(self::TEST_HASH))->validate('123456789'));
-    }
-
-    public function testValidateReturnsFalseWhenPasswordIsValid(): void
-    {
-        $this->assertTrue((new PasswordMatches(self::TEST_HASH))->validate('1234567890'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

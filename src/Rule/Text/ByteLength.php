@@ -3,8 +3,13 @@
 namespace HarmonyIO\Validation\Rule\Text;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class ByteLength implements Rule
 {
@@ -21,10 +26,19 @@ final class ByteLength implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return new Success(strlen($value) === $this->length);
+            if (!$result->isValid()) {
+                return $result;
+            }
+
+            if (strlen($value) === $this->length) {
+                return succeed();
+            }
+
+            return fail('Text.ByteLength', new Parameter('length', $this->length));
+        });
     }
 }

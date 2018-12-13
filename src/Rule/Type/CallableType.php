@@ -3,8 +3,9 @@
 namespace HarmonyIO\Validation\Rule\Type;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class CallableType implements Rule
 {
@@ -13,6 +14,10 @@ final class CallableType implements Rule
      */
     public function validate($value): Promise
     {
-        return new Success(is_callable($value));
+        if (is_callable($value)) {
+            return succeed();
+        }
+
+        return fail('Type.CallableType');
     }
 }

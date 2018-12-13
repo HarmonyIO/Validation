@@ -2,116 +2,67 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Network\IpAddress;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Network\IpAddress\NotInPrivateRange;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class NotInPrivateRangeTest extends TestCase
+class NotInPrivateRangeTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new NotInPrivateRange());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new NotInPrivateRange())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new NotInPrivateRange())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new NotInPrivateRange())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new NotInPrivateRange())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new NotInPrivateRange())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new NotInPrivateRange())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new NotInPrivateRange())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new NotInPrivateRange())->validate(static function (): void {
-        }));
-    }
-
     /**
-     * @dataProvider provideValidIpv4Addresses
+     * @param mixed[] $data
      */
-    public function testValidateReturnsTrueWhenPassingAnIpv4AddressThatIsNotWithinThePrivateRange(string $ipAddress): void
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertTrue((new NotInPrivateRange())->validate($ipAddress));
+        parent::__construct($name, $data, $dataName, NotInPrivateRange::class);
     }
 
     /**
      * @dataProvider provideInvalidIpv4Addresses
      */
-    public function testValidateReturnsFalseWhenPassingAnIpv4AddressThatIsWithinThePrivateRange(string $ipAddress): void
+    public function testValidateFailsWhenPassingAnIpv4AddressThatIsWithinThePrivateRange(string $ipAddress): void
     {
-        $this->assertFalse((new NotInPrivateRange())->validate($ipAddress));
-    }
+        /** @var Result $result */
+        $result = wait((new NotInPrivateRange())->validate($ipAddress));
 
-    /**
-     * @dataProvider provideValidIpv6Addresses
-     */
-    public function testValidateReturnsTrueWhenPassingAnIpv6AddressThatIsNotWithinThePrivateRange(string $ipAddress): void
-    {
-        $this->assertTrue((new NotInPrivateRange())->validate($ipAddress));
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.IpAddress.NotInPrivateRange', $result->getFirstError()->getMessage());
     }
 
     /**
      * @dataProvider provideInvalidIpv6Addresses
      */
-    public function testValidateReturnsFalseWhenPassingAnIpv6AddressThatIsWithinThePrivateRange(string $ipAddress): void
+    public function testValidateFailsWhenPassingAnIpv6AddressThatIsWithinThePrivateRange(string $ipAddress): void
     {
-        $this->assertFalse((new NotInPrivateRange())->validate($ipAddress));
+        /** @var Result $result */
+        $result = wait((new NotInPrivateRange())->validate($ipAddress));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.IpAddress.NotInPrivateRange', $result->getFirstError()->getMessage());
     }
 
     /**
-     * @return string[]
+     * @dataProvider provideValidIpv4Addresses
      */
-    public function provideValidIpv4Addresses(): array
+    public function testValidateSucceedsWhenPassingAnIpv4AddressThatIsNotWithinThePrivateRange(string $ipAddress): void
     {
-        return [
-            ['1.1.1.1'],
-            ['8.8.8.8'],
-            ['255.255.255.255'],
-            ['9.255.255.255'],
-            ['11.0.0.0'],
-            ['172.15.255.255'],
-            ['172.32.0.0'],
-            ['192.167.255.255'],
-            ['192.169.0.0'],
-        ];
+        /** @var Result $result */
+        $result = wait((new NotInPrivateRange())->validate($ipAddress));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @dataProvider provideValidIpv6Addresses
+     */
+    public function testValidateSucceedsWhenPassingAnIpv6AddressThatIsNotWithinThePrivateRange(string $ipAddress): void
+    {
+        /** @var Result $result */
+        $result = wait((new NotInPrivateRange())->validate($ipAddress));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
     /**
@@ -140,22 +91,40 @@ class NotInPrivateRangeTest extends TestCase
     /**
      * @return string[]
      */
-    public function provideValidIpv6Addresses(): array
+    public function provideInvalidIpv6Addresses(): array
     {
         return [
-            ['2001:0db8:85a3:0000:0000:8a2e:0370:7334'],
-            ['2001:cdba:0000:0000:0000:0000:3257:9652'],
-            ['FE80::0202:B3FF:FE1E:8329'],
+            ['fd12:3456:789a:1::1'],
         ];
     }
 
     /**
      * @return string[]
      */
-    public function provideInvalidIpv6Addresses(): array
+    public function provideValidIpv4Addresses(): array
     {
         return [
-            ['fd12:3456:789a:1::1'],
+            ['1.1.1.1'],
+            ['8.8.8.8'],
+            ['255.255.255.255'],
+            ['9.255.255.255'],
+            ['11.0.0.0'],
+            ['172.15.255.255'],
+            ['172.32.0.0'],
+            ['192.167.255.255'],
+            ['192.169.0.0'],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideValidIpv6Addresses(): array
+    {
+        return [
+            ['2001:0db8:85a3:0000:0000:8a2e:0370:7334'],
+            ['2001:cdba:0000:0000:0000:0000:3257:9652'],
+            ['FE80::0202:B3FF:FE1E:8329'],
         ];
     }
 }

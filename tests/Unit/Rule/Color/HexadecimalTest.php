@@ -2,95 +2,72 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Color;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Color\Hexadecimal;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class HexadecimalTest extends TestCase
+class HexadecimalTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Hexadecimal());
+        parent::__construct($name, $data, $dataName, Hexadecimal::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithPoundSign(): void
     {
-        $this->assertFalse((new Hexadecimal())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Hexadecimal())->validate('ff3300'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Color.Hexadecimal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringContainsACharacterOutsideOfTheHexRange(): void
     {
-        $this->assertFalse((new Hexadecimal())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Hexadecimal())->validate('#gf3300'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Color.Hexadecimal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenValueIsTooShort(): void
     {
-        $this->assertFalse((new Hexadecimal())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Hexadecimal())->validate('#ff330'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Color.Hexadecimal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenValueIsTooLong(): void
     {
-        $this->assertFalse((new Hexadecimal())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Hexadecimal())->validate('#ff33000'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Color.Hexadecimal', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateSucceedsOnValidLowerCaseValue(): void
     {
-        $this->assertFalse((new Hexadecimal())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Hexadecimal())->validate('#ff3300'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateSucceedsOnValidUpperCaseValue(): void
     {
-        $this->assertFalse((new Hexadecimal())->validate(null));
-    }
+        /** @var Result $result */
+        $result = wait((new Hexadecimal())->validate('#FF3300'));
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Hexadecimal())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Hexadecimal())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithPoundSign(): void
-    {
-        $this->assertFalse((new Hexadecimal())->validate('ff3300'));
-    }
-
-    public function testValidateReturnsFalseWhenStringContainsACharacterOutsideOfTheHexRange(): void
-    {
-        $this->assertFalse((new Hexadecimal())->validate('#gf3300'));
-    }
-
-    public function testValidateReturnsFalseWhenValueIsTooShort(): void
-    {
-        $this->assertFalse((new Hexadecimal())->validate('#ff330'));
-    }
-
-    public function testValidateReturnsFalseWhenValueIsTooLong(): void
-    {
-        $this->assertFalse((new Hexadecimal())->validate('#ff33000'));
-    }
-
-    public function testValidateReturnsTrueOnValidLowerCaseValue(): void
-    {
-        $this->assertFalse((new Hexadecimal())->validate('#ff3300'));
-    }
-
-    public function testValidateReturnsTrueOnValidUpperCaseValue(): void
-    {
-        $this->assertFalse((new Hexadecimal())->validate('#FF3300'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

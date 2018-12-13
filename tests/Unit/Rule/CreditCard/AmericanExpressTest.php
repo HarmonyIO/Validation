@@ -2,82 +2,81 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\CreditCard;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\CreditCard\AmericanExpress;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class AmericanExpressTest extends TestCase
+class AmericanExpressTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new AmericanExpress());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new AmericanExpress())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new AmericanExpress())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new AmericanExpress())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new AmericanExpress())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new AmericanExpress())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new AmericanExpress())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new AmericanExpress())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new AmericanExpress())->validate(static function (): void {
-        }));
-    }
-
     /**
-     * @dataProvider provideValidCreditCardNumbers
+     * @param mixed[] $data
      */
-    public function testValidateReturnsTrueWhenPassingAValidCreditCardNumber(string $creditCardNumber): void
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertTrue((new AmericanExpress())->validate($creditCardNumber));
+        parent::__construct($name, $data, $dataName, AmericanExpress::class);
     }
 
     /**
      * @dataProvider provideInvalidCreditCardNumbers
      */
-    public function testValidateReturnsFalseWhenPassingAnInvalidCreditCardNumber(string $creditCardNumber): void
+    public function testValidateFailsOnInvalidCreditCardNumber(string $creditCardNumber): void
     {
-        $this->assertFalse((new AmericanExpress())->validate($creditCardNumber));
+        /** @var Result $result */
+        $result = wait((new AmericanExpress())->validate($creditCardNumber));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('CreditCard.AmericanExpress', $result->getFirstError()->getMessage());
+    }
+
+    /**
+     * @dataProvider provideInvalidCreditCardCheckSums
+     */
+    public function testValidateFailsOnInvalidCreditCardCheckSums(string $creditCardNumber): void
+    {
+        /** @var Result $result */
+        $result = wait((new AmericanExpress())->validate($creditCardNumber));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('CreditCard.LuhnChecksum', $result->getFirstError()->getMessage());
+    }
+
+    /**
+     * @dataProvider provideValidCreditCardNumbers
+     */
+    public function testValidateSucceedsOnValidCreditCardNumber(string $creditCardNumber): void
+    {
+        /** @var Result $result */
+        $result = wait((new AmericanExpress())->validate($creditCardNumber));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideInvalidCreditCardNumbers(): array
+    {
+        return [
+            ['34327974884488'],
+            ['3411036129797166'],
+            ['470670303243077'],
+            ['354630746638914'],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideInvalidCreditCardCheckSums(): array
+    {
+        return [
+            ['343279748844880'],
+            ['341103612979717'],
+            ['370670303243078'],
+            ['344630746638915'],
+        ];
     }
 
     /**
@@ -96,19 +95,6 @@ class AmericanExpressTest extends TestCase
             ['342919263077362'],
             ['375491374480752'],
             ['346266142717495'],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function provideInvalidCreditCardNumbers(): array
-    {
-        return [
-            ['34327974884488'],
-            ['3411036129797166'],
-            ['470670303243077'],
-            ['354630746638914'],
         ];
     }
 }

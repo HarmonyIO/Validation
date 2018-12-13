@@ -2,75 +2,36 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\DataFormat;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\DataFormat\Json;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class JsonTest extends TestCase
+class JsonTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Json());
+        parent::__construct($name, $data, $dataName, Json::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnInvalidJsonString(): void
     {
-        $this->assertFalse((new Json())->validate(1));
-    }
+        /** @var Result $result */
+        $result = wait((new Json())->validate('{foo: "bar"}'));
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Json())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Json())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Json())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Json())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Json())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Json())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Json())->validate(static function (): void {
-        }));
+        $this->assertFalse($result->isValid());
+        $this->assertSame('DataFormat.Json', $result->getFirstError()->getMessage());
     }
 
     public function testValidateReturnsTrueWhenPassingAValidJsonString(): void
     {
-        $this->assertTrue((new Json())->validate('{"foo": "bar"}'));
-    }
+        /** @var Result $result */
+        $result = wait((new Json())->validate('{"foo": "bar"}'));
 
-    public function testValidateReturnsFalseWhenPassingAnInvalidJsonString(): void
-    {
-        $this->assertFalse((new Json())->validate('{foo: "bar"}'));
+        $this->assertTrue($result->isValid());
+        $this->assertCount(0, $result->getErrors());
     }
 }

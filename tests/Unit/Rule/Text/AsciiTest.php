@@ -2,77 +2,38 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Text;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Text\Ascii;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class AsciiTest extends TestCase
+class AsciiTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Ascii());
+        parent::__construct($name, $data, $dataName, Ascii::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnUtf8String(): void
     {
-        $this->assertFalse((new Ascii())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Ascii())->validate('€'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Text.Ascii', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingAnAsciiString(): void
     {
-        $this->assertFalse((new Ascii())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Ascii())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Ascii())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Ascii())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Ascii())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Ascii())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Ascii())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnAsciiString(): void
-    {
-        $this->assertTrue((new Ascii())->validate(
+        /** @var Result $result */
+        $result = wait((new Ascii())->validate(
             ' !"#$%&\\\'() * +,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\] ^ _`abcdefghijklmnopqrstuvwxyz{|}~'
         ));
-    }
 
-    public function testValidateReturnsFalseWhenPassingAnUtf8String(): void
-    {
-        $this->assertFalse((new Ascii())->validate('€'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

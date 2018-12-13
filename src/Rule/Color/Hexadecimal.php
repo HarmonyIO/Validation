@@ -3,8 +3,12 @@
 namespace HarmonyIO\Validation\Rule\Color;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Hexadecimal implements Rule
 {
@@ -13,10 +17,19 @@ final class Hexadecimal implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(static function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return new Success(preg_match('~^#[[:xdigit:]]$~', $value) === 1);
+            if (!$result->isValid()) {
+                return $result;
+            }
+
+            if (preg_match('~^#[[:xdigit:]]{6}$~', $value) === 1) {
+                return succeed();
+            }
+
+            return fail('Color.Hexadecimal');
+        });
     }
 }

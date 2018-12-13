@@ -2,75 +2,36 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Text;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Text\NoControlCharacters;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class NoControlCharactersTest extends TestCase
+class NoControlCharactersTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new NoControlCharacters());
+        parent::__construct($name, $data, $dataName, NoControlCharacters::class, 10);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAStringContainingControlCharacters(): void
     {
-        $this->assertFalse((new NoControlCharacters())->validate(1));
+        /** @var Result $result */
+        $result = wait((new NoControlCharacters())->validate('€€€€€€€€€' . chr(0)));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Text.NoControlCharacters', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingAStringWithoutControlCharacters(): void
     {
-        $this->assertFalse((new NoControlCharacters())->validate(1.1));
-    }
+        /** @var Result $result */
+        $result = wait((new NoControlCharacters())->validate('€€€€€€€€€€€'));
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new NoControlCharacters())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new NoControlCharacters())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new NoControlCharacters())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new NoControlCharacters())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new NoControlCharacters())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new NoControlCharacters())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringContainingControlCharacters(): void
-    {
-        $this->assertFalse((new NoControlCharacters())->validate('€€€€€€€€€' . chr(0)));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAStringWithoutControlCharacters(): void
-    {
-        $this->assertTrue((new NoControlCharacters())->validate('€€€€€€€€€€€'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

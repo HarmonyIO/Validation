@@ -3,11 +3,14 @@
 namespace HarmonyIO\Validation\Rule\File;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\File\size;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class MinimumSize implements Rule
 {
@@ -24,17 +27,23 @@ final class MinimumSize implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
-            if (!yield (new File())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new File())->validate($value);
+
+            if (!$result->isValid()) {
+                return $result;
             }
 
             //phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses
-            return (yield size($value)) >= $this->minimumSizeInBytes;
+            if ((yield size($value)) >= $this->minimumSizeInBytes) {
+                return succeed();
+            }
+
+            return fail(
+                'File.MinimumSize',
+                new Parameter('size', $this->minimumSizeInBytes)
+            );
         });
     }
 }

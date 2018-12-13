@@ -3,13 +3,18 @@
 namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
+use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\File\Image\Type\Bmp;
 use HarmonyIO\Validation\Rule\File\Image\Type\Gif;
 use HarmonyIO\Validation\Rule\File\Image\Type\Jpeg;
 use HarmonyIO\Validation\Rule\File\Image\Type\Png;
+use HarmonyIO\Validation\Rule\File\Image\Type\Svg;
+use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Image implements Rule
 {
@@ -18,6 +23,7 @@ final class Image implements Rule
         Gif::class,
         Jpeg::class,
         Png::class,
+        Svg::class,
     ];
 
     /**
@@ -25,22 +31,28 @@ final class Image implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(static function () use ($value) {
-            foreach (self::IMAGE_TYPES as $ruleFullyQualifiedClassName) {
-                /** @var Rule $rule */
-                $rule = new $ruleFullyQualifiedClassName();
+            /** @var Result $result */
+            $result = yield (new File())->validate($value);
 
-                // phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses
-                if ((yield $rule->validate($value)) === true) {
-                    return true;
-                }
+            if (!$result->isValid()) {
+                return $result;
             }
 
-            return false;
+            $imageTypes = [];
+
+            foreach (self::IMAGE_TYPES as $type) {
+                $imageTypes[] = new $type();
+            }
+
+            /** @var Result $result */
+            $result = yield (new Any(...$imageTypes))->validate($value);
+
+            if ($result->isValid()) {
+                return succeed();
+            }
+
+            return fail('File.Image.Image');
         });
     }
 }

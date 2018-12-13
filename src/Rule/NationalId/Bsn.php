@@ -3,8 +3,10 @@
 namespace HarmonyIO\Validation\Rule\NationalId;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Bsn implements Rule
 {
@@ -13,25 +15,23 @@ final class Bsn implements Rule
      */
     public function validate($value): Promise
     {
-        if (!$this->validateValueType($value)) {
-            return new Success(false);
-        }
+        return call(function () use ($value) {
+            if (!$this->validateValueType($value)) {
+                return fail('NationalId.Bsn');
+            }
 
-        $value = (string) $value;
+            $value = (string) $value;
 
-        if (strlen($value) !== 9) {
-            return new Success(false);
-        }
+            if (strlen($value) !== 9) {
+                return fail('NationalId.Bsn');
+            }
 
-        $sum = 0;
+            if ($this->isCheckDigitValid($value)) {
+                return succeed();
+            }
 
-        for ($i = 9; $i > 1; $i--) {
-            $sum += $i * $value[9 - $i];
-        }
-
-        $sum += $value[8] * -1;
-
-        return new Success($sum !== 0 && $sum % 11 === 0);
+            return fail('NationalId.Bsn');
+        });
     }
 
     /**
@@ -44,5 +44,18 @@ final class Bsn implements Rule
         }
 
         return is_string($value) && ctype_digit($value);
+    }
+
+    private function isCheckDigitValid(string $value): bool
+    {
+        $sum = 0;
+
+        for ($i = 9; $i > 1; $i--) {
+            $sum += $i * $value[9 - $i];
+        }
+
+        $sum += $value[8] * -1;
+
+        return $sum !== 0 && $sum % 11 === 0;
     }
 }

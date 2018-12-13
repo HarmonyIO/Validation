@@ -2,13 +2,22 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Text;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Exception\InvalidNumericalRange;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Text\LengthRange;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class LengthRangeTest extends TestCase
+class LengthRangeTest extends StringTestCase
 {
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName, LengthRange::class, 10, 12);
+    }
+
     public function testConstructorThrowsUpWhenMinimumLengthIsGreaterThanTheMaximumLength(): void
     {
         $this->expectException(InvalidNumericalRange::class);
@@ -17,84 +26,52 @@ class LengthRangeTest extends TestCase
         new LengthRange(12, 10);
     }
 
-    public function testRuleImplementsInterface(): void
+    public function testValidateFailsWhenPassingAStringSmallerThanTheMinimumLength(): void
     {
-        $this->assertInstanceOf(Rule::class, new LengthRange(10, 12));
+        /** @var Result $result */
+        $result = wait((new LengthRange(10, 12))->validate('€€€€€€€€€'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Text.MinimumLength', $result->getFirstError()->getMessage());
+        $this->assertSame('length', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAStringLargerThanTheMaximumLength(): void
     {
-        $this->assertFalse((new LengthRange(10, 12))->validate(1));
+        /** @var Result $result */
+        $result = wait((new LengthRange(10, 12))->validate('€€€€€€€€€€€€€'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Text.MaximumLength', $result->getFirstError()->getMessage());
+        $this->assertSame('length', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(12, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingAStringLargerThanTheMinimumLengthAndSmallerThanMaximumLength(): void
     {
-        $this->assertFalse((new LengthRange(10, 12))->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new LengthRange(10, 12))->validate('€€€€€€€€€€€'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAStringWithExactlyTheMinimumLength(): void
     {
-        $this->assertFalse((new LengthRange(10, 12))->validate(true));
+        /** @var Result $result */
+        $result = wait((new LengthRange(10, 12))->validate('€€€€€€€€€€'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingAStringExactlyTheMaximumLength(): void
     {
-        $this->assertFalse((new LengthRange(10, 12))->validate([]));
-    }
+        /** @var Result $result */
+        $result = wait((new LengthRange(10, 12))->validate('€€€€€€€€€€€€'));
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new LengthRange(10, 12))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new LengthRange(10, 12))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new LengthRange(10, 12))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new LengthRange(10, 12))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringSmallerThanTheMinimumLength(): void
-    {
-        $this->assertFalse((new LengthRange(10, 12))->validate('€€€€€€€€€'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringLargerThanTheMaximumLength(): void
-    {
-        $this->assertFalse((new LengthRange(10, 12))->validate('€€€€€€€€€€€€€'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAStringLargerThanTheMinimumLengthAndSmallerThanMaximumLength(): void
-    {
-        $this->assertTrue((new LengthRange(10, 12))->validate('€€€€€€€€€€€'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAStringWithExactlyTheMinimumLength(): void
-    {
-        $this->assertTrue((new LengthRange(10, 12))->validate('€€€€€€€€€€'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAStringExactlyTheMaximumLength(): void
-    {
-        $this->assertTrue((new LengthRange(10, 12))->validate('€€€€€€€€€€€€'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

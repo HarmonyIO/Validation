@@ -2,100 +2,81 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Isbn;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Isbn\Isbn10;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class Isbn10Test extends TestCase
+class Isbn10Test extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Isbn10());
+        parent::__construct($name, $data, $dataName, Isbn10::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $this->assertFalse((new Isbn10())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Isbn10())->validate('897013750'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Isbn10', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $this->assertFalse((new Isbn10())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Isbn10())->validate('89701375066'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Isbn10', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringContainsInvalidCharacters(): void
     {
-        $this->assertFalse((new Isbn10())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Isbn10())->validate('897013750y'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Isbn10', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenChecksumDoesNotMatch(): void
     {
-        $this->assertFalse((new Isbn10())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Isbn10())->validate('0345391803'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Isbn10', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateSucceedsTrueWhenValid(): void
     {
-        $this->assertFalse((new Isbn10())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Isbn10())->validate('0345391802'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateSucceedsWhenValidWithLowercaseCheckDigitX(): void
     {
-        $this->assertFalse((new Isbn10())->validate(null));
+        /** @var Result $result */
+        $result = wait((new Isbn10())->validate('043942089x'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateSucceedsWhenValidWithUppercaseCheckDigitX(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Isbn10())->validate('043942089X'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Isbn10())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Isbn10())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new Isbn10())->validate('897013750'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new Isbn10())->validate('89701375066'));
-    }
-
-    public function testValidateReturnsFalseWhenStringContainsInvalidCharacters(): void
-    {
-        $this->assertFalse((new Isbn10())->validate('897013750y'));
-    }
-
-    public function testValidateReturnsFalseWhenChecksumDoesNotMatch(): void
-    {
-        $this->assertFalse((new Isbn10())->validate('0345391803'));
-    }
-
-    public function testValidateReturnsTrueWhenValid(): void
-    {
-        $this->assertTrue((new Isbn10())->validate('0345391802'));
-    }
-
-    public function testValidateReturnsTrueWhenValidWithLowercaseCheckDigitX(): void
-    {
-        $this->assertTrue((new Isbn10())->validate('043942089x'));
-    }
-
-    public function testValidateReturnsTrueWhenValidWithUppercaseCheckDigitX(): void
-    {
-        $this->assertTrue((new Isbn10())->validate('043942089X'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -5,8 +5,8 @@ namespace HarmonyIO\Validation\Rule\Numeric;
 use Amp\Promise;
 use HarmonyIO\Validation\Exception\InvalidNumericalRange;
 use HarmonyIO\Validation\Exception\InvalidNumericValue;
+use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\Rule;
-use function Amp\call;
 
 final class Range implements Rule
 {
@@ -43,12 +43,6 @@ final class Range implements Rule
      */
     public function validate($value): Promise
     {
-        return call(function () use ($value) {
-            if (!yield (new NumericType())->validate($value)) {
-                return false;
-            }
-
-            return $value >= $this->minimumValue && $value <= $this->maximumValue;
-        });
+        return (new All(new Minimum($this->minimumValue), new Maximum($this->maximumValue)))->validate($value);
     }
 }

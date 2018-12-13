@@ -2,92 +2,49 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\File\Image\Type;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\Image\Type\Jpeg;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\FileTestCase;
+use function Amp\Promise\wait;
 
-class JpegTest extends TestCase
+class JpegTest extends FileTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Jpeg());
+        parent::__construct($name, $data, $dataName, Jpeg::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenNotMatchingMimeType(): void
     {
-        $this->assertFalse((new Jpeg())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Jpeg())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.MimeType', $result->getFirstError()->getMessage());
+        $this->assertSame('mimeType', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame('image/jpeg', $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Jpeg())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Jpeg())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Jpeg())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Jpeg())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Jpeg())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Jpeg())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Jpeg())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenFileDoesNotExists(): void
-    {
-        $this->assertFalse((new Jpeg())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInADirectory(): void
-    {
-        $this->assertFalse((new Jpeg())->validate(TEST_DATA_DIR . '/file-system/existing'));
-    }
-
-    public function testValidateReturnsFalseWhenNotMatchingMimeType(): void
-    {
-        $this->assertFalse((new Jpeg())->validate(TEST_DATA_DIR . '/image/mspaint.gif'));
-    }
-
-    public function testValidateReturnsFalseWhenImageIsCorrupted(): void
+    public function testValidateFailsWhenImageIsCorrupted(): void
     {
         $this->markTestSkipped('GD errors are somehow being output regardless of the STFU operators, See https://bugs.php.net/bug.php?id=77195');
 
-        $this->assertFalse((new Jpeg())->validate(TEST_DATA_DIR . '/image/broken-mspaint.jpeg'));
+        /** @var Result $result */
+        $result = wait((new Jpeg())->validate(TEST_DATA_DIR . '/image/broken-mspaint.jpeg'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Type.Jpeg', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenImageIsValid(): void
+    public function testValidateSucceedsWhenImageIsValid(): void
     {
-        $this->assertTrue((new Jpeg())->validate(TEST_DATA_DIR . '/image/mspaint.jpeg'));
+        /** @var Result $result */
+        $result = wait((new Jpeg())->validate(TEST_DATA_DIR . '/image/mspaint.jpeg'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

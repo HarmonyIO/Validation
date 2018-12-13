@@ -5,10 +5,13 @@ namespace HarmonyIO\Validation\Rule\Network\Dns;
 use Amp\Dns\NoRecordException;
 use Amp\Dns\Record;
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
 use function Amp\Dns\query;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class MxRecord implements Rule
 {
@@ -17,17 +20,20 @@ final class MxRecord implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(static function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
+
+            if (!$result->isValid()) {
+                return $result;
+            }
+
             try {
                 yield query($value, Record::MX);
 
-                return true;
+                return succeed();
             } catch (NoRecordException $e) {
-                return false;
+                return fail('Network.Dns.MxRecord');
             }
         });
     }

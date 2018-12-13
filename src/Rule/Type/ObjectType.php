@@ -3,8 +3,9 @@
 namespace HarmonyIO\Validation\Rule\Type;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Rule\Rule;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class ObjectType implements Rule
 {
@@ -13,6 +14,10 @@ final class ObjectType implements Rule
      */
     public function validate($value): Promise
     {
-        return new Success(is_object($value));
+        if (is_object($value)) {
+            return succeed();
+        }
+
+        return fail('Type.ObjectType');
     }
 }

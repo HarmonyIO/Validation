@@ -2,100 +2,134 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Numeric\Minimum;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\NumericTestCase;
+use function Amp\Promise\wait;
 
-class MinimumTest extends TestCase
+class MinimumTest extends NumericTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Minimum(10));
+        parent::__construct($name, $data, $dataName, Minimum::class, 10);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnIntegerWhichIsLessThanMinimum(): void
+    public function testValidateFailsWhenPassingAnIntegerWhichIsSmallerThanMinimum(): void
     {
-        $this->assertFalse((new Minimum(10))->validate(1));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate(9));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Minimum', $result->getFirstError()->getMessage());
+        $this->assertSame('minimum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerWhichIsExactlyMinimum(): void
+    public function testValidateFailsWhenPassingAnIntegerAsAStringWhichIsSmallerThanMinimum(): void
     {
-        $this->assertTrue((new Minimum(10))->validate(10));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate('9'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Minimum', $result->getFirstError()->getMessage());
+        $this->assertSame('minimum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerWhichIsLargerThanMinimum(): void
+    public function testValidateFailsWhenPassingAFloatWhichIsSmallerThanMinimum(): void
     {
-        $this->assertTrue((new Minimum(10))->validate(11));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate(9.9));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Minimum', $result->getFirstError()->getMessage());
+        $this->assertSame('minimum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloatWhichIsLessThanMinimum(): void
+    public function testValidateFailsWhenPassingAFloatAsAStringWhichIsSmallerThanMinimum(): void
     {
-        $this->assertFalse((new Minimum(10))->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate('9.9'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Minimum', $result->getFirstError()->getMessage());
+        $this->assertSame('minimum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatWhichIsExactlyMinimum(): void
+    public function testValidateSucceedsWhenPassingAnIntegerWhichIsExactlyMinimum(): void
     {
-        $this->assertTrue((new Minimum(10))->validate(10.0));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate(10));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatWhichIsLargerThanMinimum(): void
+    public function testValidateSucceedsWhenPassingAnIntegerWhichIsLargerThanMinimum(): void
     {
-        $this->assertTrue((new Minimum(10))->validate(10.5));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate(11));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAnIntegerAsAStringWhichIsExactlyMinimum(): void
     {
-        $this->assertFalse((new Minimum(10))->validate(true));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate('10'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingAnIntegerAsAStringWhichIsLargerThanMinimum(): void
     {
-        $this->assertFalse((new Minimum(10))->validate([]));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate('11'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateSucceedsWhenPassingAFloatWhichIsExactlyMinimum(): void
     {
-        $this->assertFalse((new Minimum(10))->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate(10.0));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateSucceedsWhenPassingAFloatWhichIsLargerThanMinimum(): void
     {
-        $this->assertFalse((new Minimum(10))->validate(null));
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate(10.1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateSucceedsWhenPassingAFloatAsAStringWhichIsExactlyMinimum(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate('10.0'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Minimum(10))->validate($resource));
-
-        fclose($resource);
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateSucceedsWhenPassingAFloatAsAStringWhichIsLargerThanMinimum(): void
     {
-        $this->assertFalse((new Minimum(10))->validate(static function (): void {
-        }));
-    }
+        /** @var Result $result */
+        $result = wait((new Minimum(10))->validate('10.1'));
 
-    public function testValidateReturnsFalseWhenPassingAnIntegerAsAStringWhichIsSmallerThanMinimum(): void
-    {
-        $this->assertFalse((new Minimum(10))->validate('1'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnIntegerAsAStringWhichIsExactlyThanMinimum(): void
-    {
-        $this->assertTrue((new Minimum(10))->validate('10'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnIntegerAsAStringWhichIsLargerThanMinimum(): void
-    {
-        $this->assertTrue((new Minimum(10))->validate('11'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

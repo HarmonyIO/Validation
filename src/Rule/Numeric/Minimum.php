@@ -3,15 +3,19 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Minimum implements Rule
 {
     /** @var int */
     private $minimum;
 
-    public function __construct(int $minimum)
+    public function __construct(float $minimum)
     {
         $this->minimum = $minimum;
     }
@@ -21,10 +25,19 @@ final class Minimum implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_numeric($value)) {
-            return new Success(false);
-        }
+        return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new NumericType())->validate($value);
 
-        return new Success($value >= $this->minimum);
+            if (!$result->isValid()) {
+                return $result;
+            }
+
+            if ($value >= $this->minimum) {
+                return succeed();
+            }
+
+            return fail('Numeric.Minimum', new Parameter('minimum', $this->minimum));
+        });
     }
 }

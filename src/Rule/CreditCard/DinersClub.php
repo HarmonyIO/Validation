@@ -3,8 +3,11 @@
 namespace HarmonyIO\Validation\Rule\CreditCard;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
 
 final class DinersClub implements Rule
 {
@@ -15,14 +18,19 @@ final class DinersClub implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(static function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        if (preg_match(self::PATTERN, $value) !== 1) {
-            return new Success(false);
-        }
+            if (!$result->isValid()) {
+                return $result;
+            }
 
-        return (new LuhnChecksum())->validate($value);
+            if (preg_match(self::PATTERN, $value) !== 1) {
+                return fail('CreditCard.DinersClub');
+            }
+
+            return (new LuhnChecksum())->validate($value);
+        });
     }
 }

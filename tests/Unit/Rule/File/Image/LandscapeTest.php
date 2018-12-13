@@ -2,90 +2,54 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\File\Image;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\Image\Landscape;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\FileTestCase;
+use function Amp\Promise\wait;
 
-class LandscapeTest extends TestCase
+class LandscapeTest extends FileTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Landscape());
+        parent::__construct($name, $data, $dataName, Landscape::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnUnsupportedImage(): void
     {
-        $this->assertFalse((new Landscape())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Landscape())->validate(TEST_DATA_DIR . '/file-mimetype-test.txt'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Image', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAnImageWhichWidthIsTheSameAsItsHeight(): void
     {
-        $this->assertFalse((new Landscape())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Landscape())->validate(TEST_DATA_DIR . '/image/400x400.png'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Landscape', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenPassingAnImageWhichHeightIsBiggerThanItsWidth(): void
     {
-        $this->assertFalse((new Landscape())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Landscape())->validate(TEST_DATA_DIR . '/image/200x400.png'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.Image.Landscape', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingAnImageWhichWidthIsBiggerThanItsHeight(): void
     {
-        $this->assertFalse((new Landscape())->validate([]));
-    }
+        /** @var Result $result */
+        $result = wait((new Landscape())->validate(TEST_DATA_DIR . '/image/400x200.png'));
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Landscape())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Landscape())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Landscape())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Landscape())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnNonExistentImage(): void
-    {
-        $this->assertFalse((new Landscape())->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnUnsupportedImage(): void
-    {
-        $this->assertFalse((new Landscape())->validate(TEST_DATA_DIR . '/image/file-mime-type-test.txt'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnImageWhichWidthIsTheSameAsItsHeight(): void
-    {
-        $this->assertFalse((new Landscape())->validate(TEST_DATA_DIR . '/image/400x400.png'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnImageWhichHeightIsBiggerThanItsWidth(): void
-    {
-        $this->assertFalse((new Landscape())->validate(TEST_DATA_DIR . '/image/200x400.png'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnImageWhichWidthIsBiggerThanItsHeight(): void
-    {
-        $this->assertTrue((new Landscape())->validate(TEST_DATA_DIR . '/image/400x200.png'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

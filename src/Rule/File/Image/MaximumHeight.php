@@ -3,10 +3,13 @@
 namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class MaximumHeight implements Rule
 {
@@ -23,25 +26,26 @@ final class MaximumHeight implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
-            // phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses
-            if ((yield (new Image())->validate($value)) === false) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new Image())->validate($value);
+
+            if (!$result->isValid()) {
+                return $result;
             }
 
             return parallel(function () use ($value) {
                 // @codeCoverageIgnoreStart
                 $imageSizeInformation = @getimagesize($value);
 
-                if (!$imageSizeInformation) {
-                    return false;
+                if (!$imageSizeInformation || $imageSizeInformation[1] > $this->maximumHeight) {
+                    return fail(
+                        'File.Image.MaximumHeight',
+                        new Parameter('height', $this->maximumHeight)
+                    );
                 }
 
-                return $imageSizeInformation[1] <= $this->maximumHeight;
+                return succeed();
                 // @codeCoverageIgnoreEnd
             })();
         });

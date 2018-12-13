@@ -3,12 +3,14 @@
 namespace HarmonyIO\Validation\Rule\Isbn;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Response;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 class Exists implements Rule
 {
@@ -33,13 +35,12 @@ class Exists implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
-            if (!yield (new Isbn())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new Isbn())->validate($value);
+
+            if (!$result->isValid()) {
+                return $result;
             }
 
             $url = sprintf(self::API_URL, $this->apiKey, rawurlencode(sprintf(self::API_IDENTIFIER, $value)));
@@ -50,16 +51,16 @@ class Exists implements Rule
             );
 
             if ($response->getNumericalStatusCode() !== 200) {
-                return false;
+                return fail('Isbn.Exists');
             }
 
             $result = json_decode($response->getBody(), true);
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return false;
+            if (json_last_error() !== JSON_ERROR_NONE || $result['totalItems'] === 0) {
+                return fail('Isbn.Exists');
             }
 
-            return $result['totalItems'] > 0;
+            return succeed();
         });
     }
 }

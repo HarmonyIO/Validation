@@ -3,8 +3,12 @@
 namespace HarmonyIO\Validation\Rule\Hash;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class HashMatches implements Rule
 {
@@ -21,10 +25,19 @@ final class HashMatches implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return new Success(hash_equals($this->knownString, $value));
+            if (!$result->isValid()) {
+                return $result;
+            }
+
+            if (hash_equals($this->knownString, $value)) {
+                return succeed();
+            }
+
+            return fail('Hash.HashMatches');
+        });
     }
 }

@@ -3,8 +3,11 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Negative implements Rule
 {
@@ -14,11 +17,18 @@ final class Negative implements Rule
     public function validate($value): Promise
     {
         return call(static function () use ($value) {
-            if (!yield (new NumericType())->validate($value)) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new NumericType())->validate($value);
+
+            if (!$result->isValid()) {
+                return $result;
             }
 
-            return $value < 0;
+            if ($value < 0) {
+                return succeed();
+            }
+
+            return fail('Numeric.Negative');
         });
     }
 }

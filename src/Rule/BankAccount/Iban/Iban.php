@@ -3,7 +3,7 @@
 namespace HarmonyIO\Validation\Rule\BankAccount\Iban;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Albania;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Andorra;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Austria;
@@ -72,8 +72,12 @@ use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Tunisia;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Turkey;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\UnitedArabEmirates;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\UnitedKingdom;
+use HarmonyIO\Validation\Rule\Combinator\Any;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Iban implements Rule
 {
@@ -153,22 +157,28 @@ final class Iban implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(static function () use ($value) {
-            foreach (self::COUNTRY_RULES as $ruleFullyQualifiedClassName) {
-                /** @var Rule $rule */
-                $rule = new $ruleFullyQualifiedClassName();
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-                // phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses
-                if ((yield $rule->validate($value)) === true) {
-                    return true;
-                }
+            if (!$result->isValid()) {
+                return $result;
             }
 
-            return false;
+            $ibanCountryValidators = [];
+
+            foreach (self::COUNTRY_RULES as $ruleFullyQualifiedClassName) {
+                $ibanCountryValidators[] = new $ruleFullyQualifiedClassName();
+            }
+
+            /** @var Result $result */
+            $result = yield (new Any(...$ibanCountryValidators))->validate($value);
+
+            if ($result->isValid()) {
+                return succeed();
+            }
+
+            return fail('BankAccount.Iban.Iban');
         });
     }
 }

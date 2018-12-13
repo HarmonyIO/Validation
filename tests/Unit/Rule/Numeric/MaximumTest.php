@@ -2,100 +2,134 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Numeric\Maximum;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\NumericTestCase;
+use function Amp\Promise\wait;
 
-class MaximumTest extends TestCase
+class MaximumTest extends NumericTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Maximum(10));
+        parent::__construct($name, $data, $dataName, Maximum::class, 10);
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerWhichIsLessThanMaximum(): void
+    public function testValidateFailsWhenPassingAnIntegerWhichIsLargerThanMaximum(): void
     {
-        $this->assertTrue((new Maximum(10))->validate(1));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate(11));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Maximum', $result->getFirstError()->getMessage());
+        $this->assertSame('maximum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerWhichIsExactlyMaximum(): void
+    public function testValidateFailsWhenPassingAFloatWhichIsLargerThanMaximum(): void
     {
-        $this->assertTrue((new Maximum(10))->validate(10));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate(11.1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Maximum', $result->getFirstError()->getMessage());
+        $this->assertSame('maximum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnIntegerWhichIsLargerThanMaximum(): void
+    public function testValidateFailsWhenPassingAnIntegerAsAStringWhichIsLargerThanMaximum(): void
     {
-        $this->assertFalse((new Maximum(10))->validate(11));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate('11'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Maximum', $result->getFirstError()->getMessage());
+        $this->assertSame('maximum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatWhichIsLessThanMaximum(): void
+    public function testValidateFailsWhenPassingAFloatAsAStringWhichIsLargerThanMaximum(): void
     {
-        $this->assertTrue((new Maximum(10))->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate('11.1'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Maximum', $result->getFirstError()->getMessage());
+        $this->assertSame('maximum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(10, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatWhichIsExactlyMaximum(): void
+    public function testValidateSucceedWhenPassingAnIntegerWhichIsLessThanMaximum(): void
     {
-        $this->assertTrue((new Maximum(10))->validate(10.0));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate(1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloatWhichIsLargerThanMaximum(): void
+    public function testValidateSucceedWhenPassingAnIntegerWhichIsExactlyMaximum(): void
     {
-        $this->assertFalse((new Maximum(10))->validate(10.5));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate(10));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedWhenPassingAFloatWhichIsLessThanMaximum(): void
     {
-        $this->assertFalse((new Maximum(10))->validate(true));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate(1.1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedWhenPassingAFloatWhichIsExactlyMaximum(): void
     {
-        $this->assertFalse((new Maximum(10))->validate([]));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate(10.0));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateSucceedsWhenPassingAnIntegerAsAStringWhichIsSmallerThanMaximum(): void
     {
-        $this->assertFalse((new Maximum(10))->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate('1'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateSucceedsWhenPassingAnIntegerAsAStringWhichIsExactlyThanMaximum(): void
     {
-        $this->assertFalse((new Maximum(10))->validate(null));
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate('10'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateSucceedsWhenPassingAFloatAsAStringWhichIsSmallerThanMaximum(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate('1.1'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Maximum(10))->validate($resource));
-
-        fclose($resource);
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateSucceedsWhenPassingAFloatAsAStringWhichIsExactlyThanMaximum(): void
     {
-        $this->assertFalse((new Maximum(10))->validate(static function (): void {
-        }));
-    }
+        /** @var Result $result */
+        $result = wait((new Maximum(10))->validate('10.0'));
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerAsAStringWhichIsSmallerThanMaximum(): void
-    {
-        $this->assertTrue((new Maximum(10))->validate('1'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnIntegerAsAStringWhichIsExactlyThanMaximum(): void
-    {
-        $this->assertTrue((new Maximum(10))->validate('10'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnIntegerAsAStringWhichIsLargerThanMaximum(): void
-    {
-        $this->assertFalse((new Maximum(10))->validate('11'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -3,13 +3,16 @@
 namespace HarmonyIO\Validation\Rule\Network\Domain;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Tld implements Rule
 {
@@ -28,15 +31,21 @@ final class Tld implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-            $result = yield $this->request();
+            if (!$result->isValid()) {
+                return $result;
+            }
 
-            return $this->isValidTld($result, $value);
+            $response = yield $this->request();
+
+            if ($this->isValidTld($response, $value)) {
+                return succeed();
+            }
+
+            return fail('Network.Domain.Tld');
         });
     }
 

@@ -4,11 +4,14 @@ namespace HarmonyIO\Validation\Rule\Network\Dns;
 
 use Amp\Dns\NoRecordException;
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Enum\Network\Dns\RecordType;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
 use function Amp\Dns\query;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class RecordExists implements Rule
 {
@@ -25,17 +28,20 @@ final class RecordExists implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
+
+            if (!$result->isValid()) {
+                return $result;
+            }
+
             try {
                 yield query($value, $this->recordType->getValue());
 
-                return true;
+                return succeed();
             } catch (NoRecordException $e) {
-                return false;
+                return fail('Network.Dns.RecordExists');
             }
         });
     }

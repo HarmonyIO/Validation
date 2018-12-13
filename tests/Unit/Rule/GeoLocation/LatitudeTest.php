@@ -2,175 +2,162 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\GeoLocation;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\GeoLocation\Latitude;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\NumericTestCase;
+use function Amp\Promise\wait;
 
-class LatitudeTest extends TestCase
+class LatitudeTest extends NumericTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Latitude());
+        parent::__construct($name, $data, $dataName, Latitude::class);
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerJustAboveThreshold(): void
+    public function testValidateFailsWhenPassingAnIntegerBelowThreshold(): void
     {
-        $this->assertTrue((new Latitude())->validate(-89));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate(-90));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('GeoLocation.Latitude', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerJustBelowThreshold(): void
+    public function testValidateFailsWhenPassingAnIntegerAboveThreshold(): void
     {
-        $this->assertTrue((new Latitude())->validate(89));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate(90));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('GeoLocation.Latitude', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnIntegerAboveThreshold(): void
+    public function testValidateFailsWhenPassingAnIntegerAsAStringBelowThreshold(): void
     {
-        $this->assertFalse((new Latitude())->validate(91));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate('-90'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('GeoLocation.Latitude', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnIntegerBelowThreshold(): void
+    public function testValidateFailsWhenPassingAnIntegerAsAStringAboveThreshold(): void
     {
-        $this->assertFalse((new Latitude())->validate(-91));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate('90'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('GeoLocation.Latitude', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnIntegerMatchingLowerBound(): void
+    public function testValidateFailsWhenPassingAFloatBelowThreshold(): void
     {
-        $this->assertFalse((new Latitude())->validate(-90));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate(-90.0));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('GeoLocation.Latitude', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnIntegerMatchingHigherBound(): void
+    public function testValidateFailsWhenPassingAFloatAboveThreshold(): void
     {
-        $this->assertFalse((new Latitude())->validate(90));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate(90.0));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('GeoLocation.Latitude', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatJustAboveThreshold(): void
+    public function testValidateFailsWhenPassingAFloatAsAStringBelowThreshold(): void
     {
-        $this->assertTrue((new Latitude())->validate(-89.9999));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate('-90.0'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('GeoLocation.Latitude', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatJustBelowThreshold(): void
+    public function testValidateFailsWhenPassingAFloatAsAStringAboveThreshold(): void
     {
-        $this->assertTrue((new Latitude())->validate(89.9999));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate('90.0'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('GeoLocation.Latitude', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloatAboveThreshold(): void
+    public function testValidateSucceedsWhenPassingAnIntegerWithInLowerRange(): void
     {
-        $this->assertFalse((new Latitude())->validate(90.0001));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate(-89));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloatBelowThreshold(): void
+    public function testValidateSucceedsWhenPassingAnIntegerWithInHigherRange(): void
     {
-        $this->assertFalse((new Latitude())->validate(-90.0001));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate(89));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloatMatchingLowerBound(): void
+    public function testValidateSucceedsWhenPassingAnIntegerAsAStringWithInLowerRange(): void
     {
-        $this->assertFalse((new Latitude())->validate(-90.0000));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate('-89'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloatMatchingHigherBound(): void
+    public function testValidateSucceedsWhenPassingAnIntegerAsAStringWithInHigherRange(): void
     {
-        $this->assertFalse((new Latitude())->validate(90.0000));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate('89'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAFloatWithInLowerRange(): void
     {
-        $this->assertFalse((new Latitude())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate(-89.9));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingAFloatWithInHigherRange(): void
     {
-        $this->assertFalse((new Latitude())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate(89.9));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateSucceedsWhenPassingAFloatAsAStringWithInLowerRange(): void
     {
-        $this->assertFalse((new Latitude())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate('-89.9'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateSucceedsWhenPassingAFloatAsAStringWithInHigherRange(): void
     {
-        $this->assertFalse((new Latitude())->validate(null));
-    }
+        /** @var Result $result */
+        $result = wait((new Latitude())->validate('89.9'));
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Latitude())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Latitude())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAStringIntegerJustAboveThreshold(): void
-    {
-        $this->assertTrue((new Latitude())->validate('-89'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAStringIntegerJustBelowThreshold(): void
-    {
-        $this->assertTrue((new Latitude())->validate('89'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringIntegerAboveThreshold(): void
-    {
-        $this->assertFalse((new Latitude())->validate('91'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringIntegerBelowThreshold(): void
-    {
-        $this->assertFalse((new Latitude())->validate('-91'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringIntegerMatchingLowerBound(): void
-    {
-        $this->assertFalse((new Latitude())->validate('-90'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringIntegerMatchingHigherBound(): void
-    {
-        $this->assertFalse((new Latitude())->validate('90'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAStringFloatJustAboveThreshold(): void
-    {
-        $this->assertTrue((new Latitude())->validate('-89.9999'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAStringFloatJustBelowThreshold(): void
-    {
-        $this->assertTrue((new Latitude())->validate('89.9999'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringFloatAboveThreshold(): void
-    {
-        $this->assertFalse((new Latitude())->validate('90.0001'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringFloatBelowThreshold(): void
-    {
-        $this->assertFalse((new Latitude())->validate('-90.0001'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringFloatMatchingLowerBound(): void
-    {
-        $this->assertFalse((new Latitude())->validate('-90.0000'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAStringFloatMatchingHigherBound(): void
-    {
-        $this->assertFalse((new Latitude())->validate('90.0000'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

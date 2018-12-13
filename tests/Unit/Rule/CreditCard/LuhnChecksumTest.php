@@ -2,82 +2,72 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\CreditCard;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\CreditCard\LuhnChecksum;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class LuhnChecksumTest extends TestCase
+class LuhnChecksumTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new LuhnChecksum());
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new LuhnChecksum())->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new LuhnChecksum())->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new LuhnChecksum())->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new LuhnChecksum())->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new LuhnChecksum())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new LuhnChecksum())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new LuhnChecksum())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new LuhnChecksum())->validate(static function (): void {
-        }));
-    }
-
     /**
-     * @dataProvider provideValidCreditCardNumbers
+     * @param mixed[] $data
      */
-    public function testValidateReturnsTrueWhenPassingAValidCreditCardNumber(string $creditCardNumber): void
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertTrue((new LuhnChecksum())->validate($creditCardNumber));
+        parent::__construct($name, $data, $dataName, LuhnChecksum::class);
     }
 
     /**
      * @dataProvider provideInvalidCreditCardNumbers
      */
-    public function testValidateReturnsFalseWhenPassingAnInvalidCreditCardNumber(string $creditCardNumber): void
+    public function testValidateFailsWhenPassingAnInvalidCreditCardNumber(string $creditCardNumber): void
     {
-        $this->assertFalse((new LuhnChecksum())->validate($creditCardNumber));
+        /** @var Result $result */
+        $result = wait((new LuhnChecksum())->validate($creditCardNumber));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('CreditCard.LuhnChecksum', $result->getFirstError()->getMessage());
+    }
+
+    /**
+     * @dataProvider provideValidCreditCardNumbers
+     */
+    public function testValidateSucceedsWhenPassingAValidCreditCardNumber(string $creditCardNumber): void
+    {
+        /** @var Result $result */
+        $result = wait((new LuhnChecksum())->validate($creditCardNumber));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideInvalidCreditCardNumbers(): array
+    {
+        return [
+            ['34327974884488'],
+            ['3411036129797166'],
+            ['470670303243077'],
+            ['354630746638914'],
+            ['40036290155579'],
+            ['30636290155579'],
+            ['37755763114193'],
+            ['601195026665572'],
+            ['60110047550120322'],
+            ['6711672088793450'],
+            ['6511241089786739'],
+            ['6011706849798969'],
+            ['540587363827692'],
+            ['55117936800718355'],
+            ['5638013614388422'],
+            ['5185497765654616'],
+            ['4485880955865524'],
+            ['433728674131'],
+            ['44837363504833'],
+            ['4716908666041'],
+        ];
     }
 
     /**
@@ -146,35 +136,6 @@ class LuhnChecksumTest extends TestCase
             ['4916217802860'],
             ['4716461604065'],
             ['4716995392898'],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function provideInvalidCreditCardNumbers(): array
-    {
-        return [
-            ['34327974884488'],
-            ['3411036129797166'],
-            ['470670303243077'],
-            ['354630746638914'],
-            ['40036290155579'],
-            ['30636290155579'],
-            ['37755763114193'],
-            ['601195026665572'],
-            ['60110047550120322'],
-            ['6711672088793450'],
-            ['6511241089786739'],
-            ['6011706849798969'],
-            ['540587363827692'],
-            ['55117936800718355'],
-            ['5638013614388422'],
-            ['5185497765654616'],
-            ['4485880955865524'],
-            ['433728674131'],
-            ['44837363504833'],
-            ['4716908666041'],
         ];
     }
 }

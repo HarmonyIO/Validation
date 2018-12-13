@@ -3,8 +3,12 @@
 namespace HarmonyIO\Validation\Rule\GeoLocation;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
+use HarmonyIO\Validation\Rule\Numeric\NumericType;
 use HarmonyIO\Validation\Rule\Rule;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Longitude implements Rule
 {
@@ -13,10 +17,19 @@ final class Longitude implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_numeric($value)) {
-            return new Success(false);
-        }
+        return call(static function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new NumericType())->validate($value);
 
-        return new Success($value > -180 && $value < 180);
+            if (!$result->isValid()) {
+                return $result;
+            }
+
+            if ($value > -180 && $value < 180) {
+                return succeed();
+            }
+
+            return fail('GeoLocation.Longitude');
+        });
     }
 }

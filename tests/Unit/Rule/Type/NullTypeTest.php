@@ -3,8 +3,10 @@
 namespace HarmonyIO\ValidationTest\Unit\Rule\Type;
 
 use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\NullType;
+use function Amp\Promise\wait;
 
 class NullTypeTest extends TestCase
 {
@@ -13,37 +15,52 @@ class NullTypeTest extends TestCase
         $this->assertInstanceOf(Rule::class, new NullType());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnInteger(): void
     {
-        $this->assertFalse((new NullType())->validate(1));
+        /** @var Result $result */
+        $result = wait((new NullType())->validate(1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.NullType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAFloat(): void
     {
-        $this->assertFalse((new NullType())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new NullType())->validate(1.1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.NullType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingABoolean(): void
+    public function testValidateFailsWhenPassingABoolean(): void
     {
-        $this->assertFalse((new NullType())->validate(true));
+        /** @var Result $result */
+        $result = wait((new NullType())->validate(true));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.NullType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenPassingAnArray(): void
     {
-        $this->assertFalse((new NullType())->validate([]));
+        /** @var Result $result */
+        $result = wait((new NullType())->validate([]));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.NullType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenPassingAnObject(): void
     {
-        $this->assertFalse((new NullType())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new NullType())->validate(new \DateTimeImmutable()));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.NullType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueWhenPassingNull(): void
-    {
-        $this->assertTrue((new NullType())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenPassingAResource(): void
     {
         $resource = fopen('php://memory', 'r');
 
@@ -53,19 +70,40 @@ class NullTypeTest extends TestCase
             return;
         }
 
-        $this->assertFalse((new NullType())->validate($resource));
+        /** @var Result $result */
+        $result = wait((new NullType())->validate($resource));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.NullType', $result->getFirstError()->getMessage());
 
         fclose($resource);
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateFailsWhenPassingACallable(): void
     {
-        $this->assertFalse((new NullType())->validate(static function (): void {
+        /** @var Result $result */
+        $result = wait((new NullType())->validate(static function (): void {
         }));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.NullType', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAString(): void
+    public function testValidateFailsWhenPassingAString(): void
     {
-        $this->assertFalse((new NullType())->validate('€'));
+        /** @var Result $result */
+        $result = wait((new NullType())->validate('€'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Type.NullType', $result->getFirstError()->getMessage());
+    }
+
+    public function testValidateSucceedsWhenPassingNull(): void
+    {
+        /** @var Result $result */
+        $result = wait((new NullType())->validate(null));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

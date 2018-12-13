@@ -2,85 +2,54 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Isbn;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Isbn\Isbn;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class IsbnTest extends TestCase
+class IsbnTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Isbn());
+        parent::__construct($name, $data, $dataName, Isbn::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingInAnInvalidIsbn10(): void
     {
-        $this->assertFalse((new Isbn())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Isbn())->validate('0345391803'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Isbn', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingInAnInvalidIsbn13(): void
     {
-        $this->assertFalse((new Isbn())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Isbn())->validate('9788970137507'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Isbn.Isbn', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingInAValidIsbn10(): void
     {
-        $this->assertFalse((new Isbn())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Isbn())->validate('0345391802'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingInAValidIsbn13(): void
     {
-        $this->assertFalse((new Isbn())->validate([]));
-    }
+        /** @var Result $result */
+        $result = wait((new Isbn())->validate('9788970137506'));
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Isbn())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Isbn())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Isbn())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Isbn())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInAnInvalidIsbn10(): void
-    {
-            $this->assertFalse((new Isbn())->validate('0345391803'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInAnInvalidIsbn13(): void
-    {
-        $this->assertFalse((new Isbn())->validate('9788970137507'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingInAValidIsbn10(): void
-    {
-        $this->assertTrue((new Isbn())->validate('0345391802'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingInAValidIsbn13(): void
-    {
-        $this->assertTrue((new Isbn())->validate('9788970137506'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

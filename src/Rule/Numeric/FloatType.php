@@ -3,8 +3,13 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
+use HarmonyIO\Validation\Rule\Combinator\Negate;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\BooleanType;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class FloatType implements Rule
 {
@@ -13,10 +18,19 @@ final class FloatType implements Rule
      */
     public function validate($value): Promise
     {
-        if (is_bool($value)) {
-            return new Success(false);
-        }
+        return call(static function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new Negate(new BooleanType()))->validate($value);
 
-        return new Success(filter_var($value, FILTER_VALIDATE_FLOAT) !== false);
+            if (!$result->isValid()) {
+                return fail('Numeric.FloatType');
+            }
+
+            if (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) {
+                return succeed();
+            }
+
+            return fail('Numeric.FloatType');
+        });
     }
 }

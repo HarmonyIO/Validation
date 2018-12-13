@@ -3,15 +3,19 @@
 namespace HarmonyIO\Validation\Rule\Numeric;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Maximum implements Rule
 {
     /** @var int */
     private $maximum;
 
-    public function __construct(int $maximum)
+    public function __construct(float $maximum)
     {
         $this->maximum = $maximum;
     }
@@ -21,10 +25,19 @@ final class Maximum implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_numeric($value)) {
-            return new Success(false);
-        }
+        return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new NumericType())->validate($value);
 
-        return new Success($value <= $this->maximum);
+            if (!$result->isValid()) {
+                return $result;
+            }
+
+            if ($value <= $this->maximum) {
+                return succeed();
+            }
+
+            return fail('Numeric.Maximum', new Parameter('maximum', $this->maximum));
+        });
     }
 }

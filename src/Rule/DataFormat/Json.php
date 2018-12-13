@@ -3,8 +3,12 @@
 namespace HarmonyIO\Validation\Rule\DataFormat;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Json implements Rule
 {
@@ -13,12 +17,21 @@ final class Json implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(static function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        json_decode($value);
+            if (!$result->isValid()) {
+                return $result;
+            }
 
-        return new Success(json_last_error() === JSON_ERROR_NONE);
+            json_decode($value);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return succeed();
+            }
+
+            return fail('DataFormat.Json');
+        });
     }
 }

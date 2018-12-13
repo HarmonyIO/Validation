@@ -3,8 +3,13 @@
 namespace HarmonyIO\Validation\Rule\Country;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class Alpha3Code implements Rule
 {
@@ -265,10 +270,19 @@ final class Alpha3Code implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(static function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return new Success(in_array(strtoupper($value), self::CODES, true));
+            if (!$result->isValid()) {
+                return $result;
+            }
+
+            if (in_array(strtoupper($value), self::CODES, true)) {
+                return succeed();
+            }
+
+            return fail('Country.Alpha3Code', new Parameter('codes', self::CODES));
+        });
     }
 }

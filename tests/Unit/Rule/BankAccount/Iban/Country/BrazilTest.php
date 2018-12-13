@@ -2,111 +2,108 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\BankAccount\Iban\Country;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\BankAccount\Iban\Country\Brazil;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
+use function Amp\Promise\wait;
 
-class BrazilTest extends TestCase
+class BrazilTest extends StringTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new Brazil());
+        parent::__construct($name, $data, $dataName, Brazil::class);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenStringDoesNotStartWithCountryCode(): void
     {
-        $this->assertFalse((new Brazil())->validate(1));
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('XR9700360305000010009795493P1'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Brazil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateFailsWhenStringDoesNotHaveChecksum(): void
     {
-        $this->assertFalse((new Brazil())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BRx700360305000010009795493P1'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Brazil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenStringDoesNotHaveBankAndBranchCode(): void
     {
-        $this->assertFalse((new Brazil())->validate(true));
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BR97x0360305000010009795493P1'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Brazil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenStringDoesNotHaveAccountNumber(): void
     {
-        $this->assertFalse((new Brazil())->validate([]));
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BR970036030500x010009795493P1'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Brazil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenStringDoesNotHaveAnAccountType(): void
     {
-        $this->assertFalse((new Brazil())->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BR970036030500001000979549311'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Brazil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenStringDoesNotHaveAndAccountHolderPosition(): void
     {
-        $this->assertFalse((new Brazil())->validate(null));
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BR9700360305000010009795493P!'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Brazil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenStringIsTooShort(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BR970036030500001000979593P1'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Brazil())->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Brazil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateFailsWhenStringIsTooLong(): void
     {
-        $this->assertFalse((new Brazil())->validate(static function (): void {
-        }));
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BR9700360305000010009795493P11'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Country.Brazil', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenStringDoesNotStartWithCountryCode(): void
+    public function testValidateFailsWhenChecksumFails(): void
     {
-        $this->assertFalse((new Brazil())->validate('XR9700360305000010009795493P1'));
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BR9700360305000010009795493P2'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('BankAccount.Iban.Checksum', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsFalseWhenStringDoesNotHaveChecksum(): void
+    public function testValidateSucceedsWhenPassingAValidIbanString(): void
     {
-        $this->assertFalse((new Brazil())->validate('BRx700360305000010009795493P1'));
-    }
+        /** @var Result $result */
+        $result = wait((new Brazil())->validate('BR9700360305000010009795493P1'));
 
-    public function testValidateReturnsFalseWhenStringDoesNotHaveBankAndBranchCode(): void
-    {
-        $this->assertFalse((new Brazil())->validate('BR97x0360305000010009795493P1'));
-        $this->assertFalse((new Brazil())->validate('BR9700360305x00010009795493P1'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAccountNumber(): void
-    {
-        $this->assertFalse((new Brazil())->validate('BR970036030500001x009795493P1'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAnAccountType(): void
-    {
-        $this->assertFalse((new Brazil())->validate('BR970036030500001000979549311'));
-    }
-
-    public function testValidateReturnsFalseWhenStringDoesNotHaveAndAccountHolderPosition(): void
-    {
-        $this->assertFalse((new Brazil())->validate('BR9700360305000010009795493Px'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooShort(): void
-    {
-        $this->assertFalse((new Brazil())->validate('BR970036030500001000979549P1'));
-    }
-
-    public function testValidateReturnsFalseWhenStringIsTooLong(): void
-    {
-        $this->assertFalse((new Brazil())->validate('BR97003603050000100097995493P1'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAValidIbanString(): void
-    {
-        $this->assertTrue((new Brazil())->validate('BR9700360305000010009795493P1'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

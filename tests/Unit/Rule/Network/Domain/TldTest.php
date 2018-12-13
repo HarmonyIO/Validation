@@ -6,80 +6,36 @@ use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\Request;
 use HarmonyIO\HttpClient\Message\Response;
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Network\Domain\Tld;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\StringTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Amp\Promise\wait;
 
-class TldTest extends TestCase
+class TldTest extends StringTestCase
 {
     /** @var MockObject|Client */
     private $httpClient;
+
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    {
+        $this->httpClient = $this->createMock(Client::class);
+
+        parent::__construct($name, $data, $dataName, Tld::class, $this->httpClient);
+    }
 
     //phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
     public function setUp()
     {
         $this->httpClient = $this->createMock(Client::class);
+
+        parent::setUp();
     }
 
-    public function testRuleImplementsInterface(): void
-    {
-        $this->assertInstanceOf(Rule::class, new Tld($this->httpClient));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
-    {
-        $this->assertFalse((new Tld($this->httpClient))->validate(1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
-    {
-        $this->assertFalse((new Tld($this->httpClient))->validate(1.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
-    {
-        $this->assertFalse((new Tld($this->httpClient))->validate(true));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new Tld($this->httpClient))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new Tld($this->httpClient))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new Tld($this->httpClient))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Tld($this->httpClient))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new Tld($this->httpClient))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsUsesCorrectUrl(): void
+    public function testValidateUsesCorrectUrl(): void
     {
         $this->httpClient
             ->method('request')
@@ -124,7 +80,11 @@ class TldTest extends TestCase
             })
         ;
 
-        $this->assertFalse((new Tld($this->httpClient))->validate('foo'));
+        /** @var Result $result */
+        $result = wait((new Tld($this->httpClient))->validate('foo'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Domain.Tld', $result->getFirstError()->getMessage());
     }
 
     public function testValidateStripsEmptyLastLineFromResult(): void
@@ -148,10 +108,14 @@ class TldTest extends TestCase
             })
         ;
 
-        $this->assertFalse((new Tld($this->httpClient))->validate(''));
+        /** @var Result $result */
+        $result = wait((new Tld($this->httpClient))->validate(''));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Domain.Tld', $result->getFirstError()->getMessage());
     }
 
-    public function testValidateReturnsTrueOnExactCasingMatch(): void
+    public function testValidateSucceedsOnExactCasingMatch(): void
     {
         $this->httpClient
             ->method('request')
@@ -172,10 +136,14 @@ class TldTest extends TestCase
             })
         ;
 
-        $this->assertTrue((new Tld($this->httpClient))->validate('BAR'));
+        /** @var Result $result */
+        $result = wait((new Tld($this->httpClient))->validate('BAR'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueOnLowerCasingMatch(): void
+    public function testValidateSucceedsOnLowerCasingMatch(): void
     {
         $this->httpClient
             ->method('request')
@@ -196,6 +164,10 @@ class TldTest extends TestCase
             })
         ;
 
-        $this->assertTrue((new Tld($this->httpClient))->validate('bar'));
+        /** @var Result $result */
+        $result = wait((new Tld($this->httpClient))->validate('bar'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

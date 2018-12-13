@@ -2,90 +2,47 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\File;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\File\MaximumSize;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\FileTestCase;
+use function Amp\Promise\wait;
 
-class MaximumSizeTest extends TestCase
+class MaximumSizeTest extends FileTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new MaximumSize(3));
+        parent::__construct($name, $data, $dataName, MaximumSize::class, 6);
     }
 
-    public function testValidateReturnsFalseWhenPassingAnInteger(): void
+    public function testValidateFailsWhenFileIsLargerThanMaximumSize(): void
     {
-        $this->assertFalse((new MaximumSize(3))->validate(1));
+        /** @var Result $result */
+        $result = wait((new MaximumSize(5))->validate(TEST_DATA_DIR . '/file-size-test-6b.txt'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('File.MaximumSize', $result->getFirstError()->getMessage());
+        $this->assertSame('size', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(5, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenFileIsExactlyMaximumSize(): void
     {
-        $this->assertFalse((new MaximumSize(3))->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new MaximumSize(6))->validate(TEST_DATA_DIR . '/file-size-test-6b.txt'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenFileIsSmallerThanMaximumSize(): void
     {
-        $this->assertFalse((new MaximumSize(3))->validate(true));
-    }
+        /** @var Result $result */
+        $result = wait((new MaximumSize(7))->validate(TEST_DATA_DIR . '/file-size-test-6b.txt'));
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
-    {
-        $this->assertFalse((new MaximumSize(3))->validate([]));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new MaximumSize(3))->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new MaximumSize(3))->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new MaximumSize(3))->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new MaximumSize(3))->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsFalseWhenFileDoesNotExists(): void
-    {
-        $this->assertFalse((new MaximumSize(3))->validate(TEST_DATA_DIR . '/unknown-file.txt'));
-    }
-
-    public function testValidateReturnsFalseWhenPassingInADirectory(): void
-    {
-        $this->assertFalse((new MaximumSize(3))->validate(TEST_DATA_DIR . '/file-system/existing'));
-    }
-
-    public function testValidateReturnsTrueWhenFileIsSmallerThanMaximumSize(): void
-    {
-        $this->assertTrue((new MaximumSize(7))->validate(TEST_DATA_DIR . '/file-size-test-6b.txt'));
-    }
-
-    public function testValidateReturnsTrueWhenFileIsExactlyMaximumSize(): void
-    {
-        $this->assertTrue((new MaximumSize(6))->validate(TEST_DATA_DIR . '/file-size-test-6b.txt'));
-    }
-
-    public function testValidateReturnsFalseWhenFileIsLargerThanMaximumSize(): void
-    {
-        $this->assertFalse((new MaximumSize(5))->validate(TEST_DATA_DIR . '/file-size-test-6b.txt'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

@@ -2,75 +2,54 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Numeric\NumericType;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\NumericTestCase;
+use function Amp\Promise\wait;
 
-class NumericTypeTest extends TestCase
+class NumericTypeTest extends NumericTestCase
 {
-    public function testRuleImplementsInterface(): void
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
-        $this->assertInstanceOf(Rule::class, new NumericType());
+        parent::__construct($name, $data, $dataName, NumericType::class);
     }
 
-    public function testValidateReturnsTrueWhenPassingAnInteger(): void
+    public function testValidateSucceedsWhenPassingAnInteger(): void
     {
-        $this->assertTrue((new NumericType())->validate(1));
+        /** @var Result $result */
+        $result = wait((new NumericType())->validate(1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloat(): void
+    public function testValidateSucceedsWhenPassingAFloat(): void
     {
-        $this->assertTrue((new NumericType())->validate(1.1));
+        /** @var Result $result */
+        $result = wait((new NumericType())->validate(1.1));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateSucceedsWhenPassingAnIntegerAsAString(): void
     {
-        $this->assertFalse((new NumericType())->validate(true));
+        /** @var Result $result */
+        $result = wait((new NumericType())->validate('1'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateSucceedsWhenPassingAFloatAsAString(): void
     {
-        $this->assertFalse((new NumericType())->validate([]));
-    }
+        /** @var Result $result */
+        $result = wait((new NumericType())->validate('1.1'));
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
-    {
-        $this->assertFalse((new NumericType())->validate(new \DateTimeImmutable()));
-    }
-
-    public function testValidateReturnsFalseWhenPassingNull(): void
-    {
-        $this->assertFalse((new NumericType())->validate(null));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAResource(): void
-    {
-        $resource = fopen('php://memory', 'r');
-
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new NumericType())->validate($resource));
-
-        fclose($resource);
-    }
-
-    public function testValidateReturnsFalseWhenPassingACallable(): void
-    {
-        $this->assertFalse((new NumericType())->validate(static function (): void {
-        }));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAnIntegerAsAString(): void
-    {
-        $this->assertTrue((new NumericType())->validate('1'));
-    }
-
-    public function testValidateReturnsTrueWhenPassingAFloatAsAString(): void
-    {
-        $this->assertTrue((new NumericType())->validate('1.1'));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

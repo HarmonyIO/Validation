@@ -3,14 +3,23 @@
 namespace HarmonyIO\Validation\Rule\File\Image;
 
 use Amp\Promise;
-use Amp\Success;
 use HarmonyIO\Validation\Exception\InvalidAspectRatio;
+use HarmonyIO\Validation\Result\Parameter;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class AspectRatio implements Rule
 {
+    /** @var string */
+    private $x;
+
+    /** @var string */
+    private $y;
+
     /** @var float */
     private $ratio;
 
@@ -20,6 +29,9 @@ final class AspectRatio implements Rule
             throw new InvalidAspectRatio($aspectRatio);
         }
 
+        $this->x = $matches['x'];
+        $this->y = $matches['y'];
+
         $this->ratio = $matches['x'] / $matches['y'];
     }
 
@@ -28,25 +40,26 @@ final class AspectRatio implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
-
         return call(function () use ($value) {
-            // phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses
-            if ((yield (new Image())->validate($value)) === false) {
-                return false;
+            /** @var Result $result */
+            $result = yield (new Image())->validate($value);
+
+            if (!$result->isValid()) {
+                return $result;
             }
 
             return parallel(function () use ($value) {
                 // @codeCoverageIgnoreStart
                 $imageSizeInformation = @getimagesize($value);
 
-                if (!$imageSizeInformation) {
-                    return false;
+                if (!$imageSizeInformation || $this->ratio !== $imageSizeInformation[0] / $imageSizeInformation[1]) {
+                    return fail(
+                        'File.Image.AspectRatio',
+                        new Parameter('ratio', sprintf('%s:%s', $this->x, $this->y))
+                    );
                 }
 
-                return $this->ratio === $imageSizeInformation[0] / $imageSizeInformation[1];
+                return succeed();
                 // @codeCoverageIgnoreEnd
             })();
         });

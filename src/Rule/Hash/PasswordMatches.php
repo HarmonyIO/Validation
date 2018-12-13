@@ -3,9 +3,13 @@
 namespace HarmonyIO\Validation\Rule\Hash;
 
 use Amp\Promise;
-use Amp\Success;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\Validation\Rule\Type\StringType;
+use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
+use function HarmonyIO\Validation\fail;
+use function HarmonyIO\Validation\succeed;
 
 final class PasswordMatches implements Rule
 {
@@ -22,14 +26,23 @@ final class PasswordMatches implements Rule
      */
     public function validate($value): Promise
     {
-        if (!is_string($value)) {
-            return new Success(false);
-        }
+        return call(function () use ($value) {
+            /** @var Result $result */
+            $result = yield (new StringType())->validate($value);
 
-        return parallel(function () use ($value) {
-            // @codeCoverageIgnoreStart
-            return password_verify($value, $this->hash);
-            // @codeCoverageIgnoreEnd
-        })();
+            if (!$result->isValid()) {
+                return $result;
+            }
+
+            return parallel(function () use ($value) {
+                // @codeCoverageIgnoreStart
+                if (password_verify($value, $this->hash)) {
+                    return succeed();
+                }
+
+                return fail('Hash.PasswordMatches');
+                // @codeCoverageIgnoreEnd
+            })();
+        });
     }
 }

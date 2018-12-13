@@ -2,14 +2,23 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Numeric;
 
-use HarmonyIO\PHPUnitExtension\TestCase;
 use HarmonyIO\Validation\Exception\InvalidNumericalRange;
 use HarmonyIO\Validation\Exception\InvalidNumericValue;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Numeric\Range;
-use HarmonyIO\Validation\Rule\Rule;
+use HarmonyIO\ValidationTest\Unit\Rule\NumericTestCase;
+use function Amp\Promise\wait;
 
-class RangeTest extends TestCase
+class RangeTest extends NumericTestCase
 {
+    /**
+     * @param mixed[] $data
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName, Range::class, 13, 16);
+    }
+
     public function testConstructorThrowsOnNonNumericMinimumValue(): void
     {
         $this->expectException(InvalidNumericValue::class);
@@ -34,89 +43,127 @@ class RangeTest extends TestCase
         new Range(51, 50);
     }
 
-    public function testRuleImplementsInterface(): void
+    public function testValidateFailsWhenPassingAnIntegerSmallerThanMinimum(): void
     {
-        $this->assertInstanceOf(Rule::class, new Range(13, 16));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate(12));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Minimum', $result->getFirstError()->getMessage());
+        $this->assertSame('minimum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(13, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnInteger(): void
+    public function testValidateFailsWhenPassingAnIntegerBiggerThanMaximum(): void
     {
-        $this->assertTrue((new Range(13, 16))->validate(14));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate(17));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Maximum', $result->getFirstError()->getMessage());
+        $this->assertSame('maximum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(16, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloat(): void
+    public function testValidateFailsWhenPassingAnIntegerAsAStringSmallerThanMinimum(): void
     {
-        $this->assertTrue((new Range(13, 16))->validate(14.1));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate('12'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Minimum', $result->getFirstError()->getMessage());
+        $this->assertSame('minimum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(13, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingABoolean(): void
+    public function testValidateFailsWhenPassingAnIntegerAsAStringBiggerThanMaximum(): void
     {
-        $this->assertFalse((new Range(13, 16))->validate(true));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate('17'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Maximum', $result->getFirstError()->getMessage());
+        $this->assertSame('maximum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(16, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnArray(): void
+    public function testValidateFailsWhenPassingAFloatSmallerThanMinimum(): void
     {
-        $this->assertFalse((new Range(13, 16))->validate([]));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate(12.9));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Minimum', $result->getFirstError()->getMessage());
+        $this->assertSame('minimum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(13, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAnObject(): void
+    public function testValidateFailsWhenPassingAFloatBiggerThanMaximum(): void
     {
-        $this->assertFalse((new Range(13, 16))->validate(new \DateTimeImmutable()));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate(16.1));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Maximum', $result->getFirstError()->getMessage());
+        $this->assertSame('maximum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(16, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingNull(): void
+    public function testValidateFailsWhenPassingAFloatAsAStringSmallerThanMinimum(): void
     {
-        $this->assertFalse((new Range(13, 16))->validate(null));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate('12.9'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Minimum', $result->getFirstError()->getMessage());
+        $this->assertSame('minimum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(13, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingAResource(): void
+    public function testValidateFailsWhenPassingAFloatAsAStringBiggerThanMaximum(): void
     {
-        $resource = fopen('php://memory', 'r');
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate('16.1'));
 
-        if ($resource === false) {
-            $this->fail('Could not open the memory stream used for the test');
-
-            return;
-        }
-
-        $this->assertFalse((new Range(13, 16))->validate($resource));
-
-        fclose($resource);
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Numeric.Maximum', $result->getFirstError()->getMessage());
+        $this->assertSame('maximum', $result->getFirstError()->getParameters()[0]->getKey());
+        $this->assertSame(16, $result->getFirstError()->getParameters()[0]->getValue());
     }
 
-    public function testValidateReturnsFalseWhenPassingACallable(): void
+    public function testValidateSucceedsWhenPassingAnIntegerWithInRange(): void
     {
-        $this->assertFalse((new Range(13, 16))->validate(static function (): void {
-        }));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate(15));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenPassingAnIntegerAsAString(): void
+    public function testValidateSucceedsWhenPassingAnIntegerAsStringWithInRange(): void
     {
-        $this->assertTrue((new Range(13, 16))->validate('14'));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate('15'));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsTrueWhenPassingAFloatAsAString(): void
+    public function testValidateSucceedsWhenPassingAFloatWithInRange(): void
     {
-        $this->assertTrue((new Range(13, 16))->validate('14.1'));
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate(15.5));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 
-    public function testValidateReturnsFalseWhenPassingAFloatValueLessThanTheMinimumValue(): void
+    public function testValidateSucceedsWhenPassingAFloatAsStringWithInRange(): void
     {
-        $this->assertFalse((new Range(13, 16))->validate(12.9));
-    }
+        /** @var Result $result */
+        $result = wait((new Range(13, 16))->validate('15.5'));
 
-    public function testValidateReturnsFalseWhenPassingAFloatValueMoreThanTheMaximumValue(): void
-    {
-        $this->assertFalse((new Range(13, 16))->validate(16.1));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnIntegerValueLessThanTheMinimumValue(): void
-    {
-        $this->assertFalse((new Range(13, 16))->validate(12));
-    }
-
-    public function testValidateReturnsFalseWhenPassingAnIntegerValueMoreThanTheMaximumValue(): void
-    {
-        $this->assertFalse((new Range(13, 16))->validate(17));
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
     }
 }

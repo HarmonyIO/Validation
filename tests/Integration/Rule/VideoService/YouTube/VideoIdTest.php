@@ -7,7 +7,9 @@ use Amp\Redis\Client as RedisClient;
 use HarmonyIO\Cache\Provider\Redis;
 use HarmonyIO\HttpClient\Client\ArtaxClient;
 use HarmonyIO\PHPUnitExtension\TestCase;
+use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\VideoService\YouTube\VideoId;
+use function Amp\Promise\wait;
 
 class VideoIdTest extends TestCase
 {
@@ -21,19 +23,38 @@ class VideoIdTest extends TestCase
     }
 
     /**
-     * @dataProvider provideValidYouTubeIds
+     * @dataProvider provideNonExistingYouTubeIds
      */
-    public function testValidYouTubeIdsToReturnTrue(string $id): void
+    public function testValidateFailsOnNonExistingYouTubeId(string $id): void
     {
-        $this->assertTrue((new VideoId($this->httpClient))->validate($id));
+        /** @var Result $result */
+        $result = wait((new VideoId($this->httpClient))->validate($id));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('VideoService.YouTube.VideoId', $result->getFirstError()->getMessage());
     }
 
     /**
-     * @dataProvider provideNonExistingYouTubeIds
+     * @dataProvider provideValidYouTubeIds
      */
-    public function testNonExistingYouTubeIdsToReturnFalse(string $id): void
+    public function testValidateSucceedsOnValidYouTubeId(string $id): void
     {
-        $this->assertFalse((new VideoId($this->httpClient))->validate($id));
+        /** @var Result $result */
+        $result = wait((new VideoId($this->httpClient))->validate($id));
+
+        $this->assertTrue($result->isValid());
+        $this->assertNull($result->getFirstError());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function provideNonExistingYouTubeIds(): array
+    {
+        return [
+            ['bgUHF-N0XhM'],
+            ['xxxxxxxxxxx'],
+        ];
     }
 
     /**
@@ -48,17 +69,6 @@ class VideoIdTest extends TestCase
             ['TlqKFlU7YAs'],
             ['J3UyjlaBMcY'],
             ['-FIHqoTcZog'],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function provideNonExistingYouTubeIds(): array
-    {
-        return [
-            ['bgUHF-N0XhM'],
-            ['xxxxxxxxxxx'],
         ];
     }
 }
