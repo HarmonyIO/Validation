@@ -20,11 +20,6 @@ final class Minimum implements Rule
         $this->minimum = $minimum;
     }
 
-    public function getErrorMessage(): string
-    {
-        return 'numeric.minimum{minimum}';
-    }
-
     /**
      * {@inheritdoc}
      */
