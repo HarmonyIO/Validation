@@ -2,6 +2,7 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Network\Url;
 
+use Amp\Artax\DnsException;
 use Amp\Success;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\Request;
@@ -94,6 +95,24 @@ class OkResponseTest extends StringTestCase
                 ;
 
                 return new Success($response);
+            })
+        ;
+
+        /** @var Result $result */
+        $result = wait((new OkResponse($this->httpClient))->validate('https://pieterhordijk.com/foobar'));
+
+        $this->assertFalse($result->isValid());
+        $this->assertSame('Network.Url.OkResponse', $result->getFirstError()->getMessage());
+    }
+
+    public function testValidateFailsWhenRequestResultsADnsException(): void
+    {
+        $this->httpClient
+            ->method('request')
+            ->willReturnCallback(function (Request $request) {
+                $this->assertSame('https://pieterhordijk.com/foobar', $request->getArtaxRequest()->getUri());
+
+                throw new DnsException();
             })
         ;
 
