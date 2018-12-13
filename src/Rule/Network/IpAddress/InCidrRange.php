@@ -10,7 +10,6 @@ use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
 use Wikimedia\IPSet;
 use function Amp\call;
-use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
@@ -44,7 +43,7 @@ final class InCidrRange implements Rule
             $result = yield (new StringType())->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             if ($this->cidrRanges->match($value)) {

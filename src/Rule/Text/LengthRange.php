@@ -9,7 +9,6 @@ use HarmonyIO\Validation\Rule\Combinator\All;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
-use function HarmonyIO\Validation\bubbleUp;
 
 final class LengthRange implements Rule
 {
@@ -39,7 +38,7 @@ final class LengthRange implements Rule
             $result = yield (new StringType())->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             return (new All(

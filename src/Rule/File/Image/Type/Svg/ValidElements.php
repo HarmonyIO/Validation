@@ -12,7 +12,6 @@ use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Xml\SafeParser;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
-use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
@@ -36,7 +35,7 @@ final class ValidElements implements Rule
             $result = yield (new MimeType('image/svg'))->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             return parallel(function () use ($value) {

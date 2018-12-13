@@ -10,7 +10,6 @@ use HarmonyIO\Validation\Rule\File\Image\Type\Svg\ValidElements;
 use HarmonyIO\Validation\Rule\File\MimeType;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
-use function HarmonyIO\Validation\bubbleUp;
 
 final class Svg implements Rule
 {
@@ -24,7 +23,7 @@ final class Svg implements Rule
             $result = yield (new MimeType('image/svg'))->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             return (new All(new ValidElements(), new ValidAttributes()))->validate($value);

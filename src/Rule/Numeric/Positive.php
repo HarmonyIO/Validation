@@ -7,7 +7,6 @@ use HarmonyIO\Validation\Result\Error;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
-use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
@@ -23,7 +22,7 @@ final class Positive implements Rule
             $result = yield (new NumericType())->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             // phpcs:ignore SlevomatCodingStandard.ControlStructures.DisallowEqualOperators.DisallowedEqualOperator

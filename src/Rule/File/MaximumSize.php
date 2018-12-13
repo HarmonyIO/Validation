@@ -10,7 +10,6 @@ use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\File\size;
-use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
@@ -34,7 +33,7 @@ final class MaximumSize implements Rule
             $result = yield (new File())->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             //phpcs:ignore SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses

@@ -9,7 +9,6 @@ use HarmonyIO\Validation\Rule\File\MimeType;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
 use function Amp\ParallelFunctions\parallel;
-use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
@@ -25,7 +24,7 @@ final class Png implements Rule
             $result = yield (new MimeType('image/png'))->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             return parallel(static function () use ($value) {

@@ -9,7 +9,6 @@ use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Numeric\Range;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
-use function HarmonyIO\Validation\bubbleUp;
 
 class LatitudeRange implements Rule
 {
@@ -52,7 +51,7 @@ class LatitudeRange implements Rule
             $result = yield (new Latitude())->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             return (new Range($this->minimumLatitude, $this->maximumLatitude))->validate($value);

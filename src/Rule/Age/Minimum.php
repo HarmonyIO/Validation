@@ -9,7 +9,6 @@ use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\InstanceOfType;
 use function Amp\call;
-use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
@@ -34,7 +33,7 @@ final class Minimum implements Rule
             $result = yield (new InstanceOfType(\DateTimeInterface::class))->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             $targetDateTime = (new \DateTimeImmutable())

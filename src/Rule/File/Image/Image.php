@@ -14,7 +14,6 @@ use HarmonyIO\Validation\Rule\File\Image\Type\Svg;
 use HarmonyIO\Validation\Rule\FileSystem\File;
 use HarmonyIO\Validation\Rule\Rule;
 use function Amp\call;
-use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
@@ -38,7 +37,7 @@ final class Image implements Rule
             $result = yield (new File())->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             $imageTypes = [];

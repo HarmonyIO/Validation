@@ -8,7 +8,6 @@ use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Rule;
 use HarmonyIO\Validation\Rule\Type\StringType;
 use function Amp\call;
-use function HarmonyIO\Validation\bubbleUp;
 use function HarmonyIO\Validation\fail;
 
 final class Discover implements Rule
@@ -25,7 +24,7 @@ final class Discover implements Rule
             $result = yield (new StringType())->validate($value);
 
             if (!$result->isValid()) {
-                return bubbleUp($result);
+                return $result;
             }
 
             if (preg_match(self::PATTERN, $value) !== 1) {
