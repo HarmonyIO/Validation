@@ -2,6 +2,7 @@
 
 namespace HarmonyIO\ValidationTest\Unit\Rule\Set;
 
+use HarmonyIO\Validation\Exception\InvalidNumericalRange;
 use HarmonyIO\Validation\Result\Result;
 use HarmonyIO\Validation\Rule\Set\LengthRange;
 use HarmonyIO\ValidationTest\Unit\Rule\CountableTestCase;
@@ -15,6 +16,14 @@ class LengthRangeTest extends CountableTestCase
     public function __construct(?string $name = null, array $data = [], string $dataName = '')
     {
         parent::__construct($name, $data, $dataName, LengthRange::class, 3, 4);
+    }
+
+    public function testConstructorThrowsWhenMinimumValueIsGreaterThanMaximumValue(): void
+    {
+        $this->expectException(InvalidNumericalRange::class);
+        $this->expectExceptionMessage('The minimum (`51`) can not be greater than the maximum (`50`).');
+
+        new LengthRange(51, 50);
     }
 
     public function testValidateFailsWhenPassingAnArrayWithLessItemsThanTheMinimum(): void
