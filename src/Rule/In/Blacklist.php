@@ -7,7 +7,7 @@ use HarmonyIO\Validation\Rule\Rule;
 use function HarmonyIO\Validation\fail;
 use function HarmonyIO\Validation\succeed;
 
-class Blacklist implements Rule
+final class Blacklist implements Rule
 {
     /** @var mixed[] */
     private $list;
