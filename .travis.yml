@@ -14,15 +14,6 @@ matrix:
       php: '7.3'
       env: require=1 dependencies=highest
 
-    - name: '[CS] PHP 7.2 With Locked Dependencies'
-      php: '7.2'
-      env: cs=1
-    - name: '[CS] PHP 7.2 With Lowest Dependencies'
-      php: '7.2'
-      env: cs=1 dependencies=lowest
-    - name: '[CS] PHP 7.2 With Highest Dependencies'
-      php: '7.2'
-      env: cs=1 dependencies=highest
     - name: '[CS] PHP 7.3 With Locked Dependencies'
       php: '7.3'
       env: cs=1
@@ -42,15 +33,6 @@ matrix:
       php: nightly
       env: cs=1 dependencies=highest
 
-    - name: '[UNIT] PHP 7.2 With Locked Dependencies'
-      php: '7.2'
-      env: unit=1
-    - name: '[UNIT] PHP 7.2 With Lowest Dependencies'
-      php: '7.2'
-      env: dependencies=lowest unit=1
-    - name: '[UNIT] PHP 7.2 With Highest Dependencies'
-      php: '7.2'
-      env: dependencies=highest unit=1
     - name: '[UNIT] PHP 7.3 With Locked Dependencies'
       php: '7.3'
       env: unit=1
@@ -70,15 +52,6 @@ matrix:
       php: nightly
       env: dependencies=lowest unit=1
 
-    - name: '[INTEGRATION] PHP 7.2 With Locked Dependencies'
-      php: '7.2'
-      env: integration=1
-    - name: '[INTEGRATION] PHP 7.2 With Lowest Dependencies'
-      php: '7.2'
-      env: dependencies=lowest integration=1
-    - name: '[INTEGRATION] PHP 7.2 With Highest Dependencies'
-      php: '7.2'
-      env: dependencies=highest integration=1
     - name: '[INTEGRATION] PHP 7.3 With Locked Dependencies'
       php: '7.3'
       env: integration=1
