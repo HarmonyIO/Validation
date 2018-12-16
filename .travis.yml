@@ -113,9 +113,9 @@ install:
 - chmod +x php-coveralls.phar
 
 before_script:
-  - if [ -z "$dependencies" ]; then travis_retry composer install --no-scripts; fi;
-  - if [ "$dependencies" = "lowest" ]; then travis_retry composer update --no-scripts --prefer-lowest -n; fi;
-  - if [ "$dependencies" = "highest" ]; then travis_retry composer update --no-scripts -n; fi;
+  - if [ -z "$dependencies" ]; then travis_retry composer install -n; fi;
+  - if [ "$dependencies" = "lowest" ]; then travis_retry composer update --prefer-lowest -n; fi;
+  - if [ "$dependencies" = "highest" ]; then travis_retry composer update -n; fi;
 
 script:
   - if [ "$unit" = 1 ]; then phpdbg -qrr vendor/bin/phpunit --testsuite HarmonIOValidationUnitTestSuite --coverage-text --coverage-clover build/logs/clover.xml; fi;
