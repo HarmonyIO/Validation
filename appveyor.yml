@@ -62,9 +62,9 @@ install:
 
   # Install dependencies
   - ps: cd $Env:project_directory
-  - IF %dependencies%==current composer install --no-progress
-  - IF %dependencies%==lowest composer update --prefer-lowest --no-progress
-  - IF %dependencies%==highest composer update --prefer-dist --no-progress
+  - IF %dependencies%==current composer install --no-progress -n
+  - IF %dependencies%==lowest composer update --prefer-lowest --no-progress -n
+  - IF %dependencies%==highest composer update --prefer-dist --no-progress -n
 
 ## Run the actual test
 test_script:
