@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [[96ddf46](https://github.com/HarmonyIO/Validation/commit/96ddf46ee6bccef0e7f0e47415ae0bc8bb48c373)] Changelog
 - [[8d90eb1](https://github.com/HarmonyIO/Validation/commit/8d90eb1081efd53496d71e2734f3e9ab0e4a9f52)] Results and errors are objects now
-
 - [[c0c622d](https://github.com/HarmonyIO/Validation/commit/c0c622d70c9fa26202c9248b3b0d4bf57b1558c4)] Numerical range validation rule
 - [[f41be80](https://github.com/HarmonyIO/Validation/commit/f41be80862f1b7e69adb429f1cfa38028339b1c4)] Geolocation validation rule
 - [[db09112](https://github.com/HarmonyIO/Validation/commit/db09112bf037b12c83167090e42fe525568862d7)] Text range validation rule
