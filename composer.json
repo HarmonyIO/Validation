@@ -33,7 +33,7 @@
         "harmonyio/http-client": "dev-master",
         "myclabs/php-enum": "^1.6",
         "react/promise": "^2.7",
-        "wikimedia/ip-set": "^1.2"
+        "wikimedia/ip-set": "^1.2 || ^2.0"
     },
     "require-dev": {
         "harmonyio/php-codesniffer-ruleset": "dev-master",
