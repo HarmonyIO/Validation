@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.4.0] - 2018-12-18
+
+### Added
+
 - [[96ddf46](https://github.com/HarmonyIO/Validation/commit/96ddf46ee6bccef0e7f0e47415ae0bc8bb48c373)] Changelog
 - [[8d90eb1](https://github.com/HarmonyIO/Validation/commit/8d90eb1081efd53496d71e2734f3e9ab0e4a9f52)] Results and errors are objects now
 - [[c0c622d](https://github.com/HarmonyIO/Validation/commit/c0c622d70c9fa26202c9248b3b0d4bf57b1558c4)] Numerical range validation rule
@@ -21,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[7a355ac](https://github.com/HarmonyIO/Validation/commit/7a355ac642ad5136f9edf894a99debe7345cda62)] URL validation rules
 - [[ad03f8d](https://github.com/HarmonyIO/Validation/commit/ad03f8d3d6ad5753bf51e696a84c43e71f820f20)] ISBN validation rules
 - [[8f19a34](https://github.com/HarmonyIO/Validation/commit/8f19a34ae253e987b4e8e9e413d2099e35cb5ede)] Set and In validation rules
+- [[5453522](https://github.com/HarmonyIO/Validation/commit/54535221576fe11d7715fb3244e8698b70a5e40b)] Regex validation rule
 
 ### Changed
 
@@ -28,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[3fae872](https://github.com/HarmonyIO/Validation/commit/3fae872109fa6d40306feadcd9a043a3a1512add)] Documented promise return values using generics syntax
 - [[383c32f](https://github.com/HarmonyIO/Validation/commit/383c32fa1fe21bb1cfc5a96a97a729991e9235c4)] Added missing final class markers
 - [[82dc9a0](https://github.com/HarmonyIO/Validation/commit/82dc9a007ca5d6a7fae4698dc9f941491a7eed48)] Updated amp to v2.1.1
+- [[c8fa79d](https://github.com/HarmonyIO/Validation/commit/c8fa79dd22e963c29505467324e4e5d89148cbee)] Updated wikimedia/ip-set to v2.0.0
 
 ### Deprecated
 
