@@ -9,6 +9,7 @@ final class InvalidNumericalRange extends Exception
     /**
      * @param mixed $minimum
      * @param mixed $maximum
+     * @throws InvalidNumericValue
      */
     public function __construct($minimum, $maximum)
     {
