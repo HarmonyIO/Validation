@@ -225,3 +225,7 @@ $result = wait((new NumericType())->validate(true));
 
 var_dump($result);
 ```
+
+## Rules
+
+An overview of all implemented rules (including usage and version information) is documented in [the wiki](https://github.com/HarmonyIO/Validation/wiki/Rules).

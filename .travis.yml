@@ -105,12 +105,12 @@ services:
   - redis-server
 
 before_install:
-- phpenv config-rm xdebug.ini || echo "No xdebug config."
-- composer self-update
+  - phpenv config-rm xdebug.ini || echo "No xdebug config."
+  - composer self-update
 
 install:
-- wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.0.0/php-coveralls.phar
-- chmod +x php-coveralls.phar
+  - wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.0.0/php-coveralls.phar
+  - chmod +x php-coveralls.phar
 
 before_script:
   - if [ -z "$dependencies" ]; then travis_retry composer install -n; fi;

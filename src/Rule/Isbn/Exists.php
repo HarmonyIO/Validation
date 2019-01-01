@@ -3,6 +3,7 @@
 namespace HarmonyIO\Validation\Rule\Isbn;
 
 use Amp\Promise;
+use HarmonyIO\Cache\Ttl;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Response;
@@ -47,7 +48,7 @@ class Exists implements Rule
 
             /** @var Response $response */
             $response = yield $this->httpClient->request(
-                new CachingRequest(self::class, 60*60*24*7, $url, 'GET')
+                new CachingRequest(self::class, new Ttl(Ttl::ONE_WEEK), $url, 'GET')
             );
 
             if ($response->getNumericalStatusCode() !== 200) {
