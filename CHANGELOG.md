@@ -9,15 +9,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+*None*
+
 ### Changed
+
+*None*
 
 ### Deprecated
 
+*None*
+
 ### Removed
+
+*None*
 
 ### Fixed
 
+*None*
+
 ### Security
+
+*None*
+
+## [1.0.0-rc1] - 2019-01-01
+
+### Added
+
+- [[f754334](https://github.com/HarmonyIO/Validation/commit/f754334dc88a8d539c0a5ec4ac03e8a6118704a8)] Added .gitattributes
+
+### Changed
+
+- [[0edc948](https://github.com/HarmonyIO/Validation/commit/0edc948181248a5136921d56b35736d9e66284b6)] Updated PHP CodeSniffer
+- [[7b7a017](https://github.com/HarmonyIO/Validation/commit/7b7a017d1fed573cd31e48085b1481e662584feb)] Added phpcs custom config to gitignore 
+- [[4b50f08](https://github.com/HarmonyIO/Validation/commit/4b50f0822ac3173abc6c8f096273811356c403f6)] Cache HIBP results 1 hour instead of 1 day
+- [[2840fa8](https://github.com/HarmonyIO/Validation/commit/2840fa8346b77fcc4ced830cccf02aed06ff2dc3)] Refactored http client calls to use Ttl objects for caching
+
+### Deprecated
+
+*None*
+
+### Removed
+
+*None*
+
+### Fixed
+
+*None*
+
+### Security
+
+*None*
 
 ## [0.4.0] - 2018-12-18
 
