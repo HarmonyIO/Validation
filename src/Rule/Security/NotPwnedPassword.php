@@ -71,7 +71,7 @@ final class NotPwnedPassword implements Rule
 
     private function buildRequest(string $password): Request
     {
-        return (new CachingRequest(self::class, 60*60*24, $this->buildUrl($password)))
+        return (new CachingRequest(self::class, 60*60, $this->buildUrl($password)))
             ->addHeader('Accept', self::REQUEST_ACCEPT_HEADER)
         ;
     }
