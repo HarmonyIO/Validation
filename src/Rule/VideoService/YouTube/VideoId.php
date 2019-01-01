@@ -3,6 +3,7 @@
 namespace HarmonyIO\Validation\Rule\VideoService\YouTube;
 
 use Amp\Promise;
+use HarmonyIO\Cache\Ttl;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Response;
@@ -43,7 +44,7 @@ final class VideoId implements Rule
             $url = sprintf(self::BASE_URL, rawurlencode(self::BASE_VIDEO_URL), rawurlencode($value));
 
             /** @var Response $response */
-            $response = yield $this->httpClient->request(new CachingRequest(self::class, 3600, $url, 'GET'));
+            $response = yield $this->httpClient->request(new CachingRequest(self::class, new Ttl(Ttl::ONE_HOUR), $url, 'GET'));
 
             if ($response->getNumericalStatusCode() !== 200) {
                 return fail('VideoService.YouTube.VideoId');

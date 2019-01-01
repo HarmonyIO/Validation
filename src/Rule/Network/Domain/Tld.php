@@ -3,6 +3,7 @@
 namespace HarmonyIO\Validation\Rule\Network\Domain;
 
 use Amp\Promise;
+use HarmonyIO\Cache\Ttl;
 use HarmonyIO\HttpClient\Client\Client;
 use HarmonyIO\HttpClient\Message\CachingRequest;
 use HarmonyIO\HttpClient\Message\Request;
@@ -64,7 +65,7 @@ final class Tld implements Rule
 
     private function buildRequest(): Request
     {
-        return new CachingRequest(self::class, 60*60*24*7, self::SOURCE);
+        return new CachingRequest(self::class, new Ttl(Ttl::ONE_WEEK), self::SOURCE);
     }
 
     private function isValidTld(string $result, string $tld): bool
