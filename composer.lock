@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e3d29523d1c63230f80526356b7823f7",
+    "content-hash": "91da14cf761227a0a4d4a0cb1e14d20e",
     "packages": [
         {
             "name": "amphp/amp",
@@ -3454,7 +3454,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "harmonyio/cache": 5
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
