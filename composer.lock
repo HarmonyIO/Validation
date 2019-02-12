@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91da14cf761227a0a4d4a0cb1e14d20e",
+    "content-hash": "060314e902d525fd890e799f5dcb3777",
     "packages": [
         {
             "name": "amphp/amp",
@@ -249,33 +249,31 @@
         },
         {
             "name": "amphp/dns",
-            "version": "v0.9.13",
+            "version": "v0.9.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/dns.git",
-                "reference": "4647e5f58263ffdeff7da5c269f517cb48cff84f"
+                "reference": "1ccd6337f72107ba422ae72a5812687739d214c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/dns/zipball/4647e5f58263ffdeff7da5c269f517cb48cff84f",
-                "reference": "4647e5f58263ffdeff7da5c269f517cb48cff84f",
+                "url": "https://api.github.com/repos/amphp/dns/zipball/1ccd6337f72107ba422ae72a5812687739d214c8",
+                "reference": "1ccd6337f72107ba422ae72a5812687739d214c8",
                 "shasum": ""
             },
             "require": {
                 "amphp/amp": "^2",
                 "amphp/byte-stream": "^1.1",
                 "amphp/cache": "^1.2",
-                "amphp/file": "^0.2 || ^0.3",
                 "amphp/parser": "^1",
-                "amphp/uri": "^0.1",
                 "amphp/windows-registry": "^0.3",
                 "daverandom/libdns": "^2.0.1",
                 "ext-filter": "*",
                 "php": ">=7.0"
             },
             "require-dev": {
+                "amphp/php-cs-fixer-config": "dev-master",
                 "amphp/phpunit-util": "^1",
-                "friendsofphp/php-cs-fixer": "^2.3",
                 "phpunit/phpunit": "^6"
             },
             "type": "library",
@@ -323,7 +321,7 @@
                 "dns",
                 "resolve"
             ],
-            "time": "2018-05-01T18:08:54+00:00"
+            "time": "2019-01-25T04:12:31+00:00"
         },
         {
             "name": "amphp/file",
@@ -3454,9 +3452,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "harmonyio/cache": 5
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
