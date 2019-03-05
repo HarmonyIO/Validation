@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91da14cf761227a0a4d4a0cb1e14d20e",
+    "content-hash": "060314e902d525fd890e799f5dcb3777",
     "packages": [
         {
             "name": "amphp/amp",
@@ -554,16 +554,16 @@
         },
         {
             "name": "amphp/process",
-            "version": "v1.0.2",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/process.git",
-                "reference": "90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c"
+                "reference": "355b1e561b01c16ab3d78fada1ad47ccc96df70e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/process/zipball/90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c",
-                "reference": "90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c",
+                "url": "https://api.github.com/repos/amphp/process/zipball/355b1e561b01c16ab3d78fada1ad47ccc96df70e",
+                "reference": "355b1e561b01c16ab3d78fada1ad47ccc96df70e",
                 "shasum": ""
             },
             "require": {
@@ -582,7 +582,7 @@
                     "Amp\\Process\\": "lib"
                 },
                 "files": [
-                    "lib/constants.php"
+                    "lib/functions.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -605,7 +605,7 @@
             ],
             "description": "Asynchronous process manager.",
             "homepage": "https://github.com/amphp/process",
-            "time": "2018-11-09T00:02:00+00:00"
+            "time": "2019-02-26T16:33:03+00:00"
         },
         {
             "name": "amphp/redis",
@@ -3454,9 +3454,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "harmonyio/cache": 5
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
