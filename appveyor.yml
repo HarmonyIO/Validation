@@ -30,6 +30,9 @@ init:
   - SET PHP=1
   - SET ANSICON=121x90 (121x90)
 install:
+  # Setup WSUS
+  - choco install chocolatey-windowsupdate.extension
+
   # Install Redis
   - nuget install redis-64 -excludeversion
   - redis-64\tools\redis-server.exe --service-install
